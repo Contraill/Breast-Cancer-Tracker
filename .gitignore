@@ -1,4 +1,4 @@
-# Logs
+# Log dosyaları
 logs
 *.log
 npm-debug.log*
@@ -7,17 +7,23 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Node modülleri
 node_modules
+
+# MacOS dosyaları
 .DS_Store
+
+# Build ve test çıktı klasörleri
 dist
 dist-ssr
 coverage
 *.local
 
+# Cypress test çıktı klasörleri
 /cypress/videos/
 /cypress/screenshots/
 
-# Editor directories and files
+# IDE/editor klasörleri ve dosyaları
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -27,4 +33,8 @@ coverage
 *.sln
 *.sw?
 
+# TypeScript build info
 *.tsbuildinfo
+
+# Firebase config dosyası (gizli)
+src/firebase.js
