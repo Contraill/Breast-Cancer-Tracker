@@ -1,67 +1,97 @@
 <template>
+  <br><br><br>
   <div class="auth-container">
     <h1>Welcome</h1>
-    <div class="button-group">
-      <Button
-        label="Login"
-        @click="formType = 'login'"
-        :class="{ active: formType === 'login' }"
-        class="toggle-btn"
-      />
-      <Button
-        label="Register"
-        @click="formType = 'register'"
-        :class="{ active: formType === 'register' }"
-        class="toggle-btn"
-      />
-    </div>
 
-    <form @submit.prevent="handleSubmit" class="auth-form">
-      <label>Email</label>
-      <InputText v-model="email" type="email" required class="input-field" />
+    <TabView v-model:activeIndex="activeIndex">
+      <!-- Login Tab -->
+      <TabPanel header="Login">
+        <form @submit.prevent="handleLogin" class="auth-form">
+          <label>Email</label>
+          <InputText v-model="email" type="email" required class="input-field" />
 
-      <label>Password</label>
-      <Password v-model="password" toggle-mask required class="input-field" />
+          <label>Password</label>
+          <!-- feedback=false ekledik -->
+          <Password v-model="password" toggle-mask required class="input-field" :feedback="false" />
 
-      <div v-if="formType === 'register'">
-        <label>Confirm Password</label>
-        <Password v-model="confirmPassword" toggle-mask required class="input-field" />
-      </div>
+          <Button type="submit" label="Login" class="submit-btn" />
+        </form>
+      </TabPanel>
 
-      <Button type="submit" :label="formType === 'login' ? 'Login' : 'Register'" class="submit-btn" />
-    </form>
+      <!-- Register Tab -->
+      <TabPanel header="Register">
+        <form @submit.prevent="handleRegister" class="auth-form">
+          <label>Email</label>
+          <InputText v-model="email" type="email" required class="input-field" />
+
+          <label>Password</label>
+          <!-- feedback default olarak true olduğu için eklemeye gerek yok -->
+          <Password v-model="password" toggle-mask required class="input-field" />
+
+          <label>Confirm Password</label>
+          <Password v-model="confirmPassword" toggle-mask required class="input-field" />
+
+          <div class="consent-box">
+            <Checkbox v-model="consentGiven" inputId="consent" :binary="true" />
+            <label for="consent" class="consent-label">
+              I agree to participate in the Breast Cancer Screening Programme.
+              I consent to the storage of my medical data and allow communication from the screening center.
+            </label>
+          </div>
+
+          <Button type="submit" label="Register" class="submit-btn" />
+        </form>
+      </TabPanel>
+    </TabView>
   </div>
 </template>
+
 
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'
+import app from '../firebase'
+
+// PrimeVue Components
+import TabView from 'primevue/tabview'
+import TabPanel from 'primevue/tabpanel'
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
+import Checkbox from 'primevue/checkbox'
 
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'
-import app from '../firebase'  // Firebase app import edildi
+const activeIndex = ref(0) // 0: Login, 1: Register
 
-const formType = ref('login')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
+const consentGiven = ref(false)
+
+const auth = getAuth(app)
 const router = useRouter()
 
-const auth = getAuth(app)  // Burada app parametresi ile çağrıldı
-
-const handleSubmit = async () => {
+const handleLogin = async () => {
   try {
-    if (formType.value === 'login') {
-      await signInWithEmailAndPassword(auth, email.value, password.value)
-    } else {
-      if (password.value !== confirmPassword.value) {
-        alert('Passwords do not match!')
-        return
-      }
-      await createUserWithEmailAndPassword(auth, email.value, password.value)
+    await signInWithEmailAndPassword(auth, email.value, password.value)
+    router.push('/home')
+  } catch (error) {
+    alert(error.message)
+  }
+}
+
+const handleRegister = async () => {
+  try {
+    if (password.value !== confirmPassword.value) {
+      alert('Passwords do not match!')
+      return
     }
+    if (!consentGiven.value) {
+      alert('You must agree to the terms before registering.')
+      return
+    }
+
+    await createUserWithEmailAndPassword(auth, email.value, password.value)
     router.push('/home')
   } catch (error) {
     alert(error.message)

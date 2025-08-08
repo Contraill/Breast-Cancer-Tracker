@@ -1,69 +1,132 @@
 <template>
-  <div class="home-container">
+  <div class="home-form-wrapper">
+    <br>
     <h1 class="title">Health Tracker</h1>
-    <div class="tabs">
-      <button
-        v-for="tab in tabs"
-        :key="tab"
-        :class="{ active: activeTab === tab }"
-        @click="activeTab = tab"
-      >
-        {{ tab }}
-      </button>
-    </div>
 
-    <form @submit.prevent="handleSubmit">
-      <!-- USER INFO -->
-      <div v-if="activeTab === 'User Information'" class="form-grid">
-        <label>First Name*<input v-model="form.firstName" required /></label>
-        <label>Middle Name<input v-model="form.middleName" /></label>
-        <label>Surname*<input v-model="form.surname" required /></label>
-        <label>Maiden Name<input v-model="form.maidenName" /></label>
-        <label>Date of Birth*<input v-model="form.dob" type="date" required /></label>
-        <label>Sex*
-          <select v-model="form.sex" required>
-            <option value="" disabled>Select</option>
-            <option>Female</option>
-            <option>Male</option>
-            <option>Other</option>
-          </select>
-        </label>
-      </div>
+    <div class="home-container">
+      <TabView v-model:activeIndex="activeIndex">
+        <!-- USER INFO -->
+        <TabPanel header="User Information">
+          <div class="form-grid">
+            <label>First Name*<input v-model="form.firstName" required /></label>
+            <label>Middle Name<input v-model="form.middleName" /></label>
+            <label>Surname*<input v-model="form.surname" required /></label>
+            <label>Maiden Name<input v-model="form.maidenName" /></label>
+            <label>Date of Birth*<input v-model="form.dob" type="date" required /></label>
+            <label>Sex*
+              <select v-model="form.sex" required>
+                <option value="" disabled>Select</option>
+                <option>Female</option>
+                <option>Male</option>
+                <option>Other</option>
+              </select>
+            </label>
+          </div>
+        </TabPanel>
 
-      <!-- ADDRESS INFO -->
-      <div v-if="activeTab === 'Address Information'" class="form-grid">
-        <label>Address Line 1*<input v-model="form.address1" required /></label>
-        <label>Address Line 2<input v-model="form.address2" /></label>
-        <label>Address Line 3<input v-model="form.address3" /></label>
-        <label>Address Line 4<input v-model="form.address4" /></label>
-        <label>City*<input v-model="form.city" required /></label>
-        <label>Country*<input v-model="form.country" required /></label>
-      </div>
+        <!-- ADDRESS INFO -->
+        <TabPanel header="Address Information">
+          <div class="form-grid">
+            <label>Address Line 1*<input v-model="form.address1" required /></label>
+            <label>Address Line 2<input v-model="form.address2" /></label>
+            <label>Address Line 3<input v-model="form.address3" /></label>
+            <label>Address Line 4<input v-model="form.address4" /></label>
+            <label>City*<input v-model="form.city" required /></label>
+            <label>Country*<input v-model="form.country" required /></label>
+          </div>
+        </TabPanel>
 
-      <!-- HEALTH INFO -->
-      <div v-if="activeTab === 'Health Information'" class="form-grid">
-        <label>Height (cm)<input v-model="form.height" type="number" /></label>
-        <label>Weight (kg)<input v-model="form.weight" type="number" /></label>
-        <label>Medical Conditions<textarea v-model="form.conditions" /></label>
-      </div>
+        <!-- HEALTH INFO -->
+        <TabPanel header="Health Information">
+          <div class="health-info-form">
+
+            <h3>HRT & Menopause</h3>
+            <!-- HRT Use (Present) -->
+            <div class="form-group horizontal-group">
+              <label class="main-label">HRT Use (Present)*</label>
+
+              <div class="radio-group">
+                <input type="radio" id="hrtPresentYes" name="hrtPresent" value="yes" v-model="form.hrtPresent" />
+                <label for="hrtPresentYes">Yes</label>
+
+                <input type="radio" id="hrtPresentNo" name="hrtPresent" value="no" v-model="form.hrtPresent" />
+                <label for="hrtPresentNo">No</label>
+              </div>
+
+              <div class="extra-field" v-show="form.hrtPresent === 'yes'">
+                <label class="inline-label">Length of current HRT use*</label>
+                <select v-model="form.hrtPresentLength" required>
+                  <option value="" disabled>Select</option>
+                  <option>Using HRT less than 1 year</option>
+                  <option>Using HRT greater than 5 years</option>
+                  <option>Using HRT 5 years</option>
+                  <option>Length of HRT Use Unknown</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- HRT Use (Past) -->
+            <div class="form-group horizontal-group">
+              <label class="main-label">HRT Use (Past)*</label>
+
+              <div class="radio-group">
+                <input type="radio" id="hrtPastYes" name="hrtPast" value="yes" v-model="form.hrtPast" />
+                <label for="hrtPastYes">Yes</label>
+
+                <input type="radio" id="hrtPastNo" name="hrtPast" value="no" v-model="form.hrtPast" />
+                <label for="hrtPastNo">No</label>
+              </div>
+
+              <div class="extra-field" v-show="form.hrtPast === 'yes'">
+                <label class="inline-label">No of Years on HRT*</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  v-model.number="form.hrtPastYears"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Menopause Status -->
+            <div class="form-group horizontal-group">
+              <label class="main-label">Menopause Status*</label>
+              <select v-model="form.menopauseStatus" required>
+                <option value="" selected disabled>Select</option>
+                <option>Peri-Menopause</option>
+                <option>Post-Menopause</option>
+                <option>Pre-Menopause</option>
+                <option>Unknown</option>
+              </select>
+            </div>
+          </div>
+        </TabPanel>
+      </TabView>
 
       <div class="submit-button">
         <button class="submit-btn" @click="saveForm">Save</button>
       </div>
-
-    </form>
+    </div>
   </div>
+  <br><br>
 </template>
 
 <script>
 import { db, auth } from "../firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 
+import TabView from 'primevue/tabview'
+import TabPanel from 'primevue/tabpanel'
+
 export default {
+  components: {
+    TabView,
+    TabPanel
+  },
   data() {
     return {
-      activeTab: 'User Information',
-      tabs: ['User Information', 'Address Information', 'Health Information'],
+      activeIndex: 0,
       form: {
         firstName: "",
         middleName: "",
@@ -79,7 +142,12 @@ export default {
         country: "",
         height: "",
         weight: "",
-        conditions: ""
+        conditions: "",
+        hrtPresent: "",
+        hrtPresentLength: "",
+        hrtPast: "",
+        hrtPastYears: null,
+        menopauseStatus: ""
       }
     };
   },
@@ -87,7 +155,7 @@ export default {
     async saveForm() {
       const user = auth.currentUser;
       if (!user) {
-        alert("Kullanıcı giriş yapmamış.");
+        alert("User is not logged in.");
         return;
       }
 
@@ -97,10 +165,10 @@ export default {
           form: this.form,
           email: user.email
         });
-        alert("Veriler başarıyla kaydedildi!");
+        alert("Data saved successfully!");
       } catch (error) {
-        console.error("Veri kaydedilirken hata:", error);
-        alert("Bir hata oluştu.");
+        console.error("Error saving data:", error);
+        alert("An error occurred.");
       }
     },
     async loadForm() {
@@ -113,24 +181,17 @@ export default {
 
         if (docSnap.exists()) {
           const data = docSnap.data();
-          // Eğer "form" alanı varsa, formu onunla doldur
           if (data.form) {
             this.form = { ...this.form, ...data.form };
           }
         }
       } catch (error) {
-        console.error("Veri çekilirken hata:", error);
+        console.error("Error loading data:", error);
       }
     }
   },
   async mounted() {
-    // Sayfa yüklendiğinde form verisini çek
     await this.loadForm();
   }
 };
 </script>
-
-
-
-
-<style src="../style/main.css"></style>
