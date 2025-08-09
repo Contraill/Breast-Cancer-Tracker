@@ -7,9 +7,15 @@ body {
   padding: 0;
 }
 
-/* ---------- INPUT GLOBAL STYLES ---------- */
+/* ---------- FORM ELEMENTS BASE STYLES ---------- */
 input,
-textarea {
+textarea,
+select,
+.auth-form input[type="text"],
+.auth-form input[type="email"],
+.auth-form input[type="password"],
+.auth-form .p-inputtext,
+.auth-form .p-password input {
   margin-top: 0.4rem;
   padding: 0.5rem 0.75rem;
   font-size: 1rem;
@@ -17,43 +23,57 @@ textarea {
   border: none;
   border-left: 2px solid #4a90e2;
   background-color: #f9fbff;
-  width: 100%;
   box-sizing: border-box;
-  transition: border-color 0.3s ease, background-color 0.3s ease;
+  transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+  width: auto;
+  min-width: 280px;
+  height: 35px;
 }
 
 select {
-  margin-top: 0.4rem;
-  padding: 0.5rem 2rem 0.5rem 0.75rem; /* sağ tarafa ok için ekstra boşluk */
-  font-size: 1rem;
-  border-radius: 8px;
-  border: none;
-  border-left: 2px solid #4a90e2;
-  background-color: #f9fbff;
-  width: 100%;
-  box-sizing: border-box;
-  transition: border-color 0.3s ease, background-color 0.3s ease;
+  padding-right: 2rem;
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg fill='gray' height='10' viewBox='0 0 24 24' width='10' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='-2.4 -2.4 28.8 28.8' fill='none' xmlns='http://www.w3.org/2000/svg' stroke='%236c757d' stroke-width='0.2'><path fill-rule='evenodd' clip-rule='evenodd' d='M12.7071 14.7071C12.3166 15.0976 11.6834 15.0976 11.2929 14.7071L6.29289 9.70711C5.90237 9.31658 5.90237 8.68342 6.29289 8.29289C6.68342 7.90237 7.31658 7.90237 7.70711 8.29289L12 12.5858L16.2929 8.29289C16.6834 7.90237 17.3166 7.90237 17.7071 8.29289C18.0976 8.68342 18.0976 9.31658 17.7071 9.70711L12.7071 14.7071Z' fill='%236c757d'/></svg>");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
-  background-size: 10px;
+  background-size: 29px;
+  width: auto;
+  height: 35px;
 }
 
+textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+/* ---------- FOCUS & HOVER STATES ---------- */
 input:focus,
 select:focus,
 textarea:focus,
-.toggle-btn:focus {
+input:hover,
+select:hover,
+textarea:hover,
+.toggle-btn:focus,
+.auth-form input[type="text"]:focus,
+.auth-form input[type="email"]:focus,
+.auth-form input[type="password"]:focus,
+.auth-form .p-inputtext:focus,
+.auth-form .p-password input:focus,
+.p-multiselect:hover,
+.p-multiselect.p-focus {
   outline: none;
   box-shadow: 0 2px 6px rgba(74, 144, 226, 0.5);
-  transition: box-shadow 0.3s ease;
+  transition: box-shadow 0.3s ease !important;
 }
 
+/* ---------- VALIDATION STATES ---------- */
 input[required]:invalid,
 select[required]:invalid,
-textarea[required]:invalid {
+textarea[required]:invalid,
+.auth-form .p-inputtext:invalid,
+.auth-form .p-password input:invalid {
   border-left-color: red !important;
 }
 
@@ -62,15 +82,58 @@ select[required]:valid,
 textarea[required]:valid,
 input:not([required]),
 select:not([required]),
-textarea:not([required]) {
+textarea:not([required]),
+.auth-form .p-inputtext:valid,
+.auth-form .p-password input:valid {
   border-left-color: #4a90e2;
 }
 
-textarea {
-  resize: vertical;
-  min-height: 70px;
+/* ---------- MULTISELECT (PrimeVue) ---------- */
+.p-multiselect {
+  border-radius: 8px !important;
+  border: none !important;
+  border-left: 2px solid #4a90e2 !important;
+  background-color: #f9fbff !important;
+  transition: border-color 0.3s ease, background-color 0.3s ease !important;
+  box-sizing: border-box;
+  width: auto !important;
+  background-image: url("https://www.svgrepo.com/show/509905/dropdown-arrow.svg");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 10px;
 }
 
+.p-multiselect-label {
+  color: #333;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.p-multiselect-token {
+  background-color: #e6f0ff;
+  border-radius: 8px;
+  color: #4a90e2;
+  font-weight: 600;
+  padding: 0 0.5rem;
+  margin-right: 0.25rem;
+  line-height: 1.8;
+  height: 27px;
+}
+
+.p-multiselect.invalid-border {
+  border-left-color: red !important;
+}
+
+.p-tabview-nav-link:focus {
+  box-shadow: none !important;
+}
+.p-multiselect.p-focus,
+.p-multiselect.p-inputwrapper-focus {
+  box-shadow: none !important;
+}
+
+/* ---------- MULTI-CHECKBOX DROPDOWN ---------- */
 .multi-checkbox-dropdown {
   position: relative;
   width: 250px;
@@ -145,9 +208,7 @@ textarea {
   margin-right: 0.5rem;
 }
 
-
-
-/* ---------- AUTH STYLES ---------- */
+/* ---------- AUTH CONTAINER ---------- */
 .auth-container {
   align-self: center;
   max-width: 420px;
@@ -185,44 +246,6 @@ textarea {
   line-height: 1.2rem;
 }
 
-/* Input Alanları */
-.auth-form input[type="text"],
-.auth-form input[type="email"],
-.auth-form input[type="password"],
-.auth-form .p-inputtext,
-.auth-form .p-password input {
-  border-radius: 8px;
-  border: none;
-  border-left: 2px solid #4a90e2;
-  background-color: #f9fbff;
-  padding: 0.5rem 0.75rem;
-  width: 100%;
-  box-sizing: border-box;
-  transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* Focus Animasyonu - tüm alanlar için */
-.auth-form input[type="text"]:focus,
-.auth-form input[type="email"]:focus,
-.auth-form input[type="password"]:focus,
-.auth-form .p-inputtext:focus,
-.auth-form .p-password input:focus {
-  outline: none;
-  box-shadow: 0 2px 6px rgba(74, 144, 226, 0.5);
-}
-
-/* Zorunlu alan renkleri */
-.auth-form .p-inputtext:invalid,
-.auth-form .p-password input:invalid {
-  border-left-color: red;
-}
-
-.auth-form .p-inputtext:valid,
-.auth-form .p-password input:valid {
-  border-left-color: #4a90e2;
-}
-
-
 /* ---------- HOME FORM CONTAINER ---------- */
 .home-container {
   align-self: center;
@@ -257,7 +280,7 @@ textarea {
   cursor: pointer;
   transition: background-color 0.3s ease;
   font-weight: 500;
-  border-bottom: 4px solid transparent;
+  border-bottom: 10px solid transparent;
   outline: none;
 }
 
@@ -270,6 +293,10 @@ textarea {
   border-bottom-color: #4a90e2;
   font-weight: 700;
   color: #2a4d8f;
+}
+
+.p-tabview-nav-link:focus {
+  box-shadow: none !important;
 }
 
 /* ---------- FORM GRID ---------- */
@@ -328,11 +355,12 @@ label {
 .health-info-form .radio-group {
   display: flex;
   gap: 1rem;
+  height: 38px;
 }
 
 .health-info-form .radio-group label {
   cursor: pointer;
-  padding: 8px 18px;
+  padding: 5px 18px;
   border: 2px solid #ccc;
   border-radius: 8px;
   transition: all 0.3s ease;
@@ -381,7 +409,7 @@ label {
   width: 250px;
 }
 
-/* ---------- CLIENT GENETICS INLINE GROUP ---------- */
+/* ---------- CLIENT GENETICS ---------- */
 .health-info-form .horizontal-group.client-genetics {
   display: flex;
   align-items: center;
@@ -430,4 +458,64 @@ label {
   border-color: #4a90e2;
   color: #4a90e2;
   background-color: #e6f0ff;
+}
+
+.custom-dropdown .p-dropdown {
+  margin-top: 0.4rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  border-left: 2px solid #4a90e2;
+  background-color: #f9fbff;
+  box-sizing: border-box;
+  width: 290px;
+  height: 35px;
+  transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ---------- Drop Down ---------- */
+.p-dropdown,
+.p-multiselect {
+  margin-top: 0.4rem !important;
+  border-radius: 8px !important;
+  border: none !important;
+  border-left: 2px solid #4a90e2 !important;
+  background-color: #f9fbff !important;
+  box-sizing: border-box !important;
+  transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease !important;
+  min-width: 280px !important;
+  height: 35px !important;
+}
+
+.p-dropdown-label,
+.p-multiselect-label {
+  background: transparent !important;
+  border: none !important;
+  padding: 0.35rem 0.75rem !important;
+  color: black !important;
+}
+
+.p-multiselect-token {
+  background-color: #e6f0ff !important;
+  border-radius: 8px !important;
+  color: #4a90e2 !important;
+  font-weight: 600 !important;
+  padding: 0 0.5rem !important;
+  margin-right: 0.25rem !important;
+  line-height: 1.8 !important;
+  height: 27px !important;
+}
+
+.p-dropdown.p-focus,
+.p-multiselect.p-focus,
+.p-dropdown:hover,
+.p-multiselect:hover {
+  outline: none !important;
+  box-shadow: 0 2px 6px rgba(74, 144, 226, 0.5) !important;
+}
+
+.p-dropdown-label.p-placeholder,
+.p-multiselect-label.p-placeholder {
+  color: #787878 !important;
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="home-form-wrapper">
-    <br>
+    <br />
     <h1 class="title">Health Tracker</h1>
 
     <div class="home-container">
@@ -32,7 +32,20 @@
             <label>Address Line 3<input v-model="form.address3" /></label>
             <label>Address Line 4<input v-model="form.address4" /></label>
             <label>City*<input v-model="form.city" required /></label>
-            <label>Country*<input v-model="form.country" required /></label>
+            <label>Country* 
+              <Dropdown 
+                v-model="form.country" 
+                :options="countries" 
+                optionLabel="name" 
+                optionValue="code" 
+                placeholder="Select Country"
+                filter 
+                filterBy="name"
+                :showClear="true"
+                required
+                class="custom-dropdown"
+              />
+            </label>
           </div>
         </TabPanel>
 
@@ -116,6 +129,7 @@
               </div>
 
               <MultiSelect
+                :class="{'invalid-border': !form.brcaGenes.length}"
                 v-if="form.brcaKnown === 'yes'"
                 v-model="form.brcaGenes"
                 :options="brcaOptions"
@@ -124,9 +138,82 @@
                 placeholder="Select BRCA genes"
                 class="w-40"
                 display="chip"
+                :showSelectAll="true"
               />
             </div>
 
+            <!-- FAMILY HISTORY -->
+            <h3>Family History</h3>
+            <div class="form-group horizontal-group">
+              <label class="main-label">Breast Cancer in Family History Status*</label>
+              <select v-model="form.familyHistoryStatus" required>
+                <option value="" disabled>Select</option>
+                <option>Family History Null</option>
+                <option>Family History Unknown</option>
+                <option>Family History Known</option>
+              </select>
+            </div>
+            <div v-if="form.familyHistoryStatus === 'Family History Known'" class="extra-fields">
+              <input
+                type="number"
+                min="0"
+                step="1"
+                v-model.number="form.ageOfOnsetYoungestRelative"
+                placeholder="Age of Onset Youngest Relative*"
+                required
+              />
+              &nbsp;
+              <MultiSelect
+                :class="{'invalid-border': !form.familyHistoryOptions.length}"
+                v-model="form.familyHistoryOptions"
+                :options="familyHistoryMultiOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Select Breast Cancer Family History*"
+                class="w-40"
+                display="chip"
+              />
+            </div>
+
+            <!-- ALLERGIES -->
+            <h3>Allergies</h3>
+            <div class="form-group horizontal-group">
+              <label class="main-label">Allergies</label>
+              <MultiSelect
+                v-model="form.allergies"
+                :options="allergyOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Select allergies"
+                filter
+                display="chip"
+                class="p-multiselect w-40"
+              />
+            </div>
+
+            <div v-if="form.allergies.includes('Dressing')" class="extra-field">
+              <label for="specifyDressing">Specify Dressing<span style="color:red;">*</span></label>
+              <input
+                id="specifyDressing"
+                type="text"
+                v-model="form.specifyDressing"
+                :required="form.allergies.includes('Dressing')"
+                placeholder="Specify Dressing"
+                class="input-field"
+              />
+            </div>
+
+            <div v-if="form.allergies.includes('Other')" class="extra-field">
+              <label for="specifyOther">Specify Other Allergies<span style="color:red;">*</span></label>
+              <input
+                id="specifyOther"
+                type="text"
+                v-model="form.specifyOtherAllergies"
+                :required="form.allergies.includes('Other')"
+                placeholder="Specify Other Allergies"
+                class="input-field"
+              />
+            </div>
           </div>
         </TabPanel>
       </TabView>
@@ -136,7 +223,7 @@
       </div>
     </div>
   </div>
-  <br><br>
+  <br /><br />
 </template>
 
 <script>
@@ -145,17 +232,20 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
-import MultiSelect from 'primevue/multiselect'  // Ekleme
+import MultiSelect from 'primevue/multiselect'
+import Dropdown from 'primevue/dropdown'
 
 export default {
   components: {
     TabView,
     TabPanel,
-    MultiSelect  // Register
+    MultiSelect,
+    Dropdown
   },
   data() {
     return {
       activeIndex: 0,
+      countries: [],
       form: {
         firstName: "",
         middleName: "",
@@ -179,10 +269,33 @@ export default {
         menopauseStatus: "",
         brcaKnown: "",
         brcaGenes: [],
+        familyHistoryStatus: "",
+        ageOfOnsetYoungestRelative: null,
+        familyHistoryOptions: [],
+        allergies: [],
+        specifyDressing: "",
+        specifyOtherAllergies: "",
       },
       brcaOptions: [
         { label: "BRCA1", value: "BRCA1" },
         { label: "BRCA2", value: "BRCA2" },
+      ],
+      familyHistoryMultiOptions: [
+        { label: "BC in 1st degree relative", value: "BC1" },
+        { label: "BC in 1st degree relative (relative < 50 years at diagnosis)", value: "BC1_U50" },
+        { label: "BC in 2st degree relative (relative < 50 years at diagnosis)", value: "BC2_U50" },
+        { label: "BC in relative (relative < 45 years at diagnosis)", value: "BC_U45" },
+        { label: "Family History BRCA Gene", value: "FH_BRCA" },
+        { label: "Family History BRCA Gene in 1st degree relative", value: "FH_BRCA1" },
+        { label: "Family History of non-breast cancer", value: "FH_NONBC" },
+      ],
+      allergyOptions: [
+        { label: "Coagulation Disorder", value: "Coagulation Disorder" },
+        { label: "Dressing", value: "Dressing" },
+        { label: "Latex", value: "Latex" },
+        { label: "Local Anesthetics", value: "Local Anesthetics" },
+        { label: "Other", value: "Other" },
+        { label: "Penicillin", value: "Penicillin" }
       ],
     };
   },
@@ -217,7 +330,9 @@ export default {
         if (docSnap.exists()) {
           const data = docSnap.data();
           if (data.form) {
-            this.form = { ...this.form, ...data.form };
+            Object.keys(data.form).forEach(key => {
+              this.form[key] = data.form[key];
+            });
           }
         }
       } catch (error) {
@@ -225,8 +340,12 @@ export default {
       }
     }
   },
-  async mounted() {
-    await this.loadForm();
+  mounted() {
+    import('@/assets/countries.js').then(module => {
+      this.countries = module.default;
+    }).catch(console.error);
+
+    this.loadForm();
   }
 };
 </script>
