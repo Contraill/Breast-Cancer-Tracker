@@ -9,10 +9,22 @@ body {
 
 /* ---------- INPUT GLOBAL STYLES ---------- */
 input,
-select,
 textarea {
   margin-top: 0.4rem;
   padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  border-left: 2px solid #4a90e2;
+  background-color: #f9fbff;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+select {
+  margin-top: 0.4rem;
+  padding: 0.5rem 2rem 0.5rem 0.75rem; /* sağ tarafa ok için ekstra boşluk */
   font-size: 1rem;
   border-radius: 8px;
   border: none;
@@ -59,6 +71,82 @@ textarea {
   min-height: 70px;
 }
 
+.multi-checkbox-dropdown {
+  position: relative;
+  width: 250px;
+}
+
+.multi-checkbox-dropdown > label.inline-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fbff;
+  border-left: 2px solid #4a90e2;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+}
+
+.multi-checkbox-dropdown > label.inline-label:focus {
+  outline: none;
+  box-shadow: 0 2px 6px rgba(74, 144, 226, 0.5);
+}
+
+.selected-items {
+  flex-grow: 1;
+  margin-left: 10px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dropdown-arrow {
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+  font-size: 1rem;
+  user-select: none;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+.dropdown-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #4a90e2;
+  border-radius: 8px;
+  margin-top: 4px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  z-index: 10;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.dropdown-options label {
+  display: flex;
+  align-items: center;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.dropdown-options label:hover {
+  background-color: #e6f0ff;
+}
+
+.dropdown-options input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+
+
 /* ---------- AUTH STYLES ---------- */
 .auth-container {
   align-self: center;
@@ -69,37 +157,6 @@ textarea {
   border-radius: 8px;
   box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
   text-align: center;
-}
-
-.button-group {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 25px;
-  gap: 15px;
-}
-
-.toggle-btn {
-  flex: 1;
-  font-weight: 600;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 2px solid #ccc;
-  background-color: white;
-  cursor: pointer;
-  text-align: center;
-}
-
-.toggle-btn:hover {
-  background-color: #e7f0ff;
-  border-color: #4a90e2;
-  color: #4a90e2 !important;
-}
-
-.toggle-btn.active {
-  background-color: #4a90e2;
-  color: white !important;
-  border-color: #4a90e2;
 }
 
 .auth-form {
@@ -116,10 +173,6 @@ textarea {
   display: block;
 }
 
-.input-field {
-  width: 100%;
-}
-
 .consent-box {
   display: flex;
   align-items: flex-start;
@@ -131,6 +184,44 @@ textarea {
   font-size: 0.85rem;
   line-height: 1.2rem;
 }
+
+/* Input Alanları */
+.auth-form input[type="text"],
+.auth-form input[type="email"],
+.auth-form input[type="password"],
+.auth-form .p-inputtext,
+.auth-form .p-password input {
+  border-radius: 8px;
+  border: none;
+  border-left: 2px solid #4a90e2;
+  background-color: #f9fbff;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Focus Animasyonu - tüm alanlar için */
+.auth-form input[type="text"]:focus,
+.auth-form input[type="email"]:focus,
+.auth-form input[type="password"]:focus,
+.auth-form .p-inputtext:focus,
+.auth-form .p-password input:focus {
+  outline: none;
+  box-shadow: 0 2px 6px rgba(74, 144, 226, 0.5);
+}
+
+/* Zorunlu alan renkleri */
+.auth-form .p-inputtext:invalid,
+.auth-form .p-password input:invalid {
+  border-left-color: red;
+}
+
+.auth-form .p-inputtext:valid,
+.auth-form .p-password input:valid {
+  border-left-color: #4a90e2;
+}
+
 
 /* ---------- HOME FORM CONTAINER ---------- */
 .home-container {
@@ -288,4 +379,55 @@ label {
   padding: 0.4rem;
   font-size: 0.9rem;
   width: 250px;
+}
+
+/* ---------- CLIENT GENETICS INLINE GROUP ---------- */
+.health-info-form .horizontal-group.client-genetics {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.health-info-form .horizontal-group.client-genetics > label.main-label {
+  min-width: 150px;
+  white-space: nowrap;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.health-info-form .horizontal-group.client-genetics .radio-group {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  min-width: 150px;
+}
+
+.health-info-form .horizontal-group.client-genetics .radio-group label {
+  cursor: pointer;
+  padding: 6px 14px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background-color: white;
+  color: #555;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.health-info-form .horizontal-group.client-genetics .radio-group label:hover {
+  border-color: #4a90e2;
+  color: #4a90e2;
+  background-color: #e6f0ff;
+}
+
+.health-info-form .horizontal-group.client-genetics .radio-group input[type="radio"] {
+  display: none;
+}
+
+.health-info-form .horizontal-group.client-genetics .radio-group input[type="radio"]:checked + label {
+  border-color: #4a90e2;
+  color: #4a90e2;
+  background-color: #e6f0ff;
 }

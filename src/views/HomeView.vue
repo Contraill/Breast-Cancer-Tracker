@@ -100,6 +100,33 @@
                 <option>Unknown</option>
               </select>
             </div>
+
+            <!-- CLIENT GENETICS -->
+            <h3>Client Genetics</h3>
+
+            <div class="form-group horizontal-group">
+              <label class="main-label">BRCA Status Known*</label>
+
+              <div class="radio-group">
+                <input type="radio" id="brcaKnownYes" name="brcaKnown" value="yes" v-model="form.brcaKnown" />
+                <label for="brcaKnownYes">Yes</label>
+
+                <input type="radio" id="brcaKnownNo" name="brcaKnown" value="no" v-model="form.brcaKnown" />
+                <label for="brcaKnownNo">No</label>
+              </div>
+
+              <MultiSelect
+                v-if="form.brcaKnown === 'yes'"
+                v-model="form.brcaGenes"
+                :options="brcaOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Select BRCA genes"
+                class="w-40"
+                display="chip"
+              />
+            </div>
+
           </div>
         </TabPanel>
       </TabView>
@@ -118,11 +145,13 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
+import MultiSelect from 'primevue/multiselect'  // Ekleme
 
 export default {
   components: {
     TabView,
-    TabPanel
+    TabPanel,
+    MultiSelect  // Register
   },
   data() {
     return {
@@ -147,8 +176,14 @@ export default {
         hrtPresentLength: "",
         hrtPast: "",
         hrtPastYears: null,
-        menopauseStatus: ""
-      }
+        menopauseStatus: "",
+        brcaKnown: "",
+        brcaGenes: [],
+      },
+      brcaOptions: [
+        { label: "BRCA1", value: "BRCA1" },
+        { label: "BRCA2", value: "BRCA2" },
+      ],
     };
   },
   methods: {

@@ -25,7 +25,6 @@
           <InputText v-model="email" type="email" required class="input-field" />
 
           <label>Password</label>
-          <!-- feedback default olarak true olduğu için eklemeye gerek yok -->
           <Password v-model="password" toggle-mask required class="input-field" />
 
           <label>Confirm Password</label>
