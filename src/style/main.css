@@ -7,6 +7,12 @@ body {
   padding: 0;
 }
 
+h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #4a90e2;
+}
+
 /* ---------- FORM ELEMENTS BASE STYLES ---------- */
 input,
 textarea,
@@ -97,6 +103,7 @@ textarea:not([required]),
   transition: border-color 0.3s ease, background-color 0.3s ease !important;
   box-sizing: border-box;
   width: auto !important;
+  max-width: 280px;
   background-image: url("https://www.svgrepo.com/show/509905/dropdown-arrow.svg");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
@@ -137,6 +144,7 @@ textarea:not([required]),
 .multi-checkbox-dropdown {
   position: relative;
   width: 250px;
+  max-width: 300px;
 }
 
 .multi-checkbox-dropdown > label.inline-label {

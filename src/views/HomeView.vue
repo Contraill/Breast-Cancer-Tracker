@@ -177,7 +177,7 @@
 
             <!-- ALLERGIES -->
             <h3>Allergies</h3>
-            <div class="form-group horizontal-group">
+            <div class="form-group horizontal-group" style="padding: -10px -10px -10px -10px;">
               <label class="main-label">Allergies</label>
               <MultiSelect
                 v-model="form.allergies"
@@ -192,7 +192,7 @@
             </div>
 
             <div v-if="form.allergies.includes('Dressing')" class="extra-field">
-              <label for="specifyDressing">Specify Dressing<span style="color:red;">*</span></label>
+              <label for="specifyDressing">Specify Dressing*</label>&nbsp
               <input
                 id="specifyDressing"
                 type="text"
@@ -201,10 +201,10 @@
                 placeholder="Specify Dressing"
                 class="input-field"
               />
-            </div>
+            </div><br>
 
             <div v-if="form.allergies.includes('Other')" class="extra-field">
-              <label for="specifyOther">Specify Other Allergies<span style="color:red;">*</span></label>
+              <label for="specifyOther">Specify Other Allergies*</label>&nbsp
               <input
                 id="specifyOther"
                 type="text"
@@ -214,6 +214,73 @@
                 class="input-field"
               />
             </div>
+
+            <!-- SMOKING, VAPING & ALCOHOL -->
+            <h3>Smoking, Vaping & Alcohol</h3>
+
+            <!-- Smoking Status -->
+            <div class="form-group horizontal-group">
+              <label class="main-label">Smoking Status*</label>
+              <select v-model="form.smokingStatus" required>
+                <option value="" disabled>Select</option>
+                <option>Ex-Smoker</option>
+                <option>Smoking</option>
+                <option>Non-Smoker</option>
+              </select>
+            </div>
+
+            <div v-if="form.smokingStatus === 'Ex-Smoker' || form.smokingStatus === 'Smoking'" class="extra-fields">
+              <input type="number" min="0" step="1" v-model.number="form.smokingYears" placeholder="Number years smoking*" required /> <br><br>
+              <input type="number" min="0" step="1" v-model.number="form.smokedDaily" placeholder="Number smoked daily*" required /> <br><br>
+            </div>
+
+            <div v-if="form.smokingStatus === 'Ex-Smoker'" class="extra-fields">
+              <input type="number" min="0" step="1" v-model.number="form.yearsStoppedSmoking" placeholder="Number years stopped smoking*" required /><br><br>
+            </div>
+
+            <!-- Vaping Status -->
+            <div class="form-group horizontal-group">
+              <label class="main-label">Vaping Status*</label>
+              <select v-model="form.vapingStatus" required>
+                <option value="" disabled>Select</option>
+                <option>Ex-Vaper</option>
+                <option>Vaping</option>
+                <option>Non-Vaper</option>
+              </select>
+            </div>
+
+            <div v-if="form.vapingStatus === 'Ex-Vaper' || form.vapingStatus === 'Vaping'" class="extra-fields">
+              <input type="number" min="0" step="1" v-model.number="form.vapingYears" placeholder="Number years vaping*" required /><br><br>
+              <input type="number" min="0" step="1" v-model.number="form.vapingPodsPerWeek" placeholder="Average pods/cartridges per week*" required /><br><br>
+              <input type="number" min="0" step="1" v-model.number="form.nicotineStrength" placeholder="Nicotine strength used (mg/ml)*" required /><br><br>
+            </div>
+
+            <div v-if="form.vapingStatus === 'Ex-Vaper'" class="extra-fields">
+              <input type="number" min="0" step="1" v-model.number="form.yearsStoppedVaping" placeholder="Number years stopped vaping*" required /><br><br>
+            </div>
+
+            <!-- Alcohol Consumption -->
+            <div class="form-group horizontal-group">
+              <label class="main-label">Alcohol Consumption*</label>
+              <select v-model="form.alcoholStatus" required>
+                <option value="" disabled>Select</option>
+                <option>Ex-Drinker</option>
+                <option>Drinking</option>
+                <option>Non-Drinker</option>
+              </select>
+            </div>
+
+            <div v-if="form.alcoholStatus === 'Ex-Drinker' || form.alcoholStatus === 'Drinking'" class="extra-fields">
+              <input type="number" min="0" step="1" v-model.number="form.drinkingYears" placeholder="Number years drinking*" required /><br><br>
+              <input type="number" min="0" step="1" v-model.number="form.standardDrinksPerWeek" placeholder="Average standard drinks per week*" required /><br><br>
+              <input type="number" min="0" step="1" v-model.number="form.bingeDrinksPerMonth" placeholder="Binge drinking frequency (per month)*" required /><br><br>
+            </div>
+
+            <div v-if="form.alcoholStatus === 'Ex-Drinker'" class="extra-fields">
+              <input type="number" min="0" step="1" v-model.number="form.yearsStoppedDrinking" placeholder="Number years stopped drinking*" required /><br><br>
+            </div>
+
+
           </div>
         </TabPanel>
       </TabView>
@@ -247,6 +314,7 @@ export default {
       activeIndex: 0,
       countries: [],
       form: {
+        consent:"has consent",
         firstName: "",
         middleName: "",
         surname: "",
@@ -259,9 +327,6 @@ export default {
         address4: "",
         city: "",
         country: "",
-        height: "",
-        weight: "",
-        conditions: "",
         hrtPresent: "",
         hrtPresentLength: "",
         hrtPast: "",
@@ -275,6 +340,20 @@ export default {
         allergies: [],
         specifyDressing: "",
         specifyOtherAllergies: "",
+        smokingStatus: "",
+        smokingYears: null,
+        smokedDaily: null,
+        yearsStoppedSmoking: null,
+        vapingStatus: "",
+        vapingYears: null,
+        vapingPodsPerWeek: null,
+        nicotineStrength: null,
+        yearsStoppedVaping: null,
+        alcoholStatus: "",
+        drinkingYears: null,
+        standardDrinksPerWeek: null,
+        bingeDrinksPerMonth: null,
+        yearsStoppedDrinking: null,
       },
       brcaOptions: [
         { label: "BRCA1", value: "BRCA1" },
