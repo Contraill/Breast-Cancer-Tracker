@@ -25,6 +25,20 @@
           />
 
           <Button type="submit" label="Login" class="submit-btn" />
+
+          <!-- Şifremi Unuttum Butonu -->
+          <Button 
+            label="Forgot Password?" 
+            link 
+            @click="handleForgotPassword" 
+            style="
+              margin-top: 10px; 
+              font-size: 0.9rem; 
+              outline: none !important; 
+              border: none !important; 
+              box-shadow: none !important;
+            " 
+          />
         </form>
       </TabPanel>
 
@@ -35,11 +49,11 @@
           <InputText v-model="email" type="email" required class="input-field" />
 
           <label>Password</label>
-          <Password 
-            v-model="password" 
-            toggle-mask 
-            required 
-            class="input-field" 
+          <Password
+            v-model="password"
+            toggle-mask
+            required
+            class="input-field"
             :inputStyle="{ paddingRight: '3rem' }"
             :pt="{
               showIcon: { style: 'position: absolute; right: 1.2rem; top: 76%; transform: translateY(-50%);' },
@@ -48,11 +62,11 @@
           />
 
           <label>Confirm Password</label>
-          <Password 
-            v-model="password" 
-            toggle-mask 
-            required 
-            class="input-field" 
+          <Password
+            v-model="confirmPassword"
+            toggle-mask
+            required
+            class="input-field"
             :inputStyle="{ paddingRight: '3rem' }"
             :pt="{
               showIcon: { style: 'position: absolute; right: 1.2rem; top: 76%; transform: translateY(-50%);' },
@@ -79,8 +93,9 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth'
 import app from '../firebase'
+
 
 // PrimeVue Components
 import TabView from 'primevue/tabview'
@@ -112,18 +127,32 @@ const handleLogin = async () => {
 const handleRegister = async () => {
   try {
     if (password.value !== confirmPassword.value) {
-      alert('Passwords do not match!')
-      return
+      alert('Passwords do not match!');
+      return;
     }
     if (!consentGiven.value) {
-      alert('You must agree to the terms before registering.')
-      return
+      alert('You must agree to the terms before registering.');
+      return;
     }
 
-    await createUserWithEmailAndPassword(auth, email.value, password.value)
-    router.push('/home')
+    await createUserWithEmailAndPassword(auth, email.value, password.value);
+    router.push('/home');
   } catch (error) {
-    alert(error.message)
+    alert(error.message);
   }
-}
+};
+
+const handleForgotPassword = async () => {
+  if (!email.value) {
+    alert('Please enter your email address first.');
+    return;
+  }
+
+  try {
+    await sendPasswordResetEmail(auth, email.value);
+    alert('Password reset email sent! Please check your inbox.');
+  } catch (error) {
+    alert(error.message);
+  }
+};
 </script>
