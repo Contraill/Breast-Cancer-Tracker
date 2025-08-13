@@ -37,4 +37,4 @@ coverage
 *.tsbuildinfo
 
 # Firebase config dosyası (gizli)
-src/firebase.js
+.env
