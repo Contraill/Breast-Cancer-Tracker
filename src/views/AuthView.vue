@@ -15,8 +15,8 @@
           :style="{ width: '320px' }"
           :inputStyle="{ width: '320px'}"
           :pt="{
-            showIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' },
-            hideIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' }
+            showIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' },
+            hideIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' }
           }"
         />
 
@@ -29,8 +29,8 @@
           :style="{ width: '320px' }"
           :inputStyle="{ width: '320px'}"
           :pt="{
-            showIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' },
-            hideIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' }
+            showIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' },
+            hideIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' }
           }"
         />
         <br>
@@ -55,8 +55,8 @@
             :style="{ width: '290px' }"
             :inputStyle="{ width: '290px'}"
             :pt="{
-              showIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' },
-              hideIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' }
+              showIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' },
+              hideIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' }
             }"
           />
 
@@ -86,8 +86,8 @@
           :style="{ width: '290px' }"
           :inputStyle="{ width: '290px'}"
           :pt="{
-            showIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' },
-            hideIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' }
+            showIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' },
+            hideIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' }
           }"
           />
 
@@ -100,8 +100,8 @@
           :style="{ width: '290px' }"
           :inputStyle="{ width: '290px'}"
           :pt="{
-            showIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' },
-            hideIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' }
+            showIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' },
+            hideIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' }
           }"
           />
 

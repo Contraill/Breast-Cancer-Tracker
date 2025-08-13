@@ -57,6 +57,34 @@ select,
   font-weight: 400;
 }
 
+/* ---------- PRIMEVUE PASSWORD FIELD FIXES ---------- */
+.auth-form .p-password {
+  width: 100% !important;
+  margin-top: 0.4rem;
+}
+
+.auth-form .p-password .p-inputtext {
+  width: 100% !important;
+  padding-right: 3rem !important; /* Space for show/hide button */
+  margin-top: 0 !important;
+  min-width: 280px;
+  height: 42px;
+  box-sizing: border-box;
+}
+
+.auth-form .p-password .p-password-toggle-icon {
+  right: 1rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: #718096 !important;
+  cursor: pointer !important;
+  font-size: 1rem !important;
+}
+
+.auth-form .p-password .p-password-panel {
+  margin-top: 0.5rem !important;
+}
+
 select {
   padding-right: 2rem;
   appearance: none;
@@ -88,6 +116,7 @@ textarea:hover,
 .auth-form input[type="password"]:focus,
 .auth-form .p-inputtext:focus,
 .auth-form .p-password input:focus,
+.auth-form .p-password .p-inputtext:focus,
 .p-multiselect:hover,
 .p-multiselect.p-focus {
   outline: none;
@@ -101,7 +130,8 @@ input[required]:invalid,
 select[required]:invalid,
 textarea[required]:invalid,
 .auth-form .p-inputtext:invalid,
-.auth-form .p-password input:invalid {
+.auth-form .p-password input:invalid,
+.auth-form .p-password .p-inputtext:invalid {
   border-color: #e53e3e !important;
   box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1) !important;
 }
@@ -113,7 +143,8 @@ input:not([required]),
 select:not([required]),
 textarea:not([required]),
 .auth-form .p-inputtext:valid,
-.auth-form .p-password input:valid {
+.auth-form .p-password input:valid,
+.auth-form .p-password .p-inputtext:valid {
   border-color: #cbd5e0;
 }
 
@@ -500,9 +531,14 @@ label {
   .auth-form input[type="email"],
   .auth-form input[type="password"],
   .auth-form .p-inputtext,
-  .auth-form .p-password input {
+  .auth-form .p-password input,
+  .auth-form .p-password .p-inputtext {
     min-width: 100%;
     font-size: 16px; /* Prevents zoom on iOS */
+  }
+  
+  .auth-form .p-password {
+    width: 100% !important;
   }
   
   .home-container {
