@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { getAuth } from 'firebase/auth'
 import HomeView from '../views/HomeView.vue'
 import AuthView from '../views/AuthView.vue'
-import AuthAction from '../views/AuthAction.vue'
 
 const routes = [
   {
@@ -15,11 +14,6 @@ const routes = [
     name: 'Home',
     component: HomeView,
     meta: { requiresAuth: true }
-  },
-  {
-    path: '/auth-action',
-    name: 'AuthAction',
-    component: AuthAction
   }
 ]
 
