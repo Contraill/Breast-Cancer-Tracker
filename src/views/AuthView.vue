@@ -31,13 +31,31 @@
           toggle-mask
           required
           class="input-field"
+          :maxlength="30"
+          :feedback="false"
           :style="{ width: '320px' }"
           :inputStyle="{ width: '320px'}"
           :pt="{
             showIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' },
-            hideIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' }
+            hideIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' },
+            input: { maxlength: 30 }
           }"
+          @input="validatePassword"
         />
+        <div class="password-requirements">
+          <small :class="{ 'valid': passwordValidation.length }" class="requirement">
+            ✓ At least 6 characters long
+          </small>
+          <small :class="{ 'valid': passwordValidation.uppercase }" class="requirement">
+            ✓ Contains uppercase letter
+          </small>
+          <small :class="{ 'valid': passwordValidation.number }" class="requirement">
+            ✓ Contains at least one number
+          </small>
+          <small :class="{ 'valid': passwordValidation.maxLength }" class="requirement">
+            ✓ Maximum 30 characters
+          </small>
+        </div>
 
         <label>Confirm Password</label>
         <Password
@@ -45,11 +63,14 @@
           toggle-mask
           required
           class="input-field"
+          :maxlength="30"
+          :feedback="false"
           :style="{ width: '320px' }"
           :inputStyle="{ width: '320px'}"
           :pt="{
             showIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' },
-            hideIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' }
+            hideIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' },
+            input: { maxlength: 30 }
           }"
         />
         <br>
@@ -367,10 +388,33 @@ const handleResetPassword = async () => {
     alert('Please enter your new password in both fields.')
     return
   }
+  
   if (password.value !== confirmPassword.value) {
     alert('The passwords you entered don\'t match. Please make sure both password fields are identical.')
     return
   }
+  
+  // Custom password validation - same as register
+  if (password.value.length < 6) {
+    alert('Password must be at least 6 characters long.')
+    return
+  }
+  
+  if (!/[A-Z]/.test(password.value)) {
+    alert('Password must contain at least one uppercase letter.')
+    return
+  }
+  
+  if (!/\d/.test(password.value)) {
+    alert('Password must contain at least one number.')
+    return
+  }
+  
+  if (password.value.length > 30) {
+    alert('Password must not exceed 30 characters.')
+    return
+  }
+  
   try {
     await confirmPasswordReset(auth, resetOobCode, password.value)
     alert('Your password has been successfully reset! You can now log in with your new password.')
@@ -380,7 +424,7 @@ const handleResetPassword = async () => {
   } catch (error) {
     console.error(error)
     if (error.code === 'auth/weak-password') {
-      alert('Please choose a stronger password. Your password should be at least 6 characters long.')
+      alert('Please choose a stronger password. Your password should be at least 6 characters long, contain an uppercase letter, and include at least one number.')
     } else if (error.code === 'auth/expired-action-code') {
       alert('This password reset link has expired. Please request a new password reset.')
     } else if (error.code === 'auth/invalid-action-code') {

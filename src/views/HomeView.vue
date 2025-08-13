@@ -890,22 +890,38 @@ export default {
     },
 
     handleDateKeydown(event) {
-      // Allow backspace, delete, tab, escape, enter
-      if ([8, 9, 27, 13, 46].indexOf(event.keyCode) !== -1 ||
-          // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-          (event.keyCode === 65 && event.ctrlKey === true) ||
-          (event.keyCode === 67 && event.ctrlKey === true) ||
-          (event.keyCode === 86 && event.ctrlKey === true) ||
-          (event.keyCode === 88 && event.ctrlKey === true) ||
-          // Allow home, end, left, right
-          (event.keyCode >= 35 && event.keyCode <= 39)) {
+      // For HTML5 date inputs, let browser handle natively
+      if (event.target.type === 'date') {
+        return; // Let browser handle date input completely
+      }
+      
+      // For other inputs, allow navigation and editing keys
+      const allowedKeys = [
+        8,  // backspace
+        9,  // tab
+        13, // enter
+        27, // escape
+        46, // delete
+        35, 36, 37, 38, 39, 40 // home, end, arrows
+      ];
+      
+      // Allow Ctrl combinations for copy/paste
+      if (event.ctrlKey) return;
+      
+      // Allow allowed keys
+      if (allowedKeys.includes(event.keyCode)) return;
+      
+      // Allow numbers 0-9 (both main keyboard and numpad)
+      if ((event.keyCode >= 48 && event.keyCode <= 57) || 
+          (event.keyCode >= 96 && event.keyCode <= 105)) {
         return;
       }
-      // Only allow numbers 0-9
-      if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && 
-          (event.keyCode < 96 || event.keyCode > 105)) {
-        event.preventDefault();
-      }
+      
+      // Allow dash/hyphen for date formatting
+      if (event.keyCode === 189 || event.keyCode === 173) return;
+      
+      // Block everything else
+      event.preventDefault();
     },
 
     handleDateInput(event) {
@@ -1355,35 +1371,6 @@ export default {
           this.errors.newEmail = 'Email address is too long';
           return;
         }
-      }
-    },
-
-    handleDateKeydown(event) {
-      // Allow backspace, delete, tab, escape, enter
-      if ([8, 9, 27, 13, 46].indexOf(event.keyCode) !== -1 ||
-          // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-          (event.keyCode === 65 && event.ctrlKey === true) ||
-          (event.keyCode === 67 && event.ctrlKey === true) ||
-          (event.keyCode === 86 && event.ctrlKey === true) ||
-          (event.keyCode === 88 && event.ctrlKey === true) ||
-          // Allow home, end, left, right
-          (event.keyCode >= 35 && event.keyCode <= 39)) {
-        return;
-      }
-      // Only allow numbers 0-9
-      if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && 
-          (event.keyCode < 96 || event.keyCode > 105)) {
-        event.preventDefault();
-      }
-    },
-
-    handleDateInput(event) {
-      // Remove any non-numeric characters except hyphens and slashes
-      const value = event.target.value;
-      const cleanValue = value.replace(/[^\d\-\/]/g, '');
-      if (value !== cleanValue) {
-        event.target.value = cleanValue;
-        this.form.dob = cleanValue;
       }
     }
   },
