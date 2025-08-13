@@ -297,6 +297,7 @@
 import { db, auth } from "../firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 
+
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import MultiSelect from 'primevue/multiselect';
@@ -503,13 +504,12 @@ export default {
       }
 
       if (!this.validateForm()) {
-        return; // Validasyon başarısızsa kaydetme
+        return;
       }
 
       try {
         const docRef = doc(db, "users", user.uid);
 
-        // Veri yapısını istediğin gibi düzenle
         const payload = {
           userInformation: {
             email: user.email,
@@ -604,7 +604,6 @@ export default {
             this.form.dob = data.userInformation.dob || "";
             this.form.sex = data.userInformation.sex || "";
             this.form.registerDate = data.userInformation.registerDate || "";
-            // email genelde auth'dan alınır, tekrar kaydetmeye gerek yok
           }
 
           if (data.addressInformation) {

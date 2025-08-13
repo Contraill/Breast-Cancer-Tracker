@@ -93,7 +93,13 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth'
+import { 
+  getAuth, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword, 
+  sendPasswordResetEmail, 
+  sendEmailVerification 
+} from 'firebase/auth'
 import app from '../firebase'
 
 
@@ -134,13 +140,15 @@ const handleRegister = async () => {
       alert('You must agree to the terms before registering.');
       return;
     }
-
-    await createUserWithEmailAndPassword(auth, email.value, password.value);
+    const userCredential = await createUserWithEmailAndPassword(auth, email.value, password.value);
+    await sendEmailVerification(userCredential.user);
+    alert('Registration successful! A verification email has been sent to your email address.');
     router.push('/home');
   } catch (error) {
     alert(error.message);
   }
 };
+
 
 const handleForgotPassword = async () => {
   if (!email.value) {
