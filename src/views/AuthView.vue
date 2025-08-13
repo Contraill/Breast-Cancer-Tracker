@@ -142,17 +142,17 @@ const handleRegister = async () => {
     }
 
     const userCredential = await createUserWithEmailAndPassword(auth, email.value, password.value);
-
     await sendEmailVerification(userCredential.user);
 
-    alert('Registration successful! Please check your email to verify your account.');
+    alert('Registration successful! A verification email has been sent to your email address. Please verify before logging in.');
 
-    router.push('/verify-email');
+    router.push('/home');
 
   } catch (error) {
     alert(error.message);
   }
 };
+
 
 
 const handleForgotPassword = async () => {
