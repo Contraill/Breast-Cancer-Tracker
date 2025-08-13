@@ -54,17 +54,31 @@
               />
             </label>
             <label>Date of Birth*
-              <input 
-                v-model="form.dob" 
-                type="date" 
-                required 
-                :min="minDate"
-                :max="maxDate"
-                title="Please enter a valid date between 1900 and today"
-                @change="validateDateOfBirth"
-                @keydown="handleDateKeydown"
-                @input="handleDateInput"
-              />
+              <div class="date-input-wrapper">
+                <input 
+                  v-model="dobString"
+                  type="text"
+                  placeholder="DD/MM/YYYY"
+                  maxlength="10"
+                  required
+                  class="date-text-input"
+                  @input="handleDateTextInput"
+                  @blur="validateDateOfBirth"
+                />
+                <Calendar 
+                  v-model="form.dob"
+                  dateFormat="dd/mm/yy"
+                  :yearNavigator="true"
+                  :yearRange="yearRange"
+                  :showIcon="true"
+                  :maxDate="maxDateObj"
+                  :minDate="minDateObj"
+                  @date-select="handleCalendarSelect"
+                  class="date-calendar-picker"
+                  :inputStyle="{ display: 'none' }"
+                  iconDisplay="button"
+                />
+              </div>
               <div class="input-error" :class="{ show: errors.dob }">{{ errors.dob }}</div>
             </label>
             <label>Sex*
@@ -150,6 +164,7 @@
                   title="Please enter a valid address"
                   @input="validateAddressInput"
                 />
+                <div class="input-error" :class="{ show: errors.address2 }">{{ errors.address2 }}</div>
               </label>
               <label>Address Line 3
                 <input 
@@ -160,6 +175,7 @@
                   title="Please enter a valid address"
                   @input="validateAddressInput"
                 />
+                <div class="input-error" :class="{ show: errors.address3 }">{{ errors.address3 }}</div>
               </label>
               <label>Address Line 4
                 <input 
@@ -170,6 +186,7 @@
                   title="Please enter a valid address"
                   @input="validateAddressInput"
                 />
+                <div class="input-error" :class="{ show: errors.address4 }">{{ errors.address4 }}</div>
               </label>
               <label>City*
                 <input 
@@ -245,13 +262,15 @@
                   <label class="inline-label">No of Years on HRT*</label>
                   <input
                     type="number"
-                    min="1"
+                    min="0.1"
                     max="50"
-                    step="1"
+                    step="0.1"
                     v-model.number="form.hrtPastYears"
                     required
-                    title="Please enter a reasonable number of years (1-50)"
+                    title="Please enter number of years (0.1-50, decimals allowed for months)"
+                    placeholder="e.g. 2.5 years or 0.5 for 6 months"
                     @input="validateHrtYears"
+                    @blur="validateHrtYears"
                   />
                   <div class="input-error" :class="{ show: errors.hrtPastYears }">{{ errors.hrtPastYears }}</div>
                 </div>
@@ -325,6 +344,7 @@
                   required
                   title="Please enter a valid age (1-120)"
                   @input="validateAgeOfOnset"
+                  @blur="validateAgeOfOnset"
                 />
                 <div class="input-error" :class="{ show: errors.ageOfOnsetYoungestRelative }">{{ errors.ageOfOnsetYoungestRelative }}</div>
                 &nbsp;
@@ -403,13 +423,13 @@
               <div v-if="form.smokingStatus === 'Ex-Smoker' || form.smokingStatus === 'Smoking'" class="extra-fields">
                 <input 
                   type="number" 
-                  min="1" 
+                  min="0.1" 
                   max="80" 
-                  step="1" 
+                  step="0.1" 
                   v-model.number="form.smokingYears" 
-                  placeholder="Number years smoking*" 
+                  placeholder="Number years smoking* (0.5 = 6 months)" 
                   required 
-                  title="Please enter a reasonable number of years (1-80)"
+                  title="Please enter years (0.1-80, decimals allowed)"
                   @input="validateSmokingYears"
                 /> 
                 <div class="input-error" :class="{ show: errors.smokingYears }">{{ errors.smokingYears }}</div>
@@ -432,13 +452,13 @@
               <div v-if="form.smokingStatus === 'Ex-Smoker'" class="extra-fields">
                 <input 
                   type="number" 
-                  min="1" 
+                  min="0.1" 
                   max="80" 
-                  step="1" 
+                  step="0.1" 
                   v-model.number="form.yearsStoppedSmoking" 
-                  placeholder="Number years stopped smoking*" 
+                  placeholder="Years stopped smoking* (0.5 = 6 months)" 
                   required 
-                  title="Please enter a reasonable number of years (1-80)"
+                  title="Please enter years (0.1-80, decimals allowed)"
                   @input="validateStoppedSmokingYears"
                 />
                 <div class="input-error" :class="{ show: errors.yearsStoppedSmoking }">{{ errors.yearsStoppedSmoking }}</div>
@@ -459,13 +479,13 @@
               <div v-if="form.vapingStatus === 'Ex-Vaper' || form.vapingStatus === 'Vaping'" class="extra-fields">
                 <input 
                   type="number" 
-                  min="1" 
+                  min="0.1" 
                   max="50" 
-                  step="1" 
+                  step="0.1" 
                   v-model.number="form.vapingYears" 
-                  placeholder="Number years vaping*" 
+                  placeholder="Number years vaping* (0.5 = 6 months)" 
                   required 
-                  title="Please enter a reasonable number of years (1-50)"
+                  title="Please enter years (0.1-50, decimals allowed)"
                   @input="validateVapingYears"
                 />
                 <div class="input-error" :class="{ show: errors.vapingYears }">{{ errors.vapingYears }}</div>
@@ -501,13 +521,13 @@
               <div v-if="form.vapingStatus === 'Ex-Vaper'" class="extra-fields">
                 <input 
                   type="number" 
-                  min="1" 
+                  min="0.1" 
                   max="50" 
-                  step="1" 
+                  step="0.1" 
                   v-model.number="form.yearsStoppedVaping" 
-                  placeholder="Number years stopped vaping*" 
+                  placeholder="Years stopped vaping* (0.5 = 6 months)" 
                   required 
-                  title="Please enter a reasonable number of years (1-50)"
+                  title="Please enter years (0.1-50, decimals allowed)"
                   @input="validateStoppedVapingYears"
                 />
                 <div class="input-error" :class="{ show: errors.yearsStoppedVaping }">{{ errors.yearsStoppedVaping }}</div>
@@ -528,13 +548,13 @@
               <div v-if="form.alcoholStatus === 'Ex-Drinker' || form.alcoholStatus === 'Drinking'" class="extra-fields">
                 <input 
                   type="number" 
-                  min="1" 
+                  min="0.1" 
                   max="80" 
-                  step="1" 
+                  step="0.1" 
                   v-model.number="form.drinkingYears" 
-                  placeholder="Number years drinking*" 
+                  placeholder="Number years drinking* (0.5 = 6 months)" 
                   required 
-                  title="Please enter a reasonable number of years (1-80)"
+                  title="Please enter years (0.1-80, decimals allowed)"
                   @input="validateDrinkingYears"
                 />
                 <div class="input-error" :class="{ show: errors.drinkingYears }">{{ errors.drinkingYears }}</div>
@@ -570,13 +590,13 @@
               <div v-if="form.alcoholStatus === 'Ex-Drinker'" class="extra-fields">
                 <input 
                   type="number" 
-                  min="1" 
+                  min="0.1" 
                   max="80" 
-                  step="1" 
+                  step="0.1" 
                   v-model.number="form.yearsStoppedDrinking" 
-                  placeholder="Number years stopped drinking*" 
+                  placeholder="Years stopped drinking* (0.5 = 6 months)" 
                   required 
-                  title="Please enter a reasonable number of years (1-80)"
+                  title="Please enter years (0.1-80, decimals allowed)"
                   @input="validateStoppedDrinkingYears"
                 />
                 <div class="input-error" :class="{ show: errors.yearsStoppedDrinking }">{{ errors.yearsStoppedDrinking }}</div>
@@ -606,19 +626,21 @@
 <script>
 import { db, auth } from "../firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
-import { signOut, updateEmail, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
+import { signOut, updateEmail, EmailAuthProvider, reauthenticateWithCredential, onAuthStateChanged } from "firebase/auth";
 
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
 import MultiSelect from 'primevue/multiselect';
 import Dropdown from 'primevue/dropdown';
+import Calendar from 'primevue/calendar';
 
 export default {
   components: {
     TabView,
     TabPanel,
     MultiSelect,
-    Dropdown
+    Dropdown,
+    Calendar
   },
   data() {
     return {
@@ -626,6 +648,9 @@ export default {
       countries: [],
       showEmailChange: false,
       currentUserEmail: '',
+      authUnsubscribe: null,
+      lastEmailChangeTime: 0,
+      emailChangeCooldown: 300000, // 5 minutes
       emailChange: {
         newEmail: '',
         currentPassword: ''
@@ -635,6 +660,9 @@ export default {
         surname: '',
         city: '',
         address1: '',
+        address2: '',
+        address3: '',
+        address4: '',
         dob: '',
         hrtPastYears: '',
         ageOfOnsetYoungestRelative: '',
@@ -653,8 +681,10 @@ export default {
       },
       minDate: '1900-01-01',
       maxDate: new Date().toISOString().split('T')[0],
-      minDate: '1900-01-01',
-      maxDate: new Date().toISOString().split('T')[0],
+      minDateObj: new Date(1900, 0, 1),
+      maxDateObj: new Date(),
+      yearRange: `1900:${new Date().getFullYear()}`,
+      dobString: '',
       form: {
         consent:"has consent",
         firstName: "",
@@ -848,84 +878,220 @@ export default {
       if (fieldName === 'city') this.errors.city = '';
       
       if (value && !/^[a-zA-ZğĞıİöÖüÜşŞçÇ\s\-'\.]*$/.test(value)) {
-        const errorMsg = 'Only letters, spaces, hyphens, and apostrophes are allowed';
+        const errorMsg = 'Please use only letters, spaces, hyphens (like O\'Connor) and periods';
         if (fieldName === 'firstname') this.errors.firstName = errorMsg;
         if (fieldName === 'surname') this.errors.surname = errorMsg;
         if (fieldName === 'city') this.errors.city = errorMsg;
         
-        // Remove invalid characters
-        event.target.value = value.replace(/[^a-zA-ZğĞıİöÖüÜşŞçÇ\s\-'\.]/g, '');
+        // Clean the value without causing cursor issues
+        const cleanValue = value.replace(/[^a-zA-ZğĞıİöÖüÜşŞçÇ\s\-'\.]/g, '');
+        
+        // Only update if the value actually changed to avoid cursor jumping
+        if (cleanValue !== value) {
+          // Use nextTick to avoid conflicts with Vue's reactivity
+          this.$nextTick(() => {
+            event.target.value = cleanValue;
+            // Update the corresponding form field
+            if (fieldName === 'firstname') this.form.firstName = cleanValue;
+            else if (fieldName === 'surname') this.form.surname = cleanValue;
+            else if (fieldName === 'city') this.form.city = cleanValue;
+            else if (fieldName === 'middlename') this.form.middleName = cleanValue;
+            else if (fieldName === 'maidenname') this.form.maidenName = cleanValue;
+          });
+        }
       }
     },
 
     validateAddressInput(event) {
       const value = event.target.value;
-      const isRequired = event.target.hasAttribute('required');
       
-      this.errors.address1 = '';
+      // Find which address field this is by checking the form field name
+      let addressField = 'address1';
+      let errorField = 'address1';
+      
+      // Check the parent label to determine which address field
+      const labelElement = event.target.closest('label');
+      if (labelElement) {
+        const labelText = labelElement.textContent;
+        if (labelText.includes('Address Line 2')) {
+          addressField = 'address2';
+          errorField = 'address2';
+        } else if (labelText.includes('Address Line 3')) {
+          addressField = 'address3';
+          errorField = 'address3';
+        } else if (labelText.includes('Address Line 4')) {
+          addressField = 'address4';
+          errorField = 'address4';
+        }
+      }
+      
+      // Clear the appropriate error
+      this.errors[errorField] = '';
       
       if (value && !/^[a-zA-Z0-9ğĞıİöÖüÜşŞçÇ\s\-\.\,\/\#]*$/.test(value)) {
-        this.errors.address1 = 'Please use only letters, numbers, and basic punctuation';
-        event.target.value = value.replace(/[^a-zA-Z0-9ğĞıİöÖüÜşŞçÇ\s\-\.\,\/\#]/g, '');
-      }
-    },
-
-    validateDateOfBirth(event) {
-      const value = event.target.value;
-      this.errors.dob = '';
-      
-      if (value) {
-        const selectedDate = new Date(value);
-        const today = new Date();
-        const minDate = new Date('1900-01-01');
+        this.errors[errorField] = `Please use only letters, numbers, and basic punctuation`;
         
-        if (selectedDate > today) {
-          this.errors.dob = 'Date of birth cannot be in the future';
-          event.target.value = '';
-        } else if (selectedDate < minDate) {
-          this.errors.dob = 'Please enter a valid date after 1900';
-          event.target.value = '';
+        // Clean the value without causing cursor issues
+        const cleanValue = value.replace(/[^a-zA-Z0-9ğĞıİöÖüÜşŞçÇ\s\-\.\,\/\#]/g, '');
+        
+        // Only update if the value actually changed
+        if (cleanValue !== value) {
+          this.$nextTick(() => {
+            event.target.value = cleanValue;
+            // Update the corresponding form field
+            this.form[addressField] = cleanValue;
+          });
         }
       }
     },
 
-    handleDateKeydown(event) {
-      // For HTML5 date inputs, let browser handle natively
-      if (event.target.type === 'date') {
-        return; // Let browser handle date input completely
+    handleDateTextInput(event) {
+      let value = event.target.value;
+      
+      // Remove any non-numeric characters except /
+      value = value.replace(/[^\d\/]/g, '');
+      
+      // Auto-format DD/MM/YYYY
+      if (value.length >= 2 && value.indexOf('/') !== 2) {
+        value = value.substring(0, 2) + '/' + value.substring(2);
+      }
+      if (value.length >= 5 && value.lastIndexOf('/') !== 5) {
+        value = value.substring(0, 5) + '/' + value.substring(5);
       }
       
-      // For other inputs, allow navigation and editing keys
-      const allowedKeys = [
-        8,  // backspace
-        9,  // tab
-        13, // enter
-        27, // escape
-        46, // delete
-        35, 36, 37, 38, 39, 40 // home, end, arrows
-      ];
+      // Update the input value
+      event.target.value = value;
+      this.dobString = value;
       
-      // Allow Ctrl combinations for copy/paste
-      if (event.ctrlKey) return;
+      // Try to parse and update form.dob
+      if (value.length === 10) {
+        const parts = value.split('/');
+        if (parts.length === 3) {
+          const day = parseInt(parts[0]);
+          const month = parseInt(parts[1]) - 1; // Month is 0-based
+          let year = parseInt(parts[2]);
+          
+          // Year validation - prevent invalid years like 0001, 0010, etc.
+          if (year < 1900 || year > new Date().getFullYear()) {
+            this.errors.dob = 'Please enter a valid year between 1900 and current year';
+            this.form.dob = null;
+            return;
+          }
+          
+          // Month validation
+          if (month < 0 || month > 11) {
+            this.errors.dob = 'Please enter a valid month (01-12)';
+            this.form.dob = null;
+            return;
+          }
+          
+          // Day validation
+          if (day < 1 || day > 31) {
+            this.errors.dob = 'Please enter a valid day (01-31)';
+            this.form.dob = null;
+            return;
+          }
+          
+          // Check if date is valid (e.g., not Feb 30)
+          const testDate = new Date(year, month, day);
+          if (testDate.getFullYear() !== year || testDate.getMonth() !== month || testDate.getDate() !== day) {
+            this.errors.dob = 'Please enter a valid date';
+            this.form.dob = null;
+            return;
+          }
+          
+          // All validations passed
+          this.form.dob = testDate;
+          this.errors.dob = '';
+        }
+      } else {
+        // Clear errors if incomplete date
+        this.errors.dob = '';
+      }
+    },
+
+    handleCalendarSelect(selectedDate) {
+      this.form.dob = selectedDate;
       
-      // Allow allowed keys
-      if (allowedKeys.includes(event.keyCode)) return;
+      // Update string representation
+      if (selectedDate) {
+        const day = selectedDate.getDate().toString().padStart(2, '0');
+        const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+        const year = selectedDate.getFullYear();
+        this.dobString = `${day}/${month}/${year}`;
+      }
       
-      // Allow numbers 0-9 (both main keyboard and numpad)
-      if ((event.keyCode >= 48 && event.keyCode <= 57) || 
-          (event.keyCode >= 96 && event.keyCode <= 105)) {
+      this.validateDateOfBirth();
+    },
+
+    validateDateOfBirth(event) {
+      let selectedDate;
+      
+      // Handle different event types
+      if (event instanceof Date) {
+        selectedDate = event;
+      } else if (event && event.target && event.target.value) {
+        // Try to parse DD/MM/YYYY format
+        const dateStr = event.target.value;
+        if (dateStr.length === 10) {
+          const parts = dateStr.split('/');
+          if (parts.length === 3) {
+            const day = parseInt(parts[0]);
+            const month = parseInt(parts[1]) - 1;
+            const year = parseInt(parts[2]);
+            selectedDate = new Date(year, month, day);
+          }
+        }
+      } else if (typeof event === 'string') {
+        selectedDate = new Date(event);
+      } else if (this.form.dob) {
+        selectedDate = this.form.dob instanceof Date ? this.form.dob : new Date(this.form.dob);
+      }
+      
+      if (!selectedDate || isNaN(selectedDate)) {
+        return; // Don't show error for invalid/incomplete dates during typing
+      }
+      
+      this.errors.dob = '';
+      
+      const today = new Date();
+      const minDate = new Date('1900-01-01');
+      const currentYear = today.getFullYear();
+      
+      // Advanced date validation
+      if (selectedDate > today) {
+        this.errors.dob = 'Date of birth cannot be in the future';
+        this.form.dob = null;
+        this.dobString = '';
+      } else if (selectedDate < minDate) {
+        this.errors.dob = 'Please enter a valid date after 1900';
+        this.form.dob = null;
+        this.dobString = '';
+      } else if (selectedDate.getFullYear() < 1900 || selectedDate.getFullYear() > currentYear) {
+        this.errors.dob = `Please enter a valid year between 1900 and ${currentYear}`;
+        this.form.dob = null;
+        this.dobString = '';
+      } else {
+        // Date is valid
+        this.form.dob = selectedDate;
+      }
+    },
+
+    handleDateKeydown(event) {
+      // For HTML5 date inputs, completely let browser handle
+      if (event.target.type === 'date') {
+        // Don't interfere with date input at all
         return;
       }
-      
-      // Allow dash/hyphen for date formatting
-      if (event.keyCode === 189 || event.keyCode === 173) return;
-      
-      // Block everything else
-      event.preventDefault();
     },
 
     handleDateInput(event) {
-      // Remove any non-numeric characters except hyphens and slashes
+      // For HTML5 date inputs, let browser handle
+      if (event.target.type === 'date') {
+        return;
+      }
+      
+      // For other inputs (if any), clean the value
       const value = event.target.value;
       const cleanValue = value.replace(/[^\d\-\/]/g, '');
       if (value !== cleanValue) {
@@ -961,12 +1127,13 @@ export default {
     },
 
     validateSmokingYears(event) {
-      const value = parseInt(event.target.value);
+      const value = parseFloat(event.target.value);
       this.errors.smokingYears = '';
       
-      if (value && (value < 1 || value > 80)) {
-        this.errors.smokingYears = 'Please enter a reasonable number of years (1-80)';
-        event.target.value = Math.min(Math.max(1, value), 80);
+      if (value && (value < 0.1 || value > 80)) {
+        this.errors.smokingYears = 'Please enter between 0.1-80 years (use decimals for months)';
+      } else if (event.target.value && (!value || isNaN(value))) {
+        this.errors.smokingYears = 'Please enter a valid number';
       }
     },
 
@@ -976,27 +1143,30 @@ export default {
       
       if (value && (value < 1 || value > 200)) {
         this.errors.smokedDaily = 'Please enter a reasonable daily amount (1-200)';
-        event.target.value = Math.min(Math.max(1, value), 200);
+      } else if (event.target.value && (!value || isNaN(value))) {
+        this.errors.smokedDaily = 'Please enter a valid number';
       }
     },
 
     validateStoppedSmokingYears(event) {
-      const value = parseInt(event.target.value);
+      const value = parseFloat(event.target.value);
       this.errors.yearsStoppedSmoking = '';
       
-      if (value && (value < 1 || value > 80)) {
-        this.errors.yearsStoppedSmoking = 'Please enter a reasonable number of years (1-80)';
-        event.target.value = Math.min(Math.max(1, value), 80);
+      if (value && (value < 0.1 || value > 80)) {
+        this.errors.yearsStoppedSmoking = 'Please enter between 0.1-80 years (use decimals for months)';
+      } else if (event.target.value && (!value || isNaN(value))) {
+        this.errors.yearsStoppedSmoking = 'Please enter a valid number';
       }
     },
 
     validateVapingYears(event) {
-      const value = parseInt(event.target.value);
+      const value = parseFloat(event.target.value);
       this.errors.vapingYears = '';
       
-      if (value && (value < 1 || value > 50)) {
-        this.errors.vapingYears = 'Please enter a reasonable number of years (1-50)';
-        event.target.value = Math.min(Math.max(1, value), 50);
+      if (value && (value < 0.1 || value > 50)) {
+        this.errors.vapingYears = 'Please enter between 0.1-50 years (use decimals for months)';
+      } else if (event.target.value && (!value || isNaN(value))) {
+        this.errors.vapingYears = 'Please enter a valid number';
       }
     },
 
@@ -1006,17 +1176,19 @@ export default {
       
       if (value && (value < 1 || value > 100)) {
         this.errors.vapingPodsPerWeek = 'Please enter a reasonable weekly amount (1-100)';
-        event.target.value = Math.min(Math.max(1, value), 100);
+      } else if (event.target.value && (!value || isNaN(value))) {
+        this.errors.vapingPodsPerWeek = 'Please enter a valid number';
       }
     },
 
     validateHrtYears(event) {
-      const value = parseInt(event.target.value);
+      const value = parseFloat(event.target.value);
       this.errors.hrtPastYears = '';
       
-      if (value && (value < 1 || value > 50)) {
-        this.errors.hrtPastYears = 'Please enter a reasonable number of years (1-50)';
-        event.target.value = Math.min(Math.max(1, value), 50);
+      if (value && (value < 0.1 || value > 50)) {
+        this.errors.hrtPastYears = 'Please enter between 0.1-50 years (use decimals for months, e.g. 0.5 = 6 months)';
+      } else if (event.target.value && (!value || isNaN(value))) {
+        this.errors.hrtPastYears = 'Please enter a valid number';
       }
     },
 
@@ -1026,7 +1198,9 @@ export default {
       
       if (value && (value < 1 || value > 120)) {
         this.errors.ageOfOnsetYoungestRelative = 'Please enter a valid age (1-120)';
-        event.target.value = Math.min(Math.max(1, value), 120);
+        // Don't auto-correct, let user fix it
+      } else if (event.target.value && (!value || isNaN(value))) {
+        this.errors.ageOfOnsetYoungestRelative = 'Please enter a valid number';
       }
     },
 
@@ -1036,27 +1210,30 @@ export default {
       
       if (value && (value < 1 || value > 100)) {
         this.errors.nicotineStrength = 'Please enter a reasonable nicotine strength (1-100 mg/ml)';
-        event.target.value = Math.min(Math.max(1, value), 100);
+      } else if (event.target.value && (!value || isNaN(value))) {
+        this.errors.nicotineStrength = 'Please enter a valid number';
       }
     },
 
     validateStoppedVapingYears(event) {
-      const value = parseInt(event.target.value);
+      const value = parseFloat(event.target.value);
       this.errors.yearsStoppedVaping = '';
       
-      if (value && (value < 1 || value > 50)) {
-        this.errors.yearsStoppedVaping = 'Please enter a reasonable number of years (1-50)';
-        event.target.value = Math.min(Math.max(1, value), 50);
+      if (value && (value < 0.1 || value > 50)) {
+        this.errors.yearsStoppedVaping = 'Please enter between 0.1-50 years (use decimals for months)';
+      } else if (event.target.value && (!value || isNaN(value))) {
+        this.errors.yearsStoppedVaping = 'Please enter a valid number';
       }
     },
 
     validateDrinkingYears(event) {
-      const value = parseInt(event.target.value);
+      const value = parseFloat(event.target.value);
       this.errors.drinkingYears = '';
       
-      if (value && (value < 1 || value > 80)) {
-        this.errors.drinkingYears = 'Please enter a reasonable number of years (1-80)';
-        event.target.value = Math.min(Math.max(1, value), 80);
+      if (value && (value < 0.1 || value > 80)) {
+        this.errors.drinkingYears = 'Please enter between 0.1-80 years (use decimals for months)';
+      } else if (event.target.value && (!value || isNaN(value))) {
+        this.errors.drinkingYears = 'Please enter a valid number';
       }
     },
 
@@ -1066,7 +1243,8 @@ export default {
       
       if (value && (value < 1 || value > 200)) {
         this.errors.standardDrinksPerWeek = 'Please enter a reasonable number of drinks per week (1-200)';
-        event.target.value = Math.min(Math.max(1, value), 200);
+      } else if (event.target.value && (!value || isNaN(value))) {
+        this.errors.standardDrinksPerWeek = 'Please enter a valid number';
       }
     },
 
@@ -1074,19 +1252,21 @@ export default {
       const value = parseInt(event.target.value);
       this.errors.bingeDrinksPerMonth = '';
       
-      if (value && (value < 0 || value > 30)) {
+      if (value !== null && value !== undefined && (value < 0 || value > 30)) {
         this.errors.bingeDrinksPerMonth = 'Please enter frequency per month (0-30)';
-        event.target.value = Math.min(Math.max(0, value), 30);
+      } else if (event.target.value && (isNaN(value) || value < 0)) {
+        this.errors.bingeDrinksPerMonth = 'Please enter a valid number (0 or more)';
       }
     },
 
     validateStoppedDrinkingYears(event) {
-      const value = parseInt(event.target.value);
+      const value = parseFloat(event.target.value);
       this.errors.yearsStoppedDrinking = '';
       
-      if (value && (value < 1 || value > 80)) {
-        this.errors.yearsStoppedDrinking = 'Please enter a reasonable number of years (1-80)';
-        event.target.value = Math.min(Math.max(1, value), 80);
+      if (value && (value < 0.1 || value > 80)) {
+        this.errors.yearsStoppedDrinking = 'Please enter between 0.1-80 years (use decimals for months)';
+      } else if (event.target.value && (!value || isNaN(value))) {
+        this.errors.yearsStoppedDrinking = 'Please enter a valid number';
       }
     },
 
@@ -1113,7 +1293,7 @@ export default {
             middleName: this.form.middleName,
             surname: this.form.surname,
             maidenName: this.form.maidenName,
-            dob: this.form.dob,
+            dob: this.form.dob instanceof Date ? this.form.dob.toISOString().split('T')[0] : this.form.dob,
             sex: this.form.sex,
           },
           addressInformation: {
@@ -1129,44 +1309,44 @@ export default {
           healthInformation: {
             HRTMenopause: {
               hrtPresent: this.form.hrtPresent,
-              hrtPresentLength: this.form.hrtPresentLength,
+              hrtPresentLength: this.form.hrtPresent === 'yes' ? this.form.hrtPresentLength : '',
               hrtPast: this.form.hrtPast,
-              hrtPastYears: this.form.hrtPastYears,
+              hrtPastYears: this.form.hrtPast === 'yes' ? this.form.hrtPastYears : null,
               menopauseStatus: this.form.menopauseStatus,
             },
             genetics: {
               brcaKnown: this.form.brcaKnown,
-              brcaGenes: this.form.brcaGenes,
+              brcaGenes: this.form.brcaKnown === 'yes' ? this.form.brcaGenes : [],
             },
             familyHistory: {
               familyHistoryStatus: this.form.familyHistoryStatus,
-              ageOfOnsetYoungestRelative: this.form.ageOfOnsetYoungestRelative,
-              familyHistoryOptions: this.form.familyHistoryOptions,
+              ageOfOnsetYoungestRelative: this.form.familyHistoryStatus === 'Family History Known' ? this.form.ageOfOnsetYoungestRelative : null,
+              familyHistoryOptions: this.form.familyHistoryStatus === 'Family History Known' ? this.form.familyHistoryOptions : [],
             },
             allergies: {
               allergies: this.form.allergies,
-              specifyDressing: this.form.specifyDressing,
-              specifyOtherAllergies: this.form.specifyOtherAllergies,
+              specifyDressing: this.form.allergies.includes('Dressing') ? this.form.specifyDressing : '',
+              specifyOtherAllergies: this.form.allergies.includes('Other') ? this.form.specifyOtherAllergies : '',
             },
             smoking: {
               smokingStatus: this.form.smokingStatus,
-              smokingYears: this.form.smokingYears,
-              smokedDaily: this.form.smokedDaily,
-              yearsStoppedSmoking: this.form.yearsStoppedSmoking,
+              smokingYears: (this.form.smokingStatus === 'Ex-Smoker' || this.form.smokingStatus === 'Smoking') ? this.form.smokingYears : null,
+              smokedDaily: (this.form.smokingStatus === 'Ex-Smoker' || this.form.smokingStatus === 'Smoking') ? this.form.smokedDaily : null,
+              yearsStoppedSmoking: this.form.smokingStatus === 'Ex-Smoker' ? this.form.yearsStoppedSmoking : null,
             },
             vaping: {
               vapingStatus: this.form.vapingStatus,
-              vapingYears: this.form.vapingYears,
-              vapingPodsPerWeek: this.form.vapingPodsPerWeek,
-              nicotineStrength: this.form.nicotineStrength,
-              yearsStoppedVaping: this.form.yearsStoppedVaping,
+              vapingYears: (this.form.vapingStatus === 'Ex-Vaper' || this.form.vapingStatus === 'Vaping') ? this.form.vapingYears : null,
+              vapingPodsPerWeek: (this.form.vapingStatus === 'Ex-Vaper' || this.form.vapingStatus === 'Vaping') ? this.form.vapingPodsPerWeek : null,
+              nicotineStrength: (this.form.vapingStatus === 'Ex-Vaper' || this.form.vapingStatus === 'Vaping') ? this.form.nicotineStrength : null,
+              yearsStoppedVaping: this.form.vapingStatus === 'Ex-Vaper' ? this.form.yearsStoppedVaping : null,
             },
             alcohol: {
               alcoholStatus: this.form.alcoholStatus,
-              drinkingYears: this.form.drinkingYears,
-              standardDrinksPerWeek: this.form.standardDrinksPerWeek,
-              bingeDrinksPerMonth: this.form.bingeDrinksPerMonth,
-              yearsStoppedDrinking: this.form.yearsStoppedDrinking,
+              drinkingYears: (this.form.alcoholStatus === 'Ex-Drinker' || this.form.alcoholStatus === 'Drinking') ? this.form.drinkingYears : null,
+              standardDrinksPerWeek: (this.form.alcoholStatus === 'Ex-Drinker' || this.form.alcoholStatus === 'Drinking') ? this.form.standardDrinksPerWeek : null,
+              bingeDrinksPerMonth: (this.form.alcoholStatus === 'Ex-Drinker' || this.form.alcoholStatus === 'Drinking') ? this.form.bingeDrinksPerMonth : null,
+              yearsStoppedDrinking: this.form.alcoholStatus === 'Ex-Drinker' ? this.form.yearsStoppedDrinking : null,
             },
           },
         };
@@ -1174,7 +1354,10 @@ export default {
         await setDoc(docRef, payload);
         alert("Your health information has been saved successfully!");
       } catch (error) {
-        console.error("Error saving data:", error);
+        // Log error for debugging in development
+        if (process.env.NODE_ENV === 'development') {
+          console.error("Error saving data:", error);
+        }
         alert("We're sorry, there was a problem saving your information. Please check your internet connection and try again.");
       }
     },
@@ -1195,7 +1378,15 @@ export default {
             this.form.middleName = data.userInformation.middleName || "";
             this.form.surname = data.userInformation.surname || "";
             this.form.maidenName = data.userInformation.maidenName || "";
-            this.form.dob = data.userInformation.dob || "";
+            this.form.dob = data.userInformation.dob ? new Date(data.userInformation.dob) : null;
+            
+            // Update dobString for display
+            if (this.form.dob) {
+              const day = this.form.dob.getDate().toString().padStart(2, '0');
+              const month = (this.form.dob.getMonth() + 1).toString().padStart(2, '0');
+              const year = this.form.dob.getFullYear();
+              this.dobString = `${day}/${month}/${year}`;
+            }
             this.form.sex = data.userInformation.sex || "";
             this.form.registerDate = data.userInformation.registerDate || "";
           }
@@ -1253,7 +1444,10 @@ export default {
           }
         }
       } catch (error) {
-        console.error("Error loading data:", error);
+        // Log error for debugging in development
+        if (process.env.NODE_ENV === 'development') {
+          console.error("Error loading data:", error);
+        }
         // Silently fail for loading - user can still fill out the form
         // Could show a non-intrusive message if needed
       }
@@ -1264,81 +1458,121 @@ export default {
         await signOut(auth);
         this.$router.push('/');
       } catch (error) {
-        console.error("Error signing out:", error);
+        // Log error for debugging in development
+        if (process.env.NODE_ENV === 'development') {
+          console.error("Error signing out:", error);
+        }
         alert("There was a problem signing you out. Please try again.");
       }
     },
 
     async updateEmail() {
-      if (!this.emailChange.newEmail || !this.emailChange.currentPassword) {
-        alert("Please fill in both the new email and current password fields.");
+      // Check rate limiting first
+      const now = Date.now();
+      const timeSinceLastAttempt = now - this.lastEmailChangeTime;
+      
+      if (timeSinceLastAttempt < this.emailChangeCooldown) {
+        const remainingTime = Math.ceil((this.emailChangeCooldown - timeSinceLastAttempt) / 1000);
+        this.$toast.add({
+          severity: 'warn',
+          summary: 'Çok Hızlı!',
+          detail: `Email değişikliği için ${remainingTime} saniye bekleyiniz`,
+          life: 3000
+        });
         return;
       }
 
-      // Validate email format
+      // Basic validation
+      if (!this.emailChange.newEmail || !this.emailChange.currentPassword) {
+        this.$toast.add({
+          severity: 'error',
+          summary: 'Hata',
+          detail: 'Yeni email ve mevcut şifrenizi giriniz',
+          life: 3000
+        });
+        return;
+      }
+
+      // Email format validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(this.emailChange.newEmail)) {
-        alert("Please enter a valid email address.");
+        this.$toast.add({
+          severity: 'error',
+          summary: 'Hata',
+          detail: 'Geçerli bir email adresi giriniz',
+          life: 3000
+        });
         return;
       }
 
       if (this.emailChange.newEmail === this.currentUserEmail) {
-        alert("The new email is the same as your current email. Please enter a different email address.");
-        return;
-      }
-
-      // Check password length (matching our registration requirements)
-      if (this.emailChange.currentPassword.length < 6 || this.emailChange.currentPassword.length > 30) {
-        alert("Password must be between 6 and 30 characters.");
+        this.$toast.add({
+          severity: 'error',
+          summary: 'Hata',
+          detail: 'Yeni email mevcut email ile aynı olamaz',
+          life: 3000
+        });
         return;
       }
 
       try {
-        const user = auth.currentUser;
+        // Record attempt time for rate limiting
+        this.lastEmailChangeTime = now;
         
+        const user = auth.currentUser;
         if (!user) {
-          alert("Please log in first.");
+          this.$toast.add({
+            severity: 'error',
+            summary: 'Hata',
+            detail: 'Önce giriş yapınız',
+            life: 3000
+          });
           return;
         }
         
-        // Create credential with current password
-        const credential = EmailAuthProvider.credential(
-          user.email,
-          this.emailChange.currentPassword
-        );
-
-        // Re-authenticate user
+        // Re-authenticate user (Firebase security requirement)
+        const credential = EmailAuthProvider.credential(user.email, this.emailChange.currentPassword);
         await reauthenticateWithCredential(user, credential);
         
         // Update email
-        await updateEmail(user, this.emailChange.newEmail);
+        const newEmail = this.emailChange.newEmail;
+        await updateEmail(user, newEmail);
         
-        // Update current email display
-        this.currentUserEmail = this.emailChange.newEmail;
-        
-        // Reset form and hide
+        // Update UI and reset form
+        this.currentUserEmail = newEmail;
         this.cancelEmailChange();
         
-        alert("Your email address has been successfully updated! Please verify your new email address if you receive a verification email.");
+        this.$toast.add({
+          severity: 'success',
+          summary: 'Başarılı',
+          detail: `Email başarıyla güncellendi: ${newEmail}`,
+          life: 3000
+        });
         
       } catch (error) {
-        console.error("Error updating email:", error);
+        let message = "Email güncellenirken hata: ";
         
-        if (error.code === 'auth/wrong-password') {
-          alert("Incorrect password. Please check your current password and try again.");
-        } else if (error.code === 'auth/email-already-in-use') {
-          alert("This email address is already in use by another account. Please use a different email.");
-        } else if (error.code === 'auth/invalid-email') {
-          alert("Please enter a valid email address.");
-        } else if (error.code === 'auth/requires-recent-login') {
-          alert("For security reasons, please log out and log back in before changing your email address.");
-        } else if (error.code === 'auth/network-request-failed') {
-          alert("Network error. Please check your internet connection and try again.");
-        } else if (error.code === 'auth/too-many-requests') {
-          alert("Too many attempts. Please wait a moment and try again.");
-        } else {
-          alert("We're sorry, there was a problem updating your email address. Please try again or contact support.");
+        switch (error.code) {
+          case 'auth/wrong-password':
+          case 'auth/invalid-credential':
+            message = "Mevcut şifreniz yanlış";
+            break;
+          case 'auth/email-already-in-use':
+            message = "Bu email adresi zaten kullanılıyor";
+            break;
+          case 'auth/requires-recent-login':
+            message = "Önce çıkış yapıp tekrar giriş yapınız";
+            break;
+          default:
+            message = error.message || "Bilinmeyen hata";
         }
+        
+        this.$toast.add({
+          severity: 'error',
+          summary: 'Hata',
+          detail: message,
+          life: 3000
+        });
       }
     },
 
@@ -1353,23 +1587,13 @@ export default {
       this.errors.newEmail = '';
       
       if (value) {
-        // Basic email format validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(value)) {
           this.errors.newEmail = 'Please enter a valid email address';
-          return;
-        }
-        
-        // Check if same as current email
-        if (value === this.currentUserEmail) {
+        } else if (value === this.currentUserEmail) {
           this.errors.newEmail = 'New email must be different from current email';
-          return;
-        }
-        
-        // Check for reasonable length
-        if (value.length > 100) {
+        } else if (value.length > 100) {
           this.errors.newEmail = 'Email address is too long';
-          return;
         }
       }
     }
@@ -1378,14 +1602,37 @@ export default {
   mounted() {
     import('@/assets/countries.js').then(module => {
       this.countries = module.default;
-    }).catch(console.error);
+    }).catch((error) => {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Auth state change error:', error);
+      }
+    });
 
-    // Set current user email
+    // Set current user email with auth state listener
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.currentUserEmail = user.email;
+      } else {
+        this.currentUserEmail = '';
+      }
+    });
+
+    // Also set immediately if user is already available
     if (auth.currentUser) {
       this.currentUserEmail = auth.currentUser.email;
     }
 
     this.loadForm();
+    
+    // Store the unsubscribe function for cleanup
+    this.authUnsubscribe = unsubscribe;
+  },
+
+  beforeUnmount() {
+    // Clean up auth listener
+    if (this.authUnsubscribe) {
+      this.authUnsubscribe();
+    }
   }
 };
 </script>

@@ -92,6 +92,7 @@
             toggle-mask 
             required 
             class="input-field"
+            :feedback="false"
             :style="{ width: '290px' }"
             :inputStyle="{ width: '290px'}"
             :pt="{
@@ -210,6 +211,8 @@ const confirmPassword = ref('')
 const consentGiven = ref(false)
 const showVerificationSuccess = ref(false)
 const showVerificationError = ref(false)
+const lastPasswordResetTime = ref(0)
+const passwordResetCooldown = 60000 // 60 seconds
 const passwordValidation = ref({
   length: false,
   uppercase: false,
@@ -245,8 +248,12 @@ onMounted(async () => {
       resetOobCode = oobCode
       isResetMode.value = true
     } catch (err) {
-      console.error(err)
-      alert('We\'re sorry, there was a problem with your password reset link. The link may have expired or already been used. Please request a new password reset.')
+      alert('Password reset link verification failed. Please request a new password reset.')
+      
+      // Log detailed error for debugging
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Password reset link verification error:', err)
+      }
     }
   }
 })
@@ -271,8 +278,12 @@ const resendVerification = async () => {
       alert('Please log in first to resend the verification email.')
     }
   } catch (error) {
-    console.error(error)
-    alert('We\'re sorry, there was a problem sending the verification email. Please try again.')
+    alert('Verification email could not be sent. Please try again.')
+    
+    // Log detailed error for debugging
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Resend verification error:', error)
+    }
   }
 }
 
@@ -291,20 +302,23 @@ const handleLogin = async () => {
     await signInWithEmailAndPassword(auth, email.value, password.value)
     router.push('/home')
   } catch (error) {
-    console.error(error)
-    // Provide user-friendly messages based on common Firebase auth errors
-    if (error.code === 'auth/user-not-found') {
-      alert('No account found with this email address. Please check your email or create a new account.')
-    } else if (error.code === 'auth/wrong-password') {
-      alert('Incorrect password. Please check your password and try again.')
-    } else if (error.code === 'auth/invalid-email') {
-      alert('Please enter a valid email address.')
+    // Generic error message to prevent user enumeration
+    if (error.code === 'auth/user-not-found' || 
+        error.code === 'auth/wrong-password' || 
+        error.code === 'auth/invalid-email' ||
+        error.code === 'auth/invalid-credential') {
+      alert('Invalid email or password. Please check your credentials and try again.')
     } else if (error.code === 'auth/user-disabled') {
       alert('This account has been disabled. Please contact support for assistance.')
     } else if (error.code === 'auth/too-many-requests') {
       alert('Too many failed login attempts. Please wait a moment and try again.')
     } else {
-      alert('We\'re sorry, there was a problem signing you in. Please check your email and password and try again.')
+      alert('Login failed. Please check your credentials and try again.')
+    }
+    
+    // Log detailed error for debugging (will be handled by production logging)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Login error:', error)
     }
   }
 }
@@ -348,16 +362,20 @@ const handleRegister = async () => {
     alert('Your account has been created successfully! We\'ve sent a verification email to your email address. Please check your inbox and verify your email before logging in.')
     router.push('/home')
   } catch (error) {
-    console.error(error)
-    // Provide user-friendly messages based on common Firebase auth errors
+    // Generic error messages to prevent information disclosure
     if (error.code === 'auth/email-already-in-use') {
-      alert('An account with this email address already exists. Please try logging in instead.')
+      alert('Registration failed. Please check your information and try again.')
     } else if (error.code === 'auth/weak-password') {
       alert('Please choose a stronger password. Your password should be at least 6 characters long, contain an uppercase letter, and include at least one number.')
     } else if (error.code === 'auth/invalid-email') {
       alert('Please enter a valid email address.')
     } else {
-      alert('We\'re sorry, there was a problem creating your account. Please try again.')
+      alert('Registration failed. Please check your information and try again.')
+    }
+    
+    // Log detailed error for debugging
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Registration error:', error)
     }
   }
 }
@@ -368,17 +386,34 @@ const handleForgotPassword = async () => {
     return
   }
 
+  // Rate limiting check
+  const now = Date.now()
+  const timeSinceLastReset = now - lastPasswordResetTime.value
+  
+  if (timeSinceLastReset < passwordResetCooldown) {
+    const waitTime = Math.ceil((passwordResetCooldown - timeSinceLastReset) / 1000)
+    alert(`Please wait ${waitTime} seconds before requesting another password reset email.`)
+    return
+  }
+
   try {
     await sendPasswordResetEmail(auth, email.value)
+    lastPasswordResetTime.value = now
     alert('A password reset email has been sent to your email address. Please check your inbox and follow the instructions to reset your password.')
   } catch (error) {
-    console.error(error)
-    if (error.code === 'auth/user-not-found') {
-      alert('No account found with this email address. Please check your email or create a new account.')
-    } else if (error.code === 'auth/invalid-email') {
-      alert('Please enter a valid email address.')
+    // Generic error message to prevent user enumeration
+    if (error.code === 'auth/user-not-found' || 
+        error.code === 'auth/invalid-email') {
+      alert('If an account exists with this email, a password reset link will be sent.')
+    } else if (error.code === 'auth/too-many-requests') {
+      alert('Too many password reset requests. Please wait a moment before trying again.')
     } else {
-      alert('We\'re sorry, there was a problem sending the password reset email. Please try again.')
+      alert('Password reset request failed. Please try again.')
+    }
+    
+    // Log detailed error for debugging
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Password reset error:', error)
     }
   }
 }
@@ -422,7 +457,7 @@ const handleResetPassword = async () => {
       window.location.reload()
     })
   } catch (error) {
-    console.error(error)
+    // Generic error messages
     if (error.code === 'auth/weak-password') {
       alert('Please choose a stronger password. Your password should be at least 6 characters long, contain an uppercase letter, and include at least one number.')
     } else if (error.code === 'auth/expired-action-code') {
@@ -430,7 +465,12 @@ const handleResetPassword = async () => {
     } else if (error.code === 'auth/invalid-action-code') {
       alert('This password reset link is invalid or has already been used. Please request a new password reset.')
     } else {
-      alert('We\'re sorry, there was a problem resetting your password. Please try requesting a new password reset.')
+      alert('Password reset failed. Please request a new password reset.')
+    }
+    
+    // Log detailed error for debugging
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Password reset confirmation error:', error)
     }
   }
 }
