@@ -8,31 +8,31 @@
       <form @submit.prevent="handleResetPassword" class="auth-form">
         <label>New Password</label>
         <Password
-            v-model="password"
-            toggle-mask
-            required
-            class="input-field"
-            :inputStyle="{ paddingRight: '3rem' }"
-            :pt="{
-              showIcon: { style: 'position: absolute; right: 1.2rem; top: 76%; transform: translateY(-50%);' },
-              hideIcon: { style: 'position: absolute; right: 1.2rem; top: 58%; transform: translateY(-50%);' }
-            }"
-         />
+          v-model="password"
+          toggle-mask
+          required
+          class="input-field"
+          :inputStyle="{ paddingRight: '3rem' }"
+          :pt="{
+            showIcon: { style: 'position: absolute; right: 1.2rem; top: 50%; transform: translateY(-50%);' },
+            hideIcon: { style: 'position: absolute; right: 1.2rem; top: 50%; transform: translateY(-50%);' }
+          }"
+        />
 
         <label>Confirm Password</label>
         <Password
-            v-model="confirmPassword"
-            toggle-mask
-            required
-            class="input-field"
-            :inputStyle="{ paddingRight: '3rem' }"
-            :pt="{
-              showIcon: { style: 'position: absolute; right: 1.2rem; top: 76%; transform: translateY(-50%);' },
-              hideIcon: { style: 'position: absolute; right: 1.2rem; top: 58%; transform: translateY(-50%);' }
-            }"
+          v-model="confirmPassword"
+          toggle-mask
+          required
+          class="input-field"
+          :inputStyle="{ paddingRight: '3rem' }"
+          :pt="{
+            showIcon: { style: 'position: absolute; right: 1.2rem; top: 50%; transform: translateY(-50%);' },
+            hideIcon: { style: 'position: absolute; right: 1.2rem; top: 50%; transform: translateY(-50%);' }
+          }"
         />
         <br>
-        <Button type="submit" label="Save Password" class="submit-btn" />
+        <Button type="submit" label="Submit" class="submit-btn" />
       </form>
     </div>
 
