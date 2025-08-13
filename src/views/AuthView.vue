@@ -102,13 +102,28 @@
             toggle-mask
             required
             class="input-field"
-          :style="{ width: '290px' }"
-          :inputStyle="{ width: '290px'}"
-          :pt="{
-            showIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' },
-            hideIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' }
-          }"
+            :maxlength="30"
+            :feedback="false"
+            :style="{ width: '290px' }"
+            :inputStyle="{ width: '290px'}"
+            :pt="{
+              showIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' },
+              hideIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' },
+              input: { maxlength: 30 }
+            }"
+            @input="validatePassword"
           />
+          <div class="password-requirements">
+            <small :class="{ 'valid': passwordValidation.length }" class="requirement">
+              ✓ At least 6 characters long
+            </small>
+            <small :class="{ 'valid': passwordValidation.uppercase }" class="requirement">
+              ✓ Contains uppercase letter
+            </small>
+            <small :class="{ 'valid': passwordValidation.maxLength }" class="requirement">
+              ✓ Maximum 30 characters
+            </small>
+          </div>
 
           <label>Confirm Password</label>
           <Password
@@ -116,12 +131,15 @@
             toggle-mask
             required
             class="input-field"
-          :style="{ width: '290px' }"
-          :inputStyle="{ width: '290px'}"
-          :pt="{
-            showIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' },
-            hideIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' }
-          }"
+            :maxlength="30"
+            :feedback="false"
+            :style="{ width: '290px' }"
+            :inputStyle="{ width: '290px'}"
+            :pt="{
+              showIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' },
+              hideIcon: { style: 'position: absolute; top: 70%; transform: translateY(-50%);' },
+              input: { maxlength: 30 }
+            }"
           />
 
           <div class="consent-box">
@@ -168,6 +186,11 @@ const confirmPassword = ref('')
 const consentGiven = ref(false)
 const showVerificationSuccess = ref(false)
 const showVerificationError = ref(false)
+const passwordValidation = ref({
+  length: false,
+  uppercase: false,
+  maxLength: true
+})
 
 const auth = getAuth(app)
 const router = useRouter()
@@ -228,6 +251,15 @@ const resendVerification = async () => {
   }
 }
 
+const validatePassword = () => {
+  const pwd = password.value
+  passwordValidation.value = {
+    length: pwd.length >= 6,
+    uppercase: /[A-Z]/.test(pwd),
+    maxLength: pwd.length <= 30
+  }
+}
+
 const handleLogin = async () => {
   try {
     await signInWithEmailAndPassword(auth, email.value, password.value)
@@ -257,6 +289,23 @@ const handleRegister = async () => {
       alert('The passwords you entered don\'t match. Please make sure both password fields are identical.')
       return
     }
+    
+    // Custom password validation
+    if (password.value.length < 6) {
+      alert('Password must be at least 6 characters long.')
+      return
+    }
+    
+    if (!/[A-Z]/.test(password.value)) {
+      alert('Password must contain at least one uppercase letter.')
+      return
+    }
+    
+    if (password.value.length > 30) {
+      alert('Password must not exceed 30 characters.')
+      return
+    }
+    
     if (!consentGiven.value) {
       alert('Please agree to participate in the Breast Cancer Screening Programme to create your account.')
       return
@@ -273,7 +322,7 @@ const handleRegister = async () => {
     if (error.code === 'auth/email-already-in-use') {
       alert('An account with this email address already exists. Please try logging in instead.')
     } else if (error.code === 'auth/weak-password') {
-      alert('Please choose a stronger password. Your password should be at least 6 characters long.')
+      alert('Please choose a stronger password. Your password should be at least 6 characters long and contain an uppercase letter.')
     } else if (error.code === 'auth/invalid-email') {
       alert('Please enter a valid email address.')
     } else {

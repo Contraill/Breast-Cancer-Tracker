@@ -427,6 +427,34 @@ textarea:not([required]),
   margin-bottom: 2rem;
 }
 
+/* ---------- PASSWORD REQUIREMENTS ---------- */
+.password-requirements {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.requirement {
+  font-size: 0.75rem;
+  color: #e53e3e;
+  transition: color 0.2s ease-in-out;
+}
+
+.requirement.valid {
+  color: #38a169;
+}
+
+.requirement:before {
+  content: '✗ ';
+  font-weight: bold;
+}
+
+.requirement.valid:before {
+  content: '✓ ';
+  font-weight: bold;
+}
+
 .verification-success .success-icon {
   font-size: 3rem;
   color: #38a169;

@@ -62,6 +62,8 @@
                 :max="maxDate"
                 title="Please enter a valid date between 1900 and today"
                 @change="validateDateOfBirth"
+                @keydown="handleDateKeydown"
+                @input="handleDateInput"
               />
               <div class="input-error" :class="{ show: errors.dob }">{{ errors.dob }}</div>
             </label>
@@ -100,7 +102,9 @@
                     type="email" 
                     required 
                     placeholder="Enter your new email address"
+                    @input="validateNewEmail"
                   />
+                  <div class="input-error" :class="{ show: errors.newEmail }">{{ errors.newEmail }}</div>
                 </label>
                 <label>Current Password*
                   <input 
@@ -108,6 +112,7 @@
                     type="password" 
                     required 
                     placeholder="Enter your current password to confirm"
+                    maxlength="30"
                   />
                 </label>
               </div>
@@ -643,7 +648,8 @@ export default {
         drinkingYears: '',
         standardDrinksPerWeek: '',
         bingeDrinksPerMonth: '',
-        yearsStoppedDrinking: ''
+        yearsStoppedDrinking: '',
+        newEmail: ''
       },
       minDate: '1900-01-01',
       maxDate: new Date().toISOString().split('T')[0],
@@ -877,6 +883,61 @@ export default {
         } else if (selectedDate < minDate) {
           this.errors.dob = 'Please enter a valid date after 1900';
           event.target.value = '';
+        }
+      }
+    },
+
+    handleDateKeydown(event) {
+      // Allow backspace, delete, tab, escape, enter
+      if ([8, 9, 27, 13, 46].indexOf(event.keyCode) !== -1 ||
+          // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+          (event.keyCode === 65 && event.ctrlKey === true) ||
+          (event.keyCode === 67 && event.ctrlKey === true) ||
+          (event.keyCode === 86 && event.ctrlKey === true) ||
+          (event.keyCode === 88 && event.ctrlKey === true) ||
+          // Allow home, end, left, right
+          (event.keyCode >= 35 && event.keyCode <= 39)) {
+        return;
+      }
+      // Only allow numbers 0-9
+      if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && 
+          (event.keyCode < 96 || event.keyCode > 105)) {
+        event.preventDefault();
+      }
+    },
+
+    handleDateInput(event) {
+      // Remove any non-numeric characters except hyphens and slashes
+      const value = event.target.value;
+      const cleanValue = value.replace(/[^\d\-\/]/g, '');
+      if (value !== cleanValue) {
+        event.target.value = cleanValue;
+        this.form.dob = cleanValue;
+      }
+    },
+
+    validateNewEmail(event) {
+      const value = event.target.value;
+      this.errors.newEmail = '';
+      
+      if (value) {
+        // Basic email format validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+          this.errors.newEmail = 'Please enter a valid email address';
+          return;
+        }
+        
+        // Check if same as current email
+        if (value === this.currentUserEmail) {
+          this.errors.newEmail = 'New email must be different from current email';
+          return;
+        }
+        
+        // Check for reasonable length
+        if (value.length > 100) {
+          this.errors.newEmail = 'Email address is too long';
+          return;
         }
       }
     },
@@ -1196,13 +1257,31 @@ export default {
         return;
       }
 
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(this.emailChange.newEmail)) {
+        alert("Please enter a valid email address.");
+        return;
+      }
+
       if (this.emailChange.newEmail === this.currentUserEmail) {
         alert("The new email is the same as your current email. Please enter a different email address.");
         return;
       }
 
+      // Check password length (matching our registration requirements)
+      if (this.emailChange.currentPassword.length < 6 || this.emailChange.currentPassword.length > 30) {
+        alert("Password must be between 6 and 30 characters.");
+        return;
+      }
+
       try {
         const user = auth.currentUser;
+        
+        if (!user) {
+          alert("Please log in first.");
+          return;
+        }
         
         // Create credential with current password
         const credential = EmailAuthProvider.credential(
@@ -1222,7 +1301,7 @@ export default {
         // Reset form and hide
         this.cancelEmailChange();
         
-        alert("Your email address has been successfully updated!");
+        alert("Your email address has been successfully updated! Please verify your new email address if you receive a verification email.");
         
       } catch (error) {
         console.error("Error updating email:", error);
@@ -1230,13 +1309,17 @@ export default {
         if (error.code === 'auth/wrong-password') {
           alert("Incorrect password. Please check your current password and try again.");
         } else if (error.code === 'auth/email-already-in-use') {
-          alert("This email address is already in use by another account.");
+          alert("This email address is already in use by another account. Please use a different email.");
         } else if (error.code === 'auth/invalid-email') {
           alert("Please enter a valid email address.");
         } else if (error.code === 'auth/requires-recent-login') {
-          alert("For security reasons, please log out and log back in before changing your email.");
+          alert("For security reasons, please log out and log back in before changing your email address.");
+        } else if (error.code === 'auth/network-request-failed') {
+          alert("Network error. Please check your internet connection and try again.");
+        } else if (error.code === 'auth/too-many-requests') {
+          alert("Too many attempts. Please wait a moment and try again.");
         } else {
-          alert("We're sorry, there was a problem updating your email address. Please try again.");
+          alert("We're sorry, there was a problem updating your email address. Please try again or contact support.");
         }
       }
     },
