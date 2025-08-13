@@ -11,8 +11,18 @@
           <InputText v-model="email" type="email" required class="input-field" />
 
           <label>Password</label>
-          <!-- feedback=false ekledik -->
-          <Password v-model="password" toggle-mask required class="input-field" :feedback="false" />
+          <Password 
+            v-model="password" 
+            toggle-mask 
+            required 
+            class="input-field" 
+            :inputStyle="{ paddingRight: '3rem' }"
+            :feedback="false"
+            :pt="{
+              showIcon: { style: 'position: absolute; right: 1.2rem; top: 76%; transform: translateY(-50%);' },
+              hideIcon: { style: 'position: absolute; right: 1.2rem; top: 58%; transform: translateY(-50%);' }
+            }"
+          />
 
           <Button type="submit" label="Login" class="submit-btn" />
         </form>
@@ -25,10 +35,30 @@
           <InputText v-model="email" type="email" required class="input-field" />
 
           <label>Password</label>
-          <Password v-model="password" toggle-mask required class="input-field" />
+          <Password 
+            v-model="password" 
+            toggle-mask 
+            required 
+            class="input-field" 
+            :inputStyle="{ paddingRight: '3rem' }"
+            :pt="{
+              showIcon: { style: 'position: absolute; right: 1.2rem; top: 76%; transform: translateY(-50%);' },
+              hideIcon: { style: 'position: absolute; right: 1.2rem; top: 58%; transform: translateY(-50%);' }
+            }"
+          />
 
           <label>Confirm Password</label>
-          <Password v-model="confirmPassword" toggle-mask required class="input-field" />
+          <Password 
+            v-model="password" 
+            toggle-mask 
+            required 
+            class="input-field" 
+            :inputStyle="{ paddingRight: '3rem' }"
+            :pt="{
+              showIcon: { style: 'position: absolute; right: 1.2rem; top: 76%; transform: translateY(-50%);' },
+              hideIcon: { style: 'position: absolute; right: 1.2rem; top: 58%; transform: translateY(-50%);' }
+            }"
+          />
 
           <div class="consent-box">
             <Checkbox v-model="consentGiven" inputId="consent" :binary="true" />

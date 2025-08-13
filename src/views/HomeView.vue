@@ -297,10 +297,10 @@
 import { db, auth } from "../firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 
-import TabView from 'primevue/tabview'
-import TabPanel from 'primevue/tabpanel'
-import MultiSelect from 'primevue/multiselect'
-import Dropdown from 'primevue/dropdown'
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
+import MultiSelect from 'primevue/multiselect';
+import Dropdown from 'primevue/dropdown';
 
 export default {
   components: {
@@ -379,6 +379,122 @@ export default {
     };
   },
   methods: {
+    validateForm() {
+      if (
+        !this.form.firstName ||
+        !this.form.surname ||
+        !this.form.dob ||
+        !this.form.sex ||
+        !this.form.address1 ||
+        !this.form.city ||
+        !this.form.country ||
+        !this.form.hrtPresent ||
+        !this.form.hrtPast ||
+        !this.form.menopauseStatus ||
+        !this.form.brcaKnown ||
+        !this.form.familyHistoryStatus ||
+        !this.form.smokingStatus ||
+        !this.form.vapingStatus ||
+        !this.form.alcoholStatus
+      ) {
+        alert("Lütfen tüm zorunlu alanları doldurun.");
+        return false;
+      }
+
+      if (this.form.hrtPresent === "yes" && !this.form.hrtPresentLength) {
+        alert("Lütfen 'Length of current HRT use' alanını doldurun.");
+        return false;
+      }
+
+      if (this.form.hrtPast === "yes" && (this.form.hrtPastYears === null || this.form.hrtPastYears === "")) {
+        alert("Lütfen 'No of Years on HRT' alanını doldurun.");
+        return false;
+      }
+
+      if (this.form.brcaKnown === "yes" && this.form.brcaGenes.length === 0) {
+        alert("Lütfen en az bir BRCA geni seçin.");
+        return false;
+      }
+
+      if (this.form.familyHistoryStatus === "Family History Known") {
+        if (
+          this.form.ageOfOnsetYoungestRelative === null ||
+          this.form.ageOfOnsetYoungestRelative === "" ||
+          this.form.familyHistoryOptions.length === 0
+        ) {
+          alert("Lütfen Family History Known ile ilgili tüm alanları doldurun.");
+          return false;
+        }
+      }
+
+      if (this.form.allergies.includes("Dressing") && !this.form.specifyDressing) {
+        alert("Lütfen 'Specify Dressing' alanını doldurun.");
+        return false;
+      }
+
+      if (this.form.allergies.includes("Other") && !this.form.specifyOtherAllergies) {
+        alert("Lütfen 'Specify Other Allergies' alanını doldurun.");
+        return false;
+      }
+
+      if (this.form.smokingStatus === "Ex-Smoker" || this.form.smokingStatus === "Smoking") {
+        if (
+          this.form.smokingYears === null ||
+          this.form.smokingYears === "" ||
+          this.form.smokedDaily === null ||
+          this.form.smokedDaily === ""
+        ) {
+          alert("Lütfen sigara ile ilgili zorunlu alanları doldurun.");
+          return false;
+        }
+      }
+
+      if (this.form.smokingStatus === "Ex-Smoker" && (this.form.yearsStoppedSmoking === null || this.form.yearsStoppedSmoking === "")) {
+        alert("Lütfen 'Number years stopped smoking' alanını doldurun.");
+        return false;
+      }
+
+      if (this.form.vapingStatus === "Ex-Vaper" || this.form.vapingStatus === "Vaping") {
+        if (
+          this.form.vapingYears === null ||
+          this.form.vapingYears === "" ||
+          this.form.vapingPodsPerWeek === null ||
+          this.form.vapingPodsPerWeek === "" ||
+          this.form.nicotineStrength === null ||
+          this.form.nicotineStrength === ""
+        ) {
+          alert("Lütfen vaping ile ilgili zorunlu alanları doldurun.");
+          return false;
+        }
+      }
+
+      if (this.form.vapingStatus === "Ex-Vaper" && (this.form.yearsStoppedVaping === null || this.form.yearsStoppedVaping === "")) {
+        alert("Lütfen 'Number years stopped vaping' alanını doldurun.");
+        return false;
+      }
+
+      if (this.form.alcoholStatus === "Ex-Drinker" || this.form.alcoholStatus === "Drinking") {
+        if (
+          this.form.drinkingYears === null ||
+          this.form.drinkingYears === "" ||
+          this.form.standardDrinksPerWeek === null ||
+          this.form.standardDrinksPerWeek === "" ||
+          this.form.bingeDrinksPerMonth === null ||
+          this.form.bingeDrinksPerMonth === ""
+        ) {
+          alert("Lütfen alkol ile ilgili zorunlu alanları doldurun.");
+          return false;
+        }
+      }
+
+      if (this.form.alcoholStatus === "Ex-Drinker" && (this.form.yearsStoppedDrinking === null || this.form.yearsStoppedDrinking === "")) {
+        alert("Lütfen 'Number years stopped drinking' alanını doldurun.");
+        return false;
+      }
+
+      return true;
+    },
+
     async saveForm() {
       const user = auth.currentUser;
       if (!user) {
@@ -386,18 +502,89 @@ export default {
         return;
       }
 
+      if (!this.validateForm()) {
+        return; // Validasyon başarısızsa kaydetme
+      }
+
       try {
         const docRef = doc(db, "users", user.uid);
-        await setDoc(docRef, {
-          form: this.form,
-          email: user.email
-        });
+
+        // Veri yapısını istediğin gibi düzenle
+        const payload = {
+          userInformation: {
+            email: user.email,
+            registerDate: this.form.registerDate || new Date().toISOString().split('T')[0],
+            lastUpdated: new Date().toISOString().split('T')[0],
+            firstName: this.form.firstName,
+            middleName: this.form.middleName,
+            surname: this.form.surname,
+            maidenName: this.form.maidenName,
+            dob: this.form.dob,
+            sex: this.form.sex,
+          },
+          addressInformation: {
+            addressLine: {
+              address1: this.form.address1,
+              address2: this.form.address2,
+              address3: this.form.address3,
+              address4: this.form.address4,
+            },
+            city: this.form.city,
+            country: this.form.country,
+          },
+          healthInformation: {
+            HRTMenopause: {
+              hrtPresent: this.form.hrtPresent,
+              hrtPresentLength: this.form.hrtPresentLength,
+              hrtPast: this.form.hrtPast,
+              hrtPastYears: this.form.hrtPastYears,
+              menopauseStatus: this.form.menopauseStatus,
+            },
+            genetics: {
+              brcaKnown: this.form.brcaKnown,
+              brcaGenes: this.form.brcaGenes,
+            },
+            familyHistory: {
+              familyHistoryStatus: this.form.familyHistoryStatus,
+              ageOfOnsetYoungestRelative: this.form.ageOfOnsetYoungestRelative,
+              familyHistoryOptions: this.form.familyHistoryOptions,
+            },
+            allergies: {
+              allergies: this.form.allergies,
+              specifyDressing: this.form.specifyDressing,
+              specifyOtherAllergies: this.form.specifyOtherAllergies,
+            },
+            smoking: {
+              smokingStatus: this.form.smokingStatus,
+              smokingYears: this.form.smokingYears,
+              smokedDaily: this.form.smokedDaily,
+              yearsStoppedSmoking: this.form.yearsStoppedSmoking,
+            },
+            vaping: {
+              vapingStatus: this.form.vapingStatus,
+              vapingYears: this.form.vapingYears,
+              vapingPodsPerWeek: this.form.vapingPodsPerWeek,
+              nicotineStrength: this.form.nicotineStrength,
+              yearsStoppedVaping: this.form.yearsStoppedVaping,
+            },
+            alcohol: {
+              alcoholStatus: this.form.alcoholStatus,
+              drinkingYears: this.form.drinkingYears,
+              standardDrinksPerWeek: this.form.standardDrinksPerWeek,
+              bingeDrinksPerMonth: this.form.bingeDrinksPerMonth,
+              yearsStoppedDrinking: this.form.yearsStoppedDrinking,
+            },
+          },
+        };
+
+        await setDoc(docRef, payload);
         alert("Data saved successfully!");
       } catch (error) {
         console.error("Error saving data:", error);
         alert("An error occurred.");
       }
     },
+
     async loadForm() {
       const user = auth.currentUser;
       if (!user) return;
@@ -408,17 +595,76 @@ export default {
 
         if (docSnap.exists()) {
           const data = docSnap.data();
-          if (data.form) {
-            Object.keys(data.form).forEach(key => {
-              this.form[key] = data.form[key];
-            });
+
+          if (data.userInformation) {
+            this.form.firstName = data.userInformation.firstName || "";
+            this.form.middleName = data.userInformation.middleName || "";
+            this.form.surname = data.userInformation.surname || "";
+            this.form.maidenName = data.userInformation.maidenName || "";
+            this.form.dob = data.userInformation.dob || "";
+            this.form.sex = data.userInformation.sex || "";
+            this.form.registerDate = data.userInformation.registerDate || "";
+            // email genelde auth'dan alınır, tekrar kaydetmeye gerek yok
+          }
+
+          if (data.addressInformation) {
+            this.form.address1 = data.addressInformation.addressLine?.address1 || "";
+            this.form.address2 = data.addressInformation.addressLine?.address2 || "";
+            this.form.address3 = data.addressInformation.addressLine?.address3 || "";
+            this.form.address4 = data.addressInformation.addressLine?.address4 || "";
+            this.form.city = data.addressInformation.city || "";
+            this.form.country = data.addressInformation.country || "";
+          }
+
+          if (data.healthInformation) {
+            const hrt = data.healthInformation.HRTMenopause || {};
+            this.form.hrtPresent = hrt.hrtPresent || "";
+            this.form.hrtPresentLength = hrt.hrtPresentLength || "";
+            this.form.hrtPast = hrt.hrtPast || "";
+            this.form.hrtPastYears = hrt.hrtPastYears || null;
+            this.form.menopauseStatus = hrt.menopauseStatus || "";
+
+            const genetics = data.healthInformation.genetics || {};
+            this.form.brcaKnown = genetics.brcaKnown || "";
+            this.form.brcaGenes = genetics.brcaGenes || [];
+
+            const family = data.healthInformation.familyHistory || {};
+            this.form.familyHistoryStatus = family.familyHistoryStatus || "";
+            this.form.ageOfOnsetYoungestRelative = family.ageOfOnsetYoungestRelative || null;
+            this.form.familyHistoryOptions = family.familyHistoryOptions || [];
+
+            const allergies = data.healthInformation.allergies || {};
+            this.form.allergies = allergies.allergies || [];
+            this.form.specifyDressing = allergies.specifyDressing || "";
+            this.form.specifyOtherAllergies = allergies.specifyOtherAllergies || "";
+
+            const smoking = data.healthInformation.smoking || {};
+            this.form.smokingStatus = smoking.smokingStatus || "";
+            this.form.smokingYears = smoking.smokingYears || null;
+            this.form.smokedDaily = smoking.smokedDaily || null;
+            this.form.yearsStoppedSmoking = smoking.yearsStoppedSmoking || null;
+
+            const vaping = data.healthInformation.vaping || {};
+            this.form.vapingStatus = vaping.vapingStatus || "";
+            this.form.vapingYears = vaping.vapingYears || null;
+            this.form.vapingPodsPerWeek = vaping.vapingPodsPerWeek || null;
+            this.form.nicotineStrength = vaping.nicotineStrength || null;
+            this.form.yearsStoppedVaping = vaping.yearsStoppedVaping || null;
+
+            const alcohol = data.healthInformation.alcohol || {};
+            this.form.alcoholStatus = alcohol.alcoholStatus || "";
+            this.form.drinkingYears = alcohol.drinkingYears || null;
+            this.form.standardDrinksPerWeek = alcohol.standardDrinksPerWeek || null;
+            this.form.bingeDrinksPerMonth = alcohol.bingeDrinksPerMonth || null;
+            this.form.yearsStoppedDrinking = alcohol.yearsStoppedDrinking || null;
           }
         }
       } catch (error) {
         console.error("Error loading data:", error);
       }
-    }
+    },
   },
+
   mounted() {
     import('@/assets/countries.js').then(module => {
       this.countries = module.default;
