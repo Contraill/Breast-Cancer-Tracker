@@ -1,9 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import HomeView from '..HomeView.vue'
-import AuthView from '..AuthView.vue'
-import AuthAction from '..AuthAction.vue'
-
+import { getAuth } from 'firebase/auth'
+import HomeView from '../views/HomeView.vue'
+import AuthView from '../views/AuthView.vue'
+import AuthAction from '../views/AuthAction.vue'
 
 const routes = [
   {
@@ -29,7 +28,7 @@ const router = createRouter({
   routes
 })
 
-//Route Guard
+// Route Guard
 router.beforeEach((to, from, next) => {
   const auth = getAuth()
   const user = auth.currentUser
