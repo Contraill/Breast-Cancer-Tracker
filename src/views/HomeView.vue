@@ -4,7 +4,8 @@
     <h1 class="title">Health Tracker</h1>
 
     <div class="home-container">
-      <TabView v-model:activeIndex="activeIndex">
+      <div class="tab-container-with-logout">
+        <TabView v-model:activeIndex="activeIndex">
         <!-- USER INFO -->
         <TabPanel header="User Information">
           <div class="form-grid">
@@ -22,268 +23,332 @@
               </select>
             </label>
           </div>
-        </TabPanel>
 
-        <!-- ADDRESS INFO -->
-        <TabPanel header="Address Information">
-          <div class="form-grid">
-            <label>Address Line 1*<input v-model="form.address1" required /></label>
-            <label>Address Line 2<input v-model="form.address2" /></label>
-            <label>Address Line 3<input v-model="form.address3" /></label>
-            <label>Address Line 4<input v-model="form.address4" /></label>
-            <label>City*<input v-model="form.city" required /></label>
-            <label>Country* 
-              <Dropdown 
-                v-model="form.country" 
-                :options="countries" 
-                optionLabel="name" 
-                optionValue="code" 
-                placeholder="Select Country"
-                filter 
-                filterBy="name"
-                :showClear="true"
-                required
-                class="custom-dropdown"
-              />
-            </label>
-          </div>
-        </TabPanel>
+          <!-- SECTION DIVIDER -->
+          <div class="section-divider"></div>
 
-        <!-- HEALTH INFO -->
-        <TabPanel header="Health Information">
-          <div class="health-info-form">
-
-            <h3>HRT & Menopause</h3>
-            <!-- HRT Use (Present) -->
-            <div class="form-group horizontal-group">
-              <label class="main-label">HRT Use (Present)*</label>
-
-              <div class="radio-group">
-                <input type="radio" id="hrtPresentYes" name="hrtPresent" value="yes" v-model="form.hrtPresent" />
-                <label for="hrtPresentYes">Yes</label>
-
-                <input type="radio" id="hrtPresentNo" name="hrtPresent" value="no" v-model="form.hrtPresent" />
-                <label for="hrtPresentNo">No</label>
-              </div>
-
-              <div class="extra-field" v-show="form.hrtPresent === 'yes'">
-                <label class="inline-label">Length of current HRT use*</label>
-                <select v-model="form.hrtPresentLength" required>
-                  <option value="" disabled>Select</option>
-                  <option>Using HRT less than 1 year</option>
-                  <option>Using HRT greater than 5 years</option>
-                  <option>Using HRT 5 years</option>
-                  <option>Length of HRT Use Unknown</option>
-                </select>
-              </div>
+          <!-- EMAIL CHANGE SECTION -->
+          <div class="email-change-section">
+            <h3>Change Email Address</h3>
+            <div class="current-email-display">
+              <label>Current Email</label>
+              <div class="current-email">{{ currentUserEmail }}</div>
+            </div>
+            
+            <div class="email-change-form" v-if="!showEmailChange">
+              <button type="button" @click="showEmailChange = true" class="change-email-btn">
+                Change Email Address
+              </button>
             </div>
 
-            <!-- HRT Use (Past) -->
-            <div class="form-group horizontal-group">
-              <label class="main-label">HRT Use (Past)*</label>
+            <div class="email-change-form" v-if="showEmailChange">
+              <div class="form-grid">
+                <label>New Email Address*
+                  <input 
+                    v-model="emailChange.newEmail" 
+                    type="email" 
+                    required 
+                    placeholder="Enter your new email address"
+                  />
+                </label>
+                <label>Current Password*
+                  <input 
+                    v-model="emailChange.currentPassword" 
+                    type="password" 
+                    required 
+                    placeholder="Enter your current password to confirm"
+                  />
+                </label>
+              </div>
+              <div class="email-change-buttons">
+                <button type="button" @click="updateEmail" class="save-email-btn">
+                  Update Email
+                </button>
+                <button type="button" @click="cancelEmailChange" class="cancel-email-btn">
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </TabPanel>          <!-- ADDRESS INFO -->
+          <TabPanel header="Address Information">
+            <div class="form-grid">
+              <label>Address Line 1*<input v-model="form.address1" required /></label>
+              <label>Address Line 2<input v-model="form.address2" /></label>
+              <label>Address Line 3<input v-model="form.address3" /></label>
+              <label>Address Line 4<input v-model="form.address4" /></label>
+              <label>City*<input v-model="form.city" required /></label>
+              <label>Country* 
+                <Dropdown 
+                  v-model="form.country" 
+                  :options="countries" 
+                  optionLabel="name" 
+                  optionValue="code" 
+                  placeholder="Select Country"
+                  filter 
+                  filterBy="name"
+                  :showClear="true"
+                  required
+                  class="custom-dropdown"
+                />
+              </label>
+            </div>
+          </TabPanel>
 
-              <div class="radio-group">
-                <input type="radio" id="hrtPastYes" name="hrtPast" value="yes" v-model="form.hrtPast" />
-                <label for="hrtPastYes">Yes</label>
+          <!-- HEALTH INFO -->
+          <TabPanel header="Health Information">
+            <div class="health-info-form">
 
-                <input type="radio" id="hrtPastNo" name="hrtPast" value="no" v-model="form.hrtPast" />
-                <label for="hrtPastNo">No</label>
+              <h3>HRT & Menopause</h3>
+              <!-- HRT Use (Present) -->
+              <div class="form-group horizontal-group">
+                <label class="main-label">HRT Use (Present)*</label>
+
+                <div class="radio-group">
+                  <input type="radio" id="hrtPresentYes" name="hrtPresent" value="yes" v-model="form.hrtPresent" />
+                  <label for="hrtPresentYes">Yes</label>
+
+                  <input type="radio" id="hrtPresentNo" name="hrtPresent" value="no" v-model="form.hrtPresent" />
+                  <label for="hrtPresentNo">No</label>
+                </div>
+
+                <div class="extra-field" v-show="form.hrtPresent === 'yes'">
+                  <label class="inline-label">Length of current HRT use*</label>
+                  <select v-model="form.hrtPresentLength" required>
+                    <option value="" disabled>Select</option>
+                    <option>Using HRT less than 1 year</option>
+                    <option>Using HRT greater than 5 years</option>
+                    <option>Using HRT 5 years</option>
+                    <option>Length of HRT Use Unknown</option>
+                  </select>
+                </div>
               </div>
 
-              <div class="extra-field" v-show="form.hrtPast === 'yes'">
-                <label class="inline-label">No of Years on HRT*</label>
+              <!-- HRT Use (Past) -->
+              <div class="form-group horizontal-group">
+                <label class="main-label">HRT Use (Past)*</label>
+
+                <div class="radio-group">
+                  <input type="radio" id="hrtPastYes" name="hrtPast" value="yes" v-model="form.hrtPast" />
+                  <label for="hrtPastYes">Yes</label>
+
+                  <input type="radio" id="hrtPastNo" name="hrtPast" value="no" v-model="form.hrtPast" />
+                  <label for="hrtPastNo">No</label>
+                </div>
+
+                <div class="extra-field" v-show="form.hrtPast === 'yes'">
+                  <label class="inline-label">No of Years on HRT*</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    v-model.number="form.hrtPastYears"
+                    required
+                  />
+                </div>
+              </div>
+
+              <!-- Menopause Status -->
+              <div class="form-group horizontal-group">
+                <label class="main-label">Menopause Status*</label>
+                <select v-model="form.menopauseStatus" required>
+                  <option value="" selected disabled>Select</option>
+                  <option>Peri-Menopause</option>
+                  <option>Post-Menopause</option>
+                  <option>Pre-Menopause</option>
+                  <option>Unknown</option>
+                </select>
+              </div>
+
+              <!-- SECTION DIVIDER -->
+              <div class="section-divider"></div>
+
+              <!-- CLIENT GENETICS -->
+              <h3>Client Genetics</h3>
+
+              <div class="form-group horizontal-group">
+                <label class="main-label">BRCA Status Known*</label>
+
+                <div class="radio-group">
+                  <input type="radio" id="brcaKnownYes" name="brcaKnown" value="yes" v-model="form.brcaKnown" />
+                  <label for="brcaKnownYes">Yes</label>
+
+                  <input type="radio" id="brcaKnownNo" name="brcaKnown" value="no" v-model="form.brcaKnown" />
+                  <label for="brcaKnownNo">No</label>
+                </div>
+
+                <MultiSelect
+                  :class="{'invalid-border': !form.brcaGenes.length}"
+                  v-if="form.brcaKnown === 'yes'"
+                  v-model="form.brcaGenes"
+                  :options="brcaOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select BRCA genes"
+                  class="w-40"
+                  display="chip"
+                  :showSelectAll="true"
+                />
+              </div>
+
+              <!-- SECTION DIVIDER -->
+              <div class="section-divider"></div>
+
+              <!-- FAMILY HISTORY -->
+              <h3>Family History</h3>
+              <div class="form-group horizontal-group">
+                <label class="main-label">Breast Cancer in Family History Status*</label>
+                <select v-model="form.familyHistoryStatus" required>
+                  <option value="" disabled>Select</option>
+                  <option>Family History Null</option>
+                  <option>Family History Unknown</option>
+                  <option>Family History Known</option>
+                </select>
+              </div>
+              <div v-if="form.familyHistoryStatus === 'Family History Known'" class="extra-fields">
                 <input
                   type="number"
                   min="0"
                   step="1"
-                  v-model.number="form.hrtPastYears"
+                  v-model.number="form.ageOfOnsetYoungestRelative"
+                  placeholder="Age of Onset Youngest Relative*"
                   required
                 />
-              </div>
-            </div>
-
-            <!-- Menopause Status -->
-            <div class="form-group horizontal-group">
-              <label class="main-label">Menopause Status*</label>
-              <select v-model="form.menopauseStatus" required>
-                <option value="" selected disabled>Select</option>
-                <option>Peri-Menopause</option>
-                <option>Post-Menopause</option>
-                <option>Pre-Menopause</option>
-                <option>Unknown</option>
-              </select>
-            </div>
-
-            <!-- CLIENT GENETICS -->
-            <h3>Client Genetics</h3>
-
-            <div class="form-group horizontal-group">
-              <label class="main-label">BRCA Status Known*</label>
-
-              <div class="radio-group">
-                <input type="radio" id="brcaKnownYes" name="brcaKnown" value="yes" v-model="form.brcaKnown" />
-                <label for="brcaKnownYes">Yes</label>
-
-                <input type="radio" id="brcaKnownNo" name="brcaKnown" value="no" v-model="form.brcaKnown" />
-                <label for="brcaKnownNo">No</label>
+                &nbsp;
+                <MultiSelect
+                  :class="{'invalid-border': !form.familyHistoryOptions.length}"
+                  v-model="form.familyHistoryOptions"
+                  :options="familyHistoryMultiOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select Breast Cancer Family History*"
+                  class="w-40"
+                  display="chip"
+                />
               </div>
 
-              <MultiSelect
-                :class="{'invalid-border': !form.brcaGenes.length}"
-                v-if="form.brcaKnown === 'yes'"
-                v-model="form.brcaGenes"
-                :options="brcaOptions"
-                optionLabel="label"
-                optionValue="value"
-                placeholder="Select BRCA genes"
-                class="w-40"
-                display="chip"
-                :showSelectAll="true"
-              />
+              <!-- SECTION DIVIDER -->
+              <div class="section-divider"></div>
+
+              <!-- ALLERGIES -->
+              <h3>Allergies</h3>
+              <div class="form-group horizontal-group" style="padding: -10px -10px -10px -10px;">
+                <label class="main-label">Allergies</label>
+                <MultiSelect
+                  v-model="form.allergies"
+                  :options="allergyOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select allergies"
+                  filter
+                  display="chip"
+                  class="p-multiselect w-40"
+                />
+              </div>
+
+              <div v-if="form.allergies.includes('Dressing')" class="extra-field">
+                <label for="specifyDressing">Specify Dressing*</label>&nbsp
+                <input
+                  id="specifyDressing"
+                  type="text"
+                  v-model="form.specifyDressing"
+                  :required="form.allergies.includes('Dressing')"
+                  placeholder="Specify Dressing"
+                  class="input-field"
+                />
+              </div><br>
+
+              <div v-if="form.allergies.includes('Other')" class="extra-field">
+                <label for="specifyOther">Specify Other Allergies*</label>&nbsp
+                <input
+                  id="specifyOther"
+                  type="text"
+                  v-model="form.specifyOtherAllergies"
+                  :required="form.allergies.includes('Other')"
+                  placeholder="Specify Other Allergies"
+                  class="input-field"
+                />
+              </div>
+
+              <!-- SECTION DIVIDER -->
+              <div class="section-divider"></div>
+
+              <!-- SMOKING, VAPING & ALCOHOL -->
+              <h3>Smoking, Vaping & Alcohol</h3>
+
+              <!-- Smoking Status -->
+              <div class="form-group horizontal-group">
+                <label class="main-label">Smoking Status*</label>
+                <select v-model="form.smokingStatus" required>
+                  <option value="" disabled>Select</option>
+                  <option>Ex-Smoker</option>
+                  <option>Smoking</option>
+                  <option>Non-Smoker</option>
+                </select>
+              </div>
+
+              <div v-if="form.smokingStatus === 'Ex-Smoker' || form.smokingStatus === 'Smoking'" class="extra-fields">
+                <input type="number" min="0" step="1" v-model.number="form.smokingYears" placeholder="Number years smoking*" required /> <br><br>
+                <input type="number" min="0" step="1" v-model.number="form.smokedDaily" placeholder="Number smoked daily*" required /> <br><br>
+              </div>
+
+              <div v-if="form.smokingStatus === 'Ex-Smoker'" class="extra-fields">
+                <input type="number" min="0" step="1" v-model.number="form.yearsStoppedSmoking" placeholder="Number years stopped smoking*" required /><br><br>
+              </div>
+
+              <!-- Vaping Status -->
+              <div class="form-group horizontal-group">
+                <label class="main-label">Vaping Status*</label>
+                <select v-model="form.vapingStatus" required>
+                  <option value="" disabled>Select</option>
+                  <option>Ex-Vaper</option>
+                  <option>Vaping</option>
+                  <option>Non-Vaper</option>
+                </select>
+              </div>
+
+              <div v-if="form.vapingStatus === 'Ex-Vaper' || form.vapingStatus === 'Vaping'" class="extra-fields">
+                <input type="number" min="0" step="1" v-model.number="form.vapingYears" placeholder="Number years vaping*" required /><br><br>
+                <input type="number" min="0" step="1" v-model.number="form.vapingPodsPerWeek" placeholder="Average pods/cartridges per week*" required /><br><br>
+                <input type="number" min="0" step="1" v-model.number="form.nicotineStrength" placeholder="Nicotine strength used (mg/ml)*" required /><br><br>
+              </div>
+
+              <div v-if="form.vapingStatus === 'Ex-Vaper'" class="extra-fields">
+                <input type="number" min="0" step="1" v-model.number="form.yearsStoppedVaping" placeholder="Number years stopped vaping*" required /><br><br>
+              </div>
+
+              <!-- Alcohol Consumption -->
+              <div class="form-group horizontal-group">
+                <label class="main-label">Alcohol Consumption*</label>
+                <select v-model="form.alcoholStatus" required>
+                  <option value="" disabled>Select</option>
+                  <option>Ex-Drinker</option>
+                  <option>Drinking</option>
+                  <option>Non-Drinker</option>
+                </select>
+              </div>
+
+              <div v-if="form.alcoholStatus === 'Ex-Drinker' || form.alcoholStatus === 'Drinking'" class="extra-fields">
+                <input type="number" min="0" step="1" v-model.number="form.drinkingYears" placeholder="Number years drinking*" required /><br><br>
+                <input type="number" min="0" step="1" v-model.number="form.standardDrinksPerWeek" placeholder="Average standard drinks per week*" required /><br><br>
+                <input type="number" min="0" step="1" v-model.number="form.bingeDrinksPerMonth" placeholder="Binge drinking frequency (per month)*" required /><br><br>
+              </div>
+
+              <div v-if="form.alcoholStatus === 'Ex-Drinker'" class="extra-fields">
+                <input type="number" min="0" step="1" v-model.number="form.yearsStoppedDrinking" placeholder="Number years stopped drinking*" required /><br><br>
+              </div>
+
+
             </div>
-
-            <!-- FAMILY HISTORY -->
-            <h3>Family History</h3>
-            <div class="form-group horizontal-group">
-              <label class="main-label">Breast Cancer in Family History Status*</label>
-              <select v-model="form.familyHistoryStatus" required>
-                <option value="" disabled>Select</option>
-                <option>Family History Null</option>
-                <option>Family History Unknown</option>
-                <option>Family History Known</option>
-              </select>
-            </div>
-            <div v-if="form.familyHistoryStatus === 'Family History Known'" class="extra-fields">
-              <input
-                type="number"
-                min="0"
-                step="1"
-                v-model.number="form.ageOfOnsetYoungestRelative"
-                placeholder="Age of Onset Youngest Relative*"
-                required
-              />
-              &nbsp;
-              <MultiSelect
-                :class="{'invalid-border': !form.familyHistoryOptions.length}"
-                v-model="form.familyHistoryOptions"
-                :options="familyHistoryMultiOptions"
-                optionLabel="label"
-                optionValue="value"
-                placeholder="Select Breast Cancer Family History*"
-                class="w-40"
-                display="chip"
-              />
-            </div>
-
-            <!-- ALLERGIES -->
-            <h3>Allergies</h3>
-            <div class="form-group horizontal-group" style="padding: -10px -10px -10px -10px;">
-              <label class="main-label">Allergies</label>
-              <MultiSelect
-                v-model="form.allergies"
-                :options="allergyOptions"
-                optionLabel="label"
-                optionValue="value"
-                placeholder="Select allergies"
-                filter
-                display="chip"
-                class="p-multiselect w-40"
-              />
-            </div>
-
-            <div v-if="form.allergies.includes('Dressing')" class="extra-field">
-              <label for="specifyDressing">Specify Dressing*</label>&nbsp
-              <input
-                id="specifyDressing"
-                type="text"
-                v-model="form.specifyDressing"
-                :required="form.allergies.includes('Dressing')"
-                placeholder="Specify Dressing"
-                class="input-field"
-              />
-            </div><br>
-
-            <div v-if="form.allergies.includes('Other')" class="extra-field">
-              <label for="specifyOther">Specify Other Allergies*</label>&nbsp
-              <input
-                id="specifyOther"
-                type="text"
-                v-model="form.specifyOtherAllergies"
-                :required="form.allergies.includes('Other')"
-                placeholder="Specify Other Allergies"
-                class="input-field"
-              />
-            </div>
-
-            <!-- SMOKING, VAPING & ALCOHOL -->
-            <h3>Smoking, Vaping & Alcohol</h3>
-
-            <!-- Smoking Status -->
-            <div class="form-group horizontal-group">
-              <label class="main-label">Smoking Status*</label>
-              <select v-model="form.smokingStatus" required>
-                <option value="" disabled>Select</option>
-                <option>Ex-Smoker</option>
-                <option>Smoking</option>
-                <option>Non-Smoker</option>
-              </select>
-            </div>
-
-            <div v-if="form.smokingStatus === 'Ex-Smoker' || form.smokingStatus === 'Smoking'" class="extra-fields">
-              <input type="number" min="0" step="1" v-model.number="form.smokingYears" placeholder="Number years smoking*" required /> <br><br>
-              <input type="number" min="0" step="1" v-model.number="form.smokedDaily" placeholder="Number smoked daily*" required /> <br><br>
-            </div>
-
-            <div v-if="form.smokingStatus === 'Ex-Smoker'" class="extra-fields">
-              <input type="number" min="0" step="1" v-model.number="form.yearsStoppedSmoking" placeholder="Number years stopped smoking*" required /><br><br>
-            </div>
-
-            <!-- Vaping Status -->
-            <div class="form-group horizontal-group">
-              <label class="main-label">Vaping Status*</label>
-              <select v-model="form.vapingStatus" required>
-                <option value="" disabled>Select</option>
-                <option>Ex-Vaper</option>
-                <option>Vaping</option>
-                <option>Non-Vaper</option>
-              </select>
-            </div>
-
-            <div v-if="form.vapingStatus === 'Ex-Vaper' || form.vapingStatus === 'Vaping'" class="extra-fields">
-              <input type="number" min="0" step="1" v-model.number="form.vapingYears" placeholder="Number years vaping*" required /><br><br>
-              <input type="number" min="0" step="1" v-model.number="form.vapingPodsPerWeek" placeholder="Average pods/cartridges per week*" required /><br><br>
-              <input type="number" min="0" step="1" v-model.number="form.nicotineStrength" placeholder="Nicotine strength used (mg/ml)*" required /><br><br>
-            </div>
-
-            <div v-if="form.vapingStatus === 'Ex-Vaper'" class="extra-fields">
-              <input type="number" min="0" step="1" v-model.number="form.yearsStoppedVaping" placeholder="Number years stopped vaping*" required /><br><br>
-            </div>
-
-            <!-- Alcohol Consumption -->
-            <div class="form-group horizontal-group">
-              <label class="main-label">Alcohol Consumption*</label>
-              <select v-model="form.alcoholStatus" required>
-                <option value="" disabled>Select</option>
-                <option>Ex-Drinker</option>
-                <option>Drinking</option>
-                <option>Non-Drinker</option>
-              </select>
-            </div>
-
-            <div v-if="form.alcoholStatus === 'Ex-Drinker' || form.alcoholStatus === 'Drinking'" class="extra-fields">
-              <input type="number" min="0" step="1" v-model.number="form.drinkingYears" placeholder="Number years drinking*" required /><br><br>
-              <input type="number" min="0" step="1" v-model.number="form.standardDrinksPerWeek" placeholder="Average standard drinks per week*" required /><br><br>
-              <input type="number" min="0" step="1" v-model.number="form.bingeDrinksPerMonth" placeholder="Binge drinking frequency (per month)*" required /><br><br>
-            </div>
-
-            <div v-if="form.alcoholStatus === 'Ex-Drinker'" class="extra-fields">
-              <input type="number" min="0" step="1" v-model.number="form.yearsStoppedDrinking" placeholder="Number years stopped drinking*" required /><br><br>
-            </div>
-
-
-          </div>
-        </TabPanel>
-      </TabView>
+          </TabPanel>
+        </TabView>
+        
+        <!-- Logout Tab Button -->
+        <button class="logout-tab-btn" @click="handleLogout">
+          <i class="pi pi-sign-out"></i>
+          <span>Logout</span>
+        </button>
+      </div>
 
       <div class="submit-button">
         <button class="submit-btn" @click="saveForm">Save</button>
@@ -296,7 +361,7 @@
 <script>
 import { db, auth } from "../firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
-
+import { signOut, updateEmail, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
@@ -314,6 +379,12 @@ export default {
     return {
       activeIndex: 0,
       countries: [],
+      showEmailChange: false,
+      currentUserEmail: '',
+      emailChange: {
+        newEmail: '',
+        currentPassword: ''
+      },
       form: {
         consent:"has consent",
         firstName: "",
@@ -398,22 +469,22 @@ export default {
         !this.form.vapingStatus ||
         !this.form.alcoholStatus
       ) {
-        alert("Lütfen tüm zorunlu alanları doldurun.");
+        alert("Please fill in all required fields to continue.");
         return false;
       }
 
       if (this.form.hrtPresent === "yes" && !this.form.hrtPresentLength) {
-        alert("Lütfen 'Length of current HRT use' alanını doldurun.");
+        alert("Please specify the length of your current HRT use.");
         return false;
       }
 
       if (this.form.hrtPast === "yes" && (this.form.hrtPastYears === null || this.form.hrtPastYears === "")) {
-        alert("Lütfen 'No of Years on HRT' alanını doldurun.");
+        alert("Please enter the number of years you used HRT in the past.");
         return false;
       }
 
       if (this.form.brcaKnown === "yes" && this.form.brcaGenes.length === 0) {
-        alert("Lütfen en az bir BRCA geni seçin.");
+        alert("Please select at least one BRCA gene option.");
         return false;
       }
 
@@ -423,18 +494,18 @@ export default {
           this.form.ageOfOnsetYoungestRelative === "" ||
           this.form.familyHistoryOptions.length === 0
         ) {
-          alert("Lütfen Family History Known ile ilgili tüm alanları doldurun.");
+          alert("Please complete all family history fields, including the age of onset and family history options.");
           return false;
         }
       }
 
       if (this.form.allergies.includes("Dressing") && !this.form.specifyDressing) {
-        alert("Lütfen 'Specify Dressing' alanını doldurun.");
+        alert("Please specify the type of dressing allergy you have.");
         return false;
       }
 
       if (this.form.allergies.includes("Other") && !this.form.specifyOtherAllergies) {
-        alert("Lütfen 'Specify Other Allergies' alanını doldurun.");
+        alert("Please specify your other allergies.");
         return false;
       }
 
@@ -445,13 +516,13 @@ export default {
           this.form.smokedDaily === null ||
           this.form.smokedDaily === ""
         ) {
-          alert("Lütfen sigara ile ilgili zorunlu alanları doldurun.");
+          alert("Please complete all smoking-related fields including years of smoking and daily amount.");
           return false;
         }
       }
 
       if (this.form.smokingStatus === "Ex-Smoker" && (this.form.yearsStoppedSmoking === null || this.form.yearsStoppedSmoking === "")) {
-        alert("Lütfen 'Number years stopped smoking' alanını doldurun.");
+        alert("Please enter how many years ago you stopped smoking.");
         return false;
       }
 
@@ -464,13 +535,13 @@ export default {
           this.form.nicotineStrength === null ||
           this.form.nicotineStrength === ""
         ) {
-          alert("Lütfen vaping ile ilgili zorunlu alanları doldurun.");
+          alert("Please complete all vaping-related fields including years, pods per week, and nicotine strength.");
           return false;
         }
       }
 
       if (this.form.vapingStatus === "Ex-Vaper" && (this.form.yearsStoppedVaping === null || this.form.yearsStoppedVaping === "")) {
-        alert("Lütfen 'Number years stopped vaping' alanını doldurun.");
+        alert("Please enter how many years ago you stopped vaping.");
         return false;
       }
 
@@ -483,13 +554,13 @@ export default {
           this.form.bingeDrinksPerMonth === null ||
           this.form.bingeDrinksPerMonth === ""
         ) {
-          alert("Lütfen alkol ile ilgili zorunlu alanları doldurun.");
+          alert("Please complete all alcohol-related fields including years, drinks per week, and binge frequency.");
           return false;
         }
       }
 
       if (this.form.alcoholStatus === "Ex-Drinker" && (this.form.yearsStoppedDrinking === null || this.form.yearsStoppedDrinking === "")) {
-        alert("Lütfen 'Number years stopped drinking' alanını doldurun.");
+        alert("Please enter how many years ago you stopped drinking alcohol.");
         return false;
       }
 
@@ -499,7 +570,7 @@ export default {
     async saveForm() {
       const user = auth.currentUser;
       if (!user) {
-        alert("User is not logged in.");
+        alert("Please log in to save your health information.");
         return;
       }
 
@@ -578,10 +649,10 @@ export default {
         };
 
         await setDoc(docRef, payload);
-        alert("Data saved successfully!");
+        alert("Your health information has been saved successfully!");
       } catch (error) {
         console.error("Error saving data:", error);
-        alert("An error occurred.");
+        alert("We're sorry, there was a problem saving your information. Please check your internet connection and try again.");
       }
     },
 
@@ -660,14 +731,88 @@ export default {
         }
       } catch (error) {
         console.error("Error loading data:", error);
+        // Silently fail for loading - user can still fill out the form
+        // Could show a non-intrusive message if needed
       }
     },
+
+    async handleLogout() {
+      try {
+        await signOut(auth);
+        this.$router.push('/');
+      } catch (error) {
+        console.error("Error signing out:", error);
+        alert("There was a problem signing you out. Please try again.");
+      }
+    },
+
+    async updateEmail() {
+      if (!this.emailChange.newEmail || !this.emailChange.currentPassword) {
+        alert("Please fill in both the new email and current password fields.");
+        return;
+      }
+
+      if (this.emailChange.newEmail === this.currentUserEmail) {
+        alert("The new email is the same as your current email. Please enter a different email address.");
+        return;
+      }
+
+      try {
+        const user = auth.currentUser;
+        
+        // Create credential with current password
+        const credential = EmailAuthProvider.credential(
+          user.email,
+          this.emailChange.currentPassword
+        );
+
+        // Re-authenticate user
+        await reauthenticateWithCredential(user, credential);
+        
+        // Update email
+        await updateEmail(user, this.emailChange.newEmail);
+        
+        // Update current email display
+        this.currentUserEmail = this.emailChange.newEmail;
+        
+        // Reset form and hide
+        this.cancelEmailChange();
+        
+        alert("Your email address has been successfully updated!");
+        
+      } catch (error) {
+        console.error("Error updating email:", error);
+        
+        if (error.code === 'auth/wrong-password') {
+          alert("Incorrect password. Please check your current password and try again.");
+        } else if (error.code === 'auth/email-already-in-use') {
+          alert("This email address is already in use by another account.");
+        } else if (error.code === 'auth/invalid-email') {
+          alert("Please enter a valid email address.");
+        } else if (error.code === 'auth/requires-recent-login') {
+          alert("For security reasons, please log out and log back in before changing your email.");
+        } else {
+          alert("We're sorry, there was a problem updating your email address. Please try again.");
+        }
+      }
+    },
+
+    cancelEmailChange() {
+      this.showEmailChange = false;
+      this.emailChange.newEmail = '';
+      this.emailChange.currentPassword = '';
+    }
   },
 
   mounted() {
     import('@/assets/countries.js').then(module => {
       this.countries = module.default;
     }).catch(console.error);
+
+    // Set current user email
+    if (auth.currentUser) {
+      this.currentUserEmail = auth.currentUser.email;
+    }
 
     this.loadForm();
   }

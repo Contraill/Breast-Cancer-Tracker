@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { getAuth } from 'firebase/auth'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import HomeView from '../views/HomeView.vue'
 import AuthView from '../views/AuthView.vue'
+import 'primeicons/primeicons.css'
 
 const routes = [
   {
@@ -22,15 +23,36 @@ const router = createRouter({
   routes
 })
 
-// Route Guard
-router.beforeEach((to, from, next) => {
-  const auth = getAuth()
-  const user = auth.currentUser
+// Function to get current authentication status
+const getCurrentUser = () => {
+  return new Promise((resolve, reject) => {
+    const removeListener = onAuthStateChanged(
+      getAuth(),
+      (user) => {
+        removeListener()
+        resolve(user)
+      },
+      reject
+    )
+  })
+}
 
-  if (to.meta.requiresAuth && !user) {
-    next({ name: 'Auth' }) // giriş yapılmamışsa giriş sayfasına yönlendir
+// Route Guard with proper authentication state handling
+router.beforeEach(async (to, from, next) => {
+  if (to.meta.requiresAuth) {
+    try {
+      const user = await getCurrentUser()
+      if (user) {
+        next()
+      } else {
+        next({ name: 'Auth' })
+      }
+    } catch (error) {
+      console.error('Authentication check failed:', error)
+      next({ name: 'Auth' })
+    }
   } else {
-    next() // sorun yoksa devam et
+    next()
   }
 })
 

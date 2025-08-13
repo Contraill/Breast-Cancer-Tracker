@@ -16,7 +16,7 @@
           :inputStyle="{ width: '320px'}"
           :pt="{
             showIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' },
-            hideIcon: { style: 'position: absolute; top: 58%; transform: translateY(-50%);' }
+            hideIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' }
           }"
         />
 
@@ -30,7 +30,7 @@
           :inputStyle="{ width: '320px'}"
           :pt="{
             showIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' },
-            hideIcon: { style: 'position: absolute; top: 58%; transform: translateY(-50%);' }
+            hideIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' }
           }"
         />
         <br>
@@ -56,7 +56,7 @@
             :inputStyle="{ width: '290px'}"
             :pt="{
               showIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' },
-              hideIcon: { style: 'position: absolute; top: 58%; transform: translateY(-50%);' }
+              hideIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' }
             }"
           />
 
@@ -87,7 +87,7 @@
           :inputStyle="{ width: '290px'}"
           :pt="{
             showIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' },
-            hideIcon: { style: 'position: absolute; top: 58%; transform: translateY(-50%);' }
+            hideIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' }
           }"
           />
 
@@ -101,7 +101,7 @@
           :inputStyle="{ width: '290px'}"
           :pt="{
             showIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' },
-            hideIcon: { style: 'position: absolute; top: 58%; transform: translateY(-50%);' }
+            hideIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' }
           }"
           />
 
@@ -162,10 +162,10 @@ onMounted(async () => {
   if (mode === 'verifyEmail' && oobCode) {
     try {
       await applyActionCode(auth, oobCode)
-      alert('Email successfully verified! You can now log in.')
+      alert('Your email has been successfully verified! You can now log in to your account.')
     } catch (err) {
       console.error(err)
-      alert('Error verifying email: ' + err.message)
+      alert('We\'re sorry, there was a problem verifying your email. The verification link may have expired. Please try requesting a new verification email.')
     }
   }
 
@@ -177,7 +177,7 @@ onMounted(async () => {
       isResetMode.value = true
     } catch (err) {
       console.error(err)
-      alert('Error with password reset link: ' + err.message)
+      alert('We\'re sorry, there was a problem with your password reset link. The link may have expired or already been used. Please request a new password reset.')
     }
   }
 })
@@ -187,63 +187,102 @@ const handleLogin = async () => {
     await signInWithEmailAndPassword(auth, email.value, password.value)
     router.push('/home')
   } catch (error) {
-    alert(error.message)
+    console.error(error)
+    // Provide user-friendly messages based on common Firebase auth errors
+    if (error.code === 'auth/user-not-found') {
+      alert('No account found with this email address. Please check your email or create a new account.')
+    } else if (error.code === 'auth/wrong-password') {
+      alert('Incorrect password. Please check your password and try again.')
+    } else if (error.code === 'auth/invalid-email') {
+      alert('Please enter a valid email address.')
+    } else if (error.code === 'auth/user-disabled') {
+      alert('This account has been disabled. Please contact support for assistance.')
+    } else if (error.code === 'auth/too-many-requests') {
+      alert('Too many failed login attempts. Please wait a moment and try again.')
+    } else {
+      alert('We\'re sorry, there was a problem signing you in. Please check your email and password and try again.')
+    }
   }
 }
 
 const handleRegister = async () => {
   try {
     if (password.value !== confirmPassword.value) {
-      alert('Passwords do not match!')
+      alert('The passwords you entered don\'t match. Please make sure both password fields are identical.')
       return
     }
     if (!consentGiven.value) {
-      alert('You must agree to the terms before registering.')
+      alert('Please agree to participate in the Breast Cancer Screening Programme to create your account.')
       return
     }
 
     const userCredential = await createUserWithEmailAndPassword(auth, email.value, password.value)
     await sendEmailVerification(userCredential.user)
 
-    alert('Registration successful! A verification email has been sent to your email address. Please verify before logging in.')
+    alert('Your account has been created successfully! We\'ve sent a verification email to your email address. Please check your inbox and verify your email before logging in.')
     router.push('/home')
   } catch (error) {
-    alert(error.message)
+    console.error(error)
+    // Provide user-friendly messages based on common Firebase auth errors
+    if (error.code === 'auth/email-already-in-use') {
+      alert('An account with this email address already exists. Please try logging in instead.')
+    } else if (error.code === 'auth/weak-password') {
+      alert('Please choose a stronger password. Your password should be at least 6 characters long.')
+    } else if (error.code === 'auth/invalid-email') {
+      alert('Please enter a valid email address.')
+    } else {
+      alert('We\'re sorry, there was a problem creating your account. Please try again.')
+    }
   }
 }
 
 const handleForgotPassword = async () => {
   if (!email.value) {
-    alert('Please enter your email address first.')
+    alert('Please enter your email address in the email field above, then click "Forgot Password?" again.')
     return
   }
 
   try {
     await sendPasswordResetEmail(auth, email.value)
-    alert('Password reset email sent! Please check your inbox.')
+    alert('A password reset email has been sent to your email address. Please check your inbox and follow the instructions to reset your password.')
   } catch (error) {
-    alert(error.message)
+    console.error(error)
+    if (error.code === 'auth/user-not-found') {
+      alert('No account found with this email address. Please check your email or create a new account.')
+    } else if (error.code === 'auth/invalid-email') {
+      alert('Please enter a valid email address.')
+    } else {
+      alert('We\'re sorry, there was a problem sending the password reset email. Please try again.')
+    }
   }
 }
 
 const handleResetPassword = async () => {
   if (!password.value || !confirmPassword.value) {
-    alert('Please fill out both password fields.')
+    alert('Please enter your new password in both fields.')
     return
   }
   if (password.value !== confirmPassword.value) {
-    alert('Passwords do not match!')
+    alert('The passwords you entered don\'t match. Please make sure both password fields are identical.')
     return
   }
   try {
     await confirmPasswordReset(auth, resetOobCode, password.value)
-    alert('Password successfully reset! You can now log in.')
+    alert('Your password has been successfully reset! You can now log in with your new password.')
     router.push('/').then(() => {
-      window.location.reload() // sayfayı tamamen yeniler
+      window.location.reload()
     })
   } catch (error) {
     console.error(error)
-    alert('Error resetting password: ' + error.message)
+    if (error.code === 'auth/weak-password') {
+      alert('Please choose a stronger password. Your password should be at least 6 characters long.')
+    } else if (error.code === 'auth/expired-action-code') {
+      alert('This password reset link has expired. Please request a new password reset.')
+    } else if (error.code === 'auth/invalid-action-code') {
+      alert('This password reset link is invalid or has already been used. Please request a new password reset.')
+    } else {
+      alert('We\'re sorry, there was a problem resetting your password. Please try requesting a new password reset.')
+    }
   }
 }
 
