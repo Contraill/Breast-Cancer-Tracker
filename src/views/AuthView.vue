@@ -12,10 +12,11 @@
           toggle-mask
           required
           class="input-field"
-          :inputStyle="{ paddingRight: '3rem' }"
+          :style="{ width: '320px' }"
+          :inputStyle="{ width: '320px'}"
           :pt="{
-            showIcon: { style: 'position: absolute; right: 1.2rem; top: 50%; transform: translateY(-50%);' },
-            hideIcon: { style: 'position: absolute; right: 1.2rem; top: 50%; transform: translateY(-50%);' }
+            showIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' },
+            hideIcon: { style: 'position: absolute; top: 58%; transform: translateY(-50%);' }
           }"
         />
 
@@ -25,14 +26,15 @@
           toggle-mask
           required
           class="input-field"
-          :inputStyle="{ paddingRight: '3rem' }"
+          :style="{ width: '320px' }"
+          :inputStyle="{ width: '320px'}"
           :pt="{
-            showIcon: { style: 'position: absolute; right: 1.2rem; top: 50%; transform: translateY(-50%);' },
-            hideIcon: { style: 'position: absolute; right: 1.2rem; top: 50%; transform: translateY(-50%);' }
+            showIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' },
+            hideIcon: { style: 'position: absolute; top: 58%; transform: translateY(-50%);' }
           }"
         />
         <br>
-        <Button type="submit" label="Submit" class="submit-btn" />
+        <Button type="submit" label="Save Password" class="submit-btn" />
       </form>
     </div>
 
@@ -49,12 +51,12 @@
             v-model="password" 
             toggle-mask 
             required 
-            class="input-field" 
-            :inputStyle="{ paddingRight: '3rem' }"
-            :feedback="false"
+            class="input-field"
+            :style="{ width: '290px' }"
+            :inputStyle="{ width: '290px'}"
             :pt="{
-              showIcon: { style: 'position: absolute; right: 1.2rem; top: 76%; transform: translateY(-50%);' },
-              hideIcon: { style: 'position: absolute; right: 1.2rem; top: 58%; transform: translateY(-50%);' }
+              showIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' },
+              hideIcon: { style: 'position: absolute; top: 58%; transform: translateY(-50%);' }
             }"
           />
 
@@ -81,11 +83,12 @@
             toggle-mask
             required
             class="input-field"
-            :inputStyle="{ paddingRight: '3rem' }"
-            :pt="{
-              showIcon: { style: 'position: absolute; right: 1.2rem; top: 76%; transform: translateY(-50%);' },
-              hideIcon: { style: 'position: absolute; right: 1.2rem; top: 58%; transform: translateY(-50%);' }
-            }"
+          :style="{ width: '290px' }"
+          :inputStyle="{ width: '290px'}"
+          :pt="{
+            showIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' },
+            hideIcon: { style: 'position: absolute; top: 58%; transform: translateY(-50%);' }
+          }"
           />
 
           <label>Confirm Password</label>
@@ -94,11 +97,12 @@
             toggle-mask
             required
             class="input-field"
-            :inputStyle="{ paddingRight: '3rem' }"
-            :pt="{
-              showIcon: { style: 'position: absolute; right: 1.2rem; top: 76%; transform: translateY(-50%);' },
-              hideIcon: { style: 'position: absolute; right: 1.2rem; top: 58%; transform: translateY(-50%);' }
-            }"
+          :style="{ width: '290px' }"
+          :inputStyle="{ width: '290px'}"
+          :pt="{
+            showIcon: { style: 'position: absolute; top: 76%; transform: translateY(-50%);' },
+            hideIcon: { style: 'position: absolute; top: 58%; transform: translateY(-50%);' }
+          }"
           />
 
           <div class="consent-box">
@@ -234,10 +238,13 @@ const handleResetPassword = async () => {
   try {
     await confirmPasswordReset(auth, resetOobCode, password.value)
     alert('Password successfully reset! You can now log in.')
-    router.push('/')
+    router.push('/').then(() => {
+      window.location.reload() // sayfayı tamamen yeniler
+    })
   } catch (error) {
     console.error(error)
     alert('Error resetting password: ' + error.message)
   }
 }
+
 </script>
