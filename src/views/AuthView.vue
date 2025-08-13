@@ -3,7 +3,41 @@
   <div class="auth-container">
     <h1>Welcome</h1>
 
-    <TabView v-model:activeIndex="activeIndex">
+    <!-- Reset Password Mode -->
+    <div v-if="isResetMode">
+      <form @submit.prevent="handleResetPassword" class="auth-form">
+        <label>New Password</label>
+        <Password
+          v-model="password"
+          toggle-mask
+          required
+          class="input-field"
+          :inputStyle="{ paddingRight: '3rem' }"
+          :pt="{
+            showIcon: { style: 'position: absolute; right: 1.2rem; top: 76%; transform: translateY(-50%);' },
+            hideIcon: { style: 'position: absolute; right: 1.2rem; top: 58%; transform: translateY(-50%);' }
+          }"
+        />
+
+        <label>Confirm Password</label>
+        <Password
+          v-model="confirmPassword"
+          toggle-mask
+          required
+          class="input-field"
+          :inputStyle="{ paddingRight: '3rem' }"
+          :pt="{
+            showIcon: { style: 'position: absolute; right: 1.2rem; top: 76%; transform: translateY(-50%);' },
+            hideIcon: { style: 'position: absolute; right: 1.2rem; top: 58%; transform: translateY(-50%);' }
+          }"
+        />
+
+        <Button type="submit" label="Save Password" class="submit-btn" />
+      </form>
+    </div>
+
+    <!-- Normal Login/Register Tabs -->
+    <TabView v-else v-model:activeIndex="activeIndex">
       <!-- Login Tab -->
       <TabPanel header="Login">
         <form @submit.prevent="handleLogin" class="auth-form">
@@ -26,18 +60,11 @@
 
           <Button type="submit" label="Login" class="submit-btn" />
 
-          <!-- Şifremi Unuttum Butonu -->
           <Button 
             label="Forgot Password?" 
             link 
             @click="handleForgotPassword" 
-            style="
-              margin-top: 10px; 
-              font-size: 0.9rem; 
-              outline: none !important; 
-              border: none !important; 
-              box-shadow: none !important;
-            " 
+            style="margin-top: 10px; font-size: 0.9rem; outline: none !important; border: none !important; box-shadow: none !important;" 
           />
         </form>
       </TabPanel>
@@ -89,7 +116,6 @@
   </div>
 </template>
 
-
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
@@ -100,11 +126,11 @@ import {
   sendPasswordResetEmail, 
   sendEmailVerification, 
   applyActionCode, 
-  verifyPasswordResetCode 
+  verifyPasswordResetCode, 
+  confirmPasswordReset 
 } from 'firebase/auth'
 import app from '../firebase'
 
-// PrimeVue Components
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
 import Button from 'primevue/button'
@@ -112,7 +138,7 @@ import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Checkbox from 'primevue/checkbox'
 
-const activeIndex = ref(0) // 0: Login, 1: Register
+const activeIndex = ref(0)
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
@@ -121,10 +147,12 @@ const consentGiven = ref(false)
 const auth = getAuth(app)
 const router = useRouter()
 
-// --- Firebase Action URL handling ---
+const isResetMode = ref(false)
+let resetOobCode = ''
+
 onMounted(async () => {
   const query = new URLSearchParams(window.location.search)
-  const mode = query.get('mode')          // verifyEmail / resetPassword
+  const mode = query.get('mode')
   const oobCode = query.get('oobCode')
 
   if (mode === 'verifyEmail' && oobCode) {
@@ -141,9 +169,8 @@ onMounted(async () => {
     try {
       const emailFromCode = await verifyPasswordResetCode(auth, oobCode)
       email.value = emailFromCode
-      activeIndex.value = 0 // show login tab
-      alert('Please enter a new password below.')
-      // burada yeni şifreyi girip resetPassword action ekleyebilirsin
+      resetOobCode = oobCode
+      isResetMode.value = true
     } catch (err) {
       console.error(err)
       alert('Error with password reset link: ' + err.message)
@@ -151,7 +178,6 @@ onMounted(async () => {
   }
 })
 
-// --- Login/Register ---
 const handleLogin = async () => {
   try {
     await signInWithEmailAndPassword(auth, email.value, password.value)
@@ -193,6 +219,25 @@ const handleForgotPassword = async () => {
     alert('Password reset email sent! Please check your inbox.')
   } catch (error) {
     alert(error.message)
+  }
+}
+
+const handleResetPassword = async () => {
+  if (!password.value || !confirmPassword.value) {
+    alert('Please fill out both password fields.')
+    return
+  }
+  if (password.value !== confirmPassword.value) {
+    alert('Passwords do not match!')
+    return
+  }
+  try {
+    await confirmPasswordReset(auth, resetOobCode, password.value)
+    alert('Password successfully reset! You can now log in.')
+    router.push('/')
+  } catch (error) {
+    console.error(error)
+    alert('Error resetting password: ' + error.message)
   }
 }
 </script>
