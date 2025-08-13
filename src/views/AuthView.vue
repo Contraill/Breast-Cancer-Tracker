@@ -140,10 +140,15 @@ const handleRegister = async () => {
       alert('You must agree to the terms before registering.');
       return;
     }
+
     const userCredential = await createUserWithEmailAndPassword(auth, email.value, password.value);
+
     await sendEmailVerification(userCredential.user);
-    alert('Registration successful! A verification email has been sent to your email address.');
-    router.push('/home');
+
+    alert('Registration successful! Please check your email to verify your account.');
+
+    router.push('/verify-email');
+
   } catch (error) {
     alert(error.message);
   }
