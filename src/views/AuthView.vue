@@ -3,8 +3,27 @@
   <div class="auth-container">
     <h1>Welcome</h1>
 
+    <!-- Email Verification Success Message -->
+    <div v-if="showVerificationSuccess" class="verification-success">
+      <div class="success-icon">✓</div>
+      <h3>Email Verified Successfully!</h3>
+      <p>Great news! Your email has been verified. You can now access all features of the Breast Cancer Health Tracker.</p>
+      <Button @click="proceedToLogin" label="Continue to Login" class="success-btn" />
+    </div>
+
+    <!-- Email Verification Error Message -->
+    <div v-else-if="showVerificationError" class="verification-error">
+      <div class="error-icon">⚠</div>
+      <h3>Verification Failed</h3>
+      <p>We're sorry, there was a problem verifying your email. The verification link may have expired or already been used.</p>
+      <div class="error-actions">
+        <Button @click="resendVerification" label="Resend Verification" class="resend-btn" />
+        <Button @click="showVerificationError = false" label="Continue" class="continue-btn" />
+      </div>
+    </div>
+
     <!-- Reset Password Mode -->
-    <div v-if="isResetMode">
+    <div v-else-if="isResetMode">
       <form @submit.prevent="handleResetPassword" class="auth-form">
         <label>New Password</label>
         <Password
@@ -147,6 +166,8 @@ const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const consentGiven = ref(false)
+const showVerificationSuccess = ref(false)
+const showVerificationError = ref(false)
 
 const auth = getAuth(app)
 const router = useRouter()
@@ -162,10 +183,10 @@ onMounted(async () => {
   if (mode === 'verifyEmail' && oobCode) {
     try {
       await applyActionCode(auth, oobCode)
-      alert('Your email has been successfully verified! You can now log in to your account.')
+      showVerificationSuccess.value = true
     } catch (err) {
       console.error(err)
-      alert('We\'re sorry, there was a problem verifying your email. The verification link may have expired. Please try requesting a new verification email.')
+      showVerificationError.value = true
     }
   }
 
@@ -181,6 +202,31 @@ onMounted(async () => {
     }
   }
 })
+
+const proceedToLogin = () => {
+  showVerificationSuccess.value = false
+  activeIndex.value = 0
+}
+
+const resendVerification = async () => {
+  if (!email.value) {
+    alert('Please enter your email address first.')
+    return
+  }
+  
+  try {
+    const currentUser = auth.currentUser
+    if (currentUser) {
+      await sendEmailVerification(currentUser)
+      alert('A new verification email has been sent to your email address.')
+    } else {
+      alert('Please log in first to resend the verification email.')
+    }
+  } catch (error) {
+    console.error(error)
+    alert('We\'re sorry, there was a problem sending the verification email. Please try again.')
+  }
+}
 
 const handleLogin = async () => {
   try {

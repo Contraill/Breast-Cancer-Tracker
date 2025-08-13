@@ -57,6 +57,87 @@ select,
   font-weight: 400;
 }
 
+/* ---------- INPUT VALIDATION RULES ---------- */
+/* Name fields - only letters, spaces, hyphens, apostrophes */
+input[data-type="name"] {
+  text-transform: capitalize;
+}
+
+input[data-type="name"]:invalid {
+  border-color: #fed7d7 !important;
+  background-color: #fff5f5 !important;
+}
+
+/* Number fields with reasonable limits */
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Age/Years validation styling */
+input[data-validation="age"]:invalid,
+input[data-validation="years"]:invalid {
+  border-color: #fed7d7 !important;
+  background-color: #fff5f5 !important;
+}
+
+/* Email validation */
+input[type="email"]:invalid {
+  border-color: #fed7d7 !important;
+  background-color: #fff5f5 !important;
+}
+
+/* Address validation - prevent special characters except basic punctuation */
+input[data-type="address"]:invalid {
+  border-color: #fed7d7 !important;
+  background-color: #fff5f5 !important;
+}
+
+/* Date validation */
+input[type="date"] {
+  position: relative;
+}
+
+input[type="date"]:invalid {
+  border-color: #fed7d7 !important;
+  background-color: #fff5f5 !important;
+}
+
+/* Valid input styling */
+input:valid:not(:placeholder-shown) {
+  border-color: #9ae6b4 !important;
+  background-color: #f0fff4 !important;
+}
+
+/* Input length warnings */
+.input-warning {
+  font-size: 0.75rem;
+  color: #d69e2e;
+  margin-top: 0.25rem;
+  display: none;
+}
+
+.input-warning.show {
+  display: block;
+}
+
+.input-error {
+  font-size: 0.75rem;
+  color: #e53e3e;
+  margin-top: 0.25rem;
+  display: none;
+}
+
+.input-error.show {
+  display: block;
+}
+
 /* ---------- PRIMEVUE PASSWORD FIELD FIXES ---------- */
 .auth-form .p-password {
   width: 100% !important;
@@ -336,7 +417,146 @@ textarea:not([required]),
   margin-right: 0.75rem;
 }
 
-/* ---------- AUTH CONTAINER ---------- */
+/* ---------- EMAIL VERIFICATION MESSAGES ---------- */
+.verification-success {
+  text-align: center;
+  padding: 2.5rem 2rem;
+  background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
+  border: 1px solid #9ae6b4;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.verification-success .success-icon {
+  font-size: 3rem;
+  color: #38a169;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+.verification-success h3 {
+  color: #2f855a;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.verification-success p {
+  color: #2d3748;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.success-btn {
+  background: linear-gradient(135deg, #38a169 0%, #2f855a 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 0.875rem 2.5rem !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.success-btn:hover {
+  background: linear-gradient(135deg, #2f855a 0%, #276749 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(56, 161, 105, 0.25) !important;
+}
+
+.verification-error {
+  text-align: center;
+  padding: 2.5rem 2rem;
+  background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+  border: 1px solid #feb2b2;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.verification-error .error-icon {
+  font-size: 3rem;
+  color: #e53e3e;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+.verification-error h3 {
+  color: #c53030;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.verification-error p {
+  color: #2d3748;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.error-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.resend-btn {
+  background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 0.875rem 2rem !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.resend-btn:hover {
+  background: linear-gradient(135deg, #2c5282 0%, #2a4365 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 8px rgba(49, 130, 206, 0.25) !important;
+}
+
+.continue-btn {
+  background: #ffffff !important;
+  color: #718096 !important;
+  border: 1px solid #cbd5e0 !important;
+  padding: 0.875rem 2rem !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+.continue-btn:hover {
+  color: #2d3748 !important;
+  background: #f7fafc !important;
+  border-color: #a0aec0 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+}
+
+@media (max-width: 768px) {
+  .verification-success,
+  .verification-error {
+    padding: 2rem 1.5rem;
+  }
+  
+  .error-actions {
+    flex-direction: column;
+  }
+  
+  .resend-btn,
+  .continue-btn,
+  .success-btn {
+    width: 100% !important;
+  }
+}
 .auth-container {
   align-self: center;
   max-width: 420px;

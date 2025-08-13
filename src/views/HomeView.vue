@@ -9,11 +9,62 @@
         <!-- USER INFO -->
         <TabPanel header="User Information">
           <div class="form-grid">
-            <label>First Name*<input v-model="form.firstName" required /></label>
-            <label>Middle Name<input v-model="form.middleName" /></label>
-            <label>Surname*<input v-model="form.surname" required /></label>
-            <label>Maiden Name<input v-model="form.maidenName" /></label>
-            <label>Date of Birth*<input v-model="form.dob" type="date" required /></label>
+            <label>First Name*
+              <input 
+                v-model="form.firstName" 
+                required 
+                data-type="name"
+                pattern="^[a-zA-ZğĞıİöÖüÜşŞçÇ\s\-'\.]{1,50}$"
+                maxlength="50"
+                title="Please enter a valid first name (letters, spaces, hyphens, and apostrophes only)"
+                @input="validateNameInput"
+              />
+              <div class="input-error" :class="{ show: errors.firstName }">{{ errors.firstName }}</div>
+            </label>
+            <label>Middle Name
+              <input 
+                v-model="form.middleName" 
+                data-type="name"
+                pattern="^[a-zA-ZğĞıİöÖüÜşŞçÇ\s\-'\.]{0,50}$"
+                maxlength="50"
+                title="Please enter a valid middle name (letters, spaces, hyphens, and apostrophes only)"
+                @input="validateNameInput"
+              />
+            </label>
+            <label>Surname*
+              <input 
+                v-model="form.surname" 
+                required 
+                data-type="name"
+                pattern="^[a-zA-ZğĞıİöÖüÜşŞçÇ\s\-'\.]{1,50}$"
+                maxlength="50"
+                title="Please enter a valid surname (letters, spaces, hyphens, and apostrophes only)"
+                @input="validateNameInput"
+              />
+              <div class="input-error" :class="{ show: errors.surname }">{{ errors.surname }}</div>
+            </label>
+            <label>Maiden Name
+              <input 
+                v-model="form.maidenName" 
+                data-type="name"
+                pattern="^[a-zA-ZğĞıİöÖüÜşŞçÇ\s\-'\.]{0,50}$"
+                maxlength="50"
+                title="Please enter a valid maiden name (letters, spaces, hyphens, and apostrophes only)"
+                @input="validateNameInput"
+              />
+            </label>
+            <label>Date of Birth*
+              <input 
+                v-model="form.dob" 
+                type="date" 
+                required 
+                :min="minDate"
+                :max="maxDate"
+                title="Please enter a valid date between 1900 and today"
+                @change="validateDateOfBirth"
+              />
+              <div class="input-error" :class="{ show: errors.dob }">{{ errors.dob }}</div>
+            </label>
             <label>Sex*
               <select v-model="form.sex" required>
                 <option value="" disabled>Select</option>
@@ -73,11 +124,60 @@
         </TabPanel>          <!-- ADDRESS INFO -->
           <TabPanel header="Address Information">
             <div class="form-grid">
-              <label>Address Line 1*<input v-model="form.address1" required /></label>
-              <label>Address Line 2<input v-model="form.address2" /></label>
-              <label>Address Line 3<input v-model="form.address3" /></label>
-              <label>Address Line 4<input v-model="form.address4" /></label>
-              <label>City*<input v-model="form.city" required /></label>
+              <label>Address Line 1*
+                <input 
+                  v-model="form.address1" 
+                  required 
+                  data-type="address"
+                  pattern="^[a-zA-Z0-9ğĞıİöÖüÜşŞçÇ\s\-\.\,\/\#]{1,100}$"
+                  maxlength="100"
+                  title="Please enter a valid address"
+                  @input="validateAddressInput"
+                />
+                <div class="input-error" :class="{ show: errors.address1 }">{{ errors.address1 }}</div>
+              </label>
+              <label>Address Line 2
+                <input 
+                  v-model="form.address2" 
+                  data-type="address"
+                  pattern="^[a-zA-Z0-9ğĞıİöÖüÜşŞçÇ\s\-\.\,\/\#]{0,100}$"
+                  maxlength="100"
+                  title="Please enter a valid address"
+                  @input="validateAddressInput"
+                />
+              </label>
+              <label>Address Line 3
+                <input 
+                  v-model="form.address3" 
+                  data-type="address"
+                  pattern="^[a-zA-Z0-9ğĞıİöÖüÜşŞçÇ\s\-\.\,\/\#]{0,100}$"
+                  maxlength="100"
+                  title="Please enter a valid address"
+                  @input="validateAddressInput"
+                />
+              </label>
+              <label>Address Line 4
+                <input 
+                  v-model="form.address4" 
+                  data-type="address"
+                  pattern="^[a-zA-Z0-9ğĞıİöÖüÜşŞçÇ\s\-\.\,\/\#]{0,100}$"
+                  maxlength="100"
+                  title="Please enter a valid address"
+                  @input="validateAddressInput"
+                />
+              </label>
+              <label>City*
+                <input 
+                  v-model="form.city" 
+                  required 
+                  data-type="name"
+                  pattern="^[a-zA-ZğĞıİöÖüÜşŞçÇ\s\-'\.]{1,50}$"
+                  maxlength="50"
+                  title="Please enter a valid city name"
+                  @input="validateNameInput"
+                />
+                <div class="input-error" :class="{ show: errors.city }">{{ errors.city }}</div>
+              </label>
               <label>Country* 
                 <Dropdown 
                   v-model="form.country" 
@@ -140,11 +240,15 @@
                   <label class="inline-label">No of Years on HRT*</label>
                   <input
                     type="number"
-                    min="0"
+                    min="1"
+                    max="50"
                     step="1"
                     v-model.number="form.hrtPastYears"
                     required
+                    title="Please enter a reasonable number of years (1-50)"
+                    @input="validateHrtYears"
                   />
+                  <div class="input-error" :class="{ show: errors.hrtPastYears }">{{ errors.hrtPastYears }}</div>
                 </div>
               </div>
 
@@ -208,12 +312,16 @@
               <div v-if="form.familyHistoryStatus === 'Family History Known'" class="extra-fields">
                 <input
                   type="number"
-                  min="0"
+                  min="1"
+                  max="120"
                   step="1"
                   v-model.number="form.ageOfOnsetYoungestRelative"
                   placeholder="Age of Onset Youngest Relative*"
                   required
+                  title="Please enter a valid age (1-120)"
+                  @input="validateAgeOfOnset"
                 />
+                <div class="input-error" :class="{ show: errors.ageOfOnsetYoungestRelative }">{{ errors.ageOfOnsetYoungestRelative }}</div>
                 &nbsp;
                 <MultiSelect
                   :class="{'invalid-border': !form.familyHistoryOptions.length}"
@@ -288,12 +396,48 @@
               </div>
 
               <div v-if="form.smokingStatus === 'Ex-Smoker' || form.smokingStatus === 'Smoking'" class="extra-fields">
-                <input type="number" min="0" step="1" v-model.number="form.smokingYears" placeholder="Number years smoking*" required /> <br><br>
-                <input type="number" min="0" step="1" v-model.number="form.smokedDaily" placeholder="Number smoked daily*" required /> <br><br>
+                <input 
+                  type="number" 
+                  min="1" 
+                  max="80" 
+                  step="1" 
+                  v-model.number="form.smokingYears" 
+                  placeholder="Number years smoking*" 
+                  required 
+                  title="Please enter a reasonable number of years (1-80)"
+                  @input="validateSmokingYears"
+                /> 
+                <div class="input-error" :class="{ show: errors.smokingYears }">{{ errors.smokingYears }}</div>
+                <br><br>
+                <input 
+                  type="number" 
+                  min="1" 
+                  max="200" 
+                  step="1" 
+                  v-model.number="form.smokedDaily" 
+                  placeholder="Number smoked daily*" 
+                  required 
+                  title="Please enter a reasonable daily amount (1-200)"
+                  @input="validateSmokedDaily"
+                /> 
+                <div class="input-error" :class="{ show: errors.smokedDaily }">{{ errors.smokedDaily }}</div>
+                <br><br>
               </div>
 
               <div v-if="form.smokingStatus === 'Ex-Smoker'" class="extra-fields">
-                <input type="number" min="0" step="1" v-model.number="form.yearsStoppedSmoking" placeholder="Number years stopped smoking*" required /><br><br>
+                <input 
+                  type="number" 
+                  min="1" 
+                  max="80" 
+                  step="1" 
+                  v-model.number="form.yearsStoppedSmoking" 
+                  placeholder="Number years stopped smoking*" 
+                  required 
+                  title="Please enter a reasonable number of years (1-80)"
+                  @input="validateStoppedSmokingYears"
+                />
+                <div class="input-error" :class="{ show: errors.yearsStoppedSmoking }">{{ errors.yearsStoppedSmoking }}</div>
+                <br><br>
               </div>
 
               <!-- Vaping Status -->
@@ -308,13 +452,61 @@
               </div>
 
               <div v-if="form.vapingStatus === 'Ex-Vaper' || form.vapingStatus === 'Vaping'" class="extra-fields">
-                <input type="number" min="0" step="1" v-model.number="form.vapingYears" placeholder="Number years vaping*" required /><br><br>
-                <input type="number" min="0" step="1" v-model.number="form.vapingPodsPerWeek" placeholder="Average pods/cartridges per week*" required /><br><br>
-                <input type="number" min="0" step="1" v-model.number="form.nicotineStrength" placeholder="Nicotine strength used (mg/ml)*" required /><br><br>
+                <input 
+                  type="number" 
+                  min="1" 
+                  max="50" 
+                  step="1" 
+                  v-model.number="form.vapingYears" 
+                  placeholder="Number years vaping*" 
+                  required 
+                  title="Please enter a reasonable number of years (1-50)"
+                  @input="validateVapingYears"
+                />
+                <div class="input-error" :class="{ show: errors.vapingYears }">{{ errors.vapingYears }}</div>
+                <br><br>
+                <input 
+                  type="number" 
+                  min="1" 
+                  max="100" 
+                  step="1" 
+                  v-model.number="form.vapingPodsPerWeek" 
+                  placeholder="Average pods/cartridges per week*" 
+                  required 
+                  title="Please enter a reasonable weekly amount (1-100)"
+                  @input="validateVapingPods"
+                />
+                <div class="input-error" :class="{ show: errors.vapingPodsPerWeek }">{{ errors.vapingPodsPerWeek }}</div>
+                <br><br>
+                <input 
+                  type="number" 
+                  min="1" 
+                  max="100" 
+                  step="1" 
+                  v-model.number="form.nicotineStrength" 
+                  placeholder="Nicotine strength used (mg/ml)*" 
+                  required 
+                  title="Please enter a reasonable nicotine strength (1-100 mg/ml)"
+                  @input="validateNicotineStrength"
+                />
+                <div class="input-error" :class="{ show: errors.nicotineStrength }">{{ errors.nicotineStrength }}</div>
+                <br><br>
               </div>
 
               <div v-if="form.vapingStatus === 'Ex-Vaper'" class="extra-fields">
-                <input type="number" min="0" step="1" v-model.number="form.yearsStoppedVaping" placeholder="Number years stopped vaping*" required /><br><br>
+                <input 
+                  type="number" 
+                  min="1" 
+                  max="50" 
+                  step="1" 
+                  v-model.number="form.yearsStoppedVaping" 
+                  placeholder="Number years stopped vaping*" 
+                  required 
+                  title="Please enter a reasonable number of years (1-50)"
+                  @input="validateStoppedVapingYears"
+                />
+                <div class="input-error" :class="{ show: errors.yearsStoppedVaping }">{{ errors.yearsStoppedVaping }}</div>
+                <br><br>
               </div>
 
               <!-- Alcohol Consumption -->
@@ -329,13 +521,61 @@
               </div>
 
               <div v-if="form.alcoholStatus === 'Ex-Drinker' || form.alcoholStatus === 'Drinking'" class="extra-fields">
-                <input type="number" min="0" step="1" v-model.number="form.drinkingYears" placeholder="Number years drinking*" required /><br><br>
-                <input type="number" min="0" step="1" v-model.number="form.standardDrinksPerWeek" placeholder="Average standard drinks per week*" required /><br><br>
-                <input type="number" min="0" step="1" v-model.number="form.bingeDrinksPerMonth" placeholder="Binge drinking frequency (per month)*" required /><br><br>
+                <input 
+                  type="number" 
+                  min="1" 
+                  max="80" 
+                  step="1" 
+                  v-model.number="form.drinkingYears" 
+                  placeholder="Number years drinking*" 
+                  required 
+                  title="Please enter a reasonable number of years (1-80)"
+                  @input="validateDrinkingYears"
+                />
+                <div class="input-error" :class="{ show: errors.drinkingYears }">{{ errors.drinkingYears }}</div>
+                <br><br>
+                <input 
+                  type="number" 
+                  min="1" 
+                  max="200" 
+                  step="1" 
+                  v-model.number="form.standardDrinksPerWeek" 
+                  placeholder="Average standard drinks per week*" 
+                  required 
+                  title="Please enter a reasonable number of drinks per week (1-200)"
+                  @input="validateDrinksPerWeek"
+                />
+                <div class="input-error" :class="{ show: errors.standardDrinksPerWeek }">{{ errors.standardDrinksPerWeek }}</div>
+                <br><br>
+                <input 
+                  type="number" 
+                  min="0" 
+                  max="30" 
+                  step="1" 
+                  v-model.number="form.bingeDrinksPerMonth" 
+                  placeholder="Binge drinking frequency (per month)*" 
+                  required 
+                  title="Please enter frequency of binge drinking per month (0-30)"
+                  @input="validateBingeDrinking"
+                />
+                <div class="input-error" :class="{ show: errors.bingeDrinksPerMonth }">{{ errors.bingeDrinksPerMonth }}</div>
+                <br><br>
               </div>
 
               <div v-if="form.alcoholStatus === 'Ex-Drinker'" class="extra-fields">
-                <input type="number" min="0" step="1" v-model.number="form.yearsStoppedDrinking" placeholder="Number years stopped drinking*" required /><br><br>
+                <input 
+                  type="number" 
+                  min="1" 
+                  max="80" 
+                  step="1" 
+                  v-model.number="form.yearsStoppedDrinking" 
+                  placeholder="Number years stopped drinking*" 
+                  required 
+                  title="Please enter a reasonable number of years (1-80)"
+                  @input="validateStoppedDrinkingYears"
+                />
+                <div class="input-error" :class="{ show: errors.yearsStoppedDrinking }">{{ errors.yearsStoppedDrinking }}</div>
+                <br><br>
               </div>
 
 
@@ -385,6 +625,28 @@ export default {
         newEmail: '',
         currentPassword: ''
       },
+      errors: {
+        firstName: '',
+        surname: '',
+        city: '',
+        address1: '',
+        dob: '',
+        hrtPastYears: '',
+        ageOfOnsetYoungestRelative: '',
+        smokingYears: '',
+        smokedDaily: '',
+        yearsStoppedSmoking: '',
+        vapingYears: '',
+        vapingPodsPerWeek: '',
+        nicotineStrength: '',
+        yearsStoppedVaping: '',
+        drinkingYears: '',
+        standardDrinksPerWeek: '',
+        bingeDrinksPerMonth: '',
+        yearsStoppedDrinking: ''
+      },
+      minDate: '1900-01-01',
+      maxDate: new Date().toISOString().split('T')[0],
       form: {
         consent:"has consent",
         firstName: "",
@@ -565,6 +827,188 @@ export default {
       }
 
       return true;
+    },
+
+    // Input validation methods
+    validateNameInput(event) {
+      const value = event.target.value;
+      const fieldName = event.target.closest('label').textContent.split('*')[0].trim().toLowerCase().replace(/\s/g, '');
+      
+      // Clear previous errors
+      if (fieldName === 'firstname') this.errors.firstName = '';
+      if (fieldName === 'surname') this.errors.surname = '';
+      if (fieldName === 'city') this.errors.city = '';
+      
+      if (value && !/^[a-zA-ZğĞıİöÖüÜşŞçÇ\s\-'\.]*$/.test(value)) {
+        const errorMsg = 'Only letters, spaces, hyphens, and apostrophes are allowed';
+        if (fieldName === 'firstname') this.errors.firstName = errorMsg;
+        if (fieldName === 'surname') this.errors.surname = errorMsg;
+        if (fieldName === 'city') this.errors.city = errorMsg;
+        
+        // Remove invalid characters
+        event.target.value = value.replace(/[^a-zA-ZğĞıİöÖüÜşŞçÇ\s\-'\.]/g, '');
+      }
+    },
+
+    validateAddressInput(event) {
+      const value = event.target.value;
+      const isRequired = event.target.hasAttribute('required');
+      
+      this.errors.address1 = '';
+      
+      if (value && !/^[a-zA-Z0-9ğĞıİöÖüÜşŞçÇ\s\-\.\,\/\#]*$/.test(value)) {
+        this.errors.address1 = 'Please use only letters, numbers, and basic punctuation';
+        event.target.value = value.replace(/[^a-zA-Z0-9ğĞıİöÖüÜşŞçÇ\s\-\.\,\/\#]/g, '');
+      }
+    },
+
+    validateDateOfBirth(event) {
+      const value = event.target.value;
+      this.errors.dob = '';
+      
+      if (value) {
+        const selectedDate = new Date(value);
+        const today = new Date();
+        const minDate = new Date('1900-01-01');
+        
+        if (selectedDate > today) {
+          this.errors.dob = 'Date of birth cannot be in the future';
+          event.target.value = '';
+        } else if (selectedDate < minDate) {
+          this.errors.dob = 'Please enter a valid date after 1900';
+          event.target.value = '';
+        }
+      }
+    },
+
+    validateSmokingYears(event) {
+      const value = parseInt(event.target.value);
+      this.errors.smokingYears = '';
+      
+      if (value && (value < 1 || value > 80)) {
+        this.errors.smokingYears = 'Please enter a reasonable number of years (1-80)';
+        event.target.value = Math.min(Math.max(1, value), 80);
+      }
+    },
+
+    validateSmokedDaily(event) {
+      const value = parseInt(event.target.value);
+      this.errors.smokedDaily = '';
+      
+      if (value && (value < 1 || value > 200)) {
+        this.errors.smokedDaily = 'Please enter a reasonable daily amount (1-200)';
+        event.target.value = Math.min(Math.max(1, value), 200);
+      }
+    },
+
+    validateStoppedSmokingYears(event) {
+      const value = parseInt(event.target.value);
+      this.errors.yearsStoppedSmoking = '';
+      
+      if (value && (value < 1 || value > 80)) {
+        this.errors.yearsStoppedSmoking = 'Please enter a reasonable number of years (1-80)';
+        event.target.value = Math.min(Math.max(1, value), 80);
+      }
+    },
+
+    validateVapingYears(event) {
+      const value = parseInt(event.target.value);
+      this.errors.vapingYears = '';
+      
+      if (value && (value < 1 || value > 50)) {
+        this.errors.vapingYears = 'Please enter a reasonable number of years (1-50)';
+        event.target.value = Math.min(Math.max(1, value), 50);
+      }
+    },
+
+    validateVapingPods(event) {
+      const value = parseInt(event.target.value);
+      this.errors.vapingPodsPerWeek = '';
+      
+      if (value && (value < 1 || value > 100)) {
+        this.errors.vapingPodsPerWeek = 'Please enter a reasonable weekly amount (1-100)';
+        event.target.value = Math.min(Math.max(1, value), 100);
+      }
+    },
+
+    validateHrtYears(event) {
+      const value = parseInt(event.target.value);
+      this.errors.hrtPastYears = '';
+      
+      if (value && (value < 1 || value > 50)) {
+        this.errors.hrtPastYears = 'Please enter a reasonable number of years (1-50)';
+        event.target.value = Math.min(Math.max(1, value), 50);
+      }
+    },
+
+    validateAgeOfOnset(event) {
+      const value = parseInt(event.target.value);
+      this.errors.ageOfOnsetYoungestRelative = '';
+      
+      if (value && (value < 1 || value > 120)) {
+        this.errors.ageOfOnsetYoungestRelative = 'Please enter a valid age (1-120)';
+        event.target.value = Math.min(Math.max(1, value), 120);
+      }
+    },
+
+    validateNicotineStrength(event) {
+      const value = parseInt(event.target.value);
+      this.errors.nicotineStrength = '';
+      
+      if (value && (value < 1 || value > 100)) {
+        this.errors.nicotineStrength = 'Please enter a reasonable nicotine strength (1-100 mg/ml)';
+        event.target.value = Math.min(Math.max(1, value), 100);
+      }
+    },
+
+    validateStoppedVapingYears(event) {
+      const value = parseInt(event.target.value);
+      this.errors.yearsStoppedVaping = '';
+      
+      if (value && (value < 1 || value > 50)) {
+        this.errors.yearsStoppedVaping = 'Please enter a reasonable number of years (1-50)';
+        event.target.value = Math.min(Math.max(1, value), 50);
+      }
+    },
+
+    validateDrinkingYears(event) {
+      const value = parseInt(event.target.value);
+      this.errors.drinkingYears = '';
+      
+      if (value && (value < 1 || value > 80)) {
+        this.errors.drinkingYears = 'Please enter a reasonable number of years (1-80)';
+        event.target.value = Math.min(Math.max(1, value), 80);
+      }
+    },
+
+    validateDrinksPerWeek(event) {
+      const value = parseInt(event.target.value);
+      this.errors.standardDrinksPerWeek = '';
+      
+      if (value && (value < 1 || value > 200)) {
+        this.errors.standardDrinksPerWeek = 'Please enter a reasonable number of drinks per week (1-200)';
+        event.target.value = Math.min(Math.max(1, value), 200);
+      }
+    },
+
+    validateBingeDrinking(event) {
+      const value = parseInt(event.target.value);
+      this.errors.bingeDrinksPerMonth = '';
+      
+      if (value && (value < 0 || value > 30)) {
+        this.errors.bingeDrinksPerMonth = 'Please enter frequency per month (0-30)';
+        event.target.value = Math.min(Math.max(0, value), 30);
+      }
+    },
+
+    validateStoppedDrinkingYears(event) {
+      const value = parseInt(event.target.value);
+      this.errors.yearsStoppedDrinking = '';
+      
+      if (value && (value < 1 || value > 80)) {
+        this.errors.yearsStoppedDrinking = 'Please enter a reasonable number of years (1-80)';
+        event.target.value = Math.min(Math.max(1, value), 80);
+      }
     },
 
     async saveForm() {
