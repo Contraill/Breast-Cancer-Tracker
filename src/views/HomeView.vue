@@ -653,6 +653,8 @@ export default {
       },
       minDate: '1900-01-01',
       maxDate: new Date().toISOString().split('T')[0],
+      minDate: '1900-01-01',
+      maxDate: new Date().toISOString().split('T')[0],
       form: {
         consent:"has consent",
         firstName: "",
@@ -1328,6 +1330,61 @@ export default {
       this.showEmailChange = false;
       this.emailChange.newEmail = '';
       this.emailChange.currentPassword = '';
+    },
+
+    validateNewEmail(event) {
+      const value = event.target.value;
+      this.errors.newEmail = '';
+      
+      if (value) {
+        // Basic email format validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+          this.errors.newEmail = 'Please enter a valid email address';
+          return;
+        }
+        
+        // Check if same as current email
+        if (value === this.currentUserEmail) {
+          this.errors.newEmail = 'New email must be different from current email';
+          return;
+        }
+        
+        // Check for reasonable length
+        if (value.length > 100) {
+          this.errors.newEmail = 'Email address is too long';
+          return;
+        }
+      }
+    },
+
+    handleDateKeydown(event) {
+      // Allow backspace, delete, tab, escape, enter
+      if ([8, 9, 27, 13, 46].indexOf(event.keyCode) !== -1 ||
+          // Allow Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+          (event.keyCode === 65 && event.ctrlKey === true) ||
+          (event.keyCode === 67 && event.ctrlKey === true) ||
+          (event.keyCode === 86 && event.ctrlKey === true) ||
+          (event.keyCode === 88 && event.ctrlKey === true) ||
+          // Allow home, end, left, right
+          (event.keyCode >= 35 && event.keyCode <= 39)) {
+        return;
+      }
+      // Only allow numbers 0-9
+      if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && 
+          (event.keyCode < 96 || event.keyCode > 105)) {
+        event.preventDefault();
+      }
+    },
+
+    handleDateInput(event) {
+      // Remove any non-numeric characters except hyphens and slashes
+      const value = event.target.value;
+      const cleanValue = value.replace(/[^\d\-\/]/g, '');
+      if (value !== cleanValue) {
+        event.target.value = cleanValue;
+        this.form.dob = cleanValue;
+      }
     }
   },
 

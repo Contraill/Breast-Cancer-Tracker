@@ -120,6 +120,9 @@
             <small :class="{ 'valid': passwordValidation.uppercase }" class="requirement">
               ✓ Contains uppercase letter
             </small>
+            <small :class="{ 'valid': passwordValidation.number }" class="requirement">
+              ✓ Contains at least one number
+            </small>
             <small :class="{ 'valid': passwordValidation.maxLength }" class="requirement">
               ✓ Maximum 30 characters
             </small>
@@ -189,6 +192,7 @@ const showVerificationError = ref(false)
 const passwordValidation = ref({
   length: false,
   uppercase: false,
+  number: false,
   maxLength: true
 })
 
@@ -256,6 +260,7 @@ const validatePassword = () => {
   passwordValidation.value = {
     length: pwd.length >= 6,
     uppercase: /[A-Z]/.test(pwd),
+    number: /\d/.test(pwd),
     maxLength: pwd.length <= 30
   }
 }
@@ -301,6 +306,11 @@ const handleRegister = async () => {
       return
     }
     
+    if (!/\d/.test(password.value)) {
+      alert('Password must contain at least one number.')
+      return
+    }
+    
     if (password.value.length > 30) {
       alert('Password must not exceed 30 characters.')
       return
@@ -322,7 +332,7 @@ const handleRegister = async () => {
     if (error.code === 'auth/email-already-in-use') {
       alert('An account with this email address already exists. Please try logging in instead.')
     } else if (error.code === 'auth/weak-password') {
-      alert('Please choose a stronger password. Your password should be at least 6 characters long and contain an uppercase letter.')
+      alert('Please choose a stronger password. Your password should be at least 6 characters long, contain an uppercase letter, and include at least one number.')
     } else if (error.code === 'auth/invalid-email') {
       alert('Please enter a valid email address.')
     } else {
