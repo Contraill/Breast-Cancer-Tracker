@@ -13,7 +13,12 @@ const routes = [
     path: '/home',
     name: 'Home',
     component: HomeView,
-    meta: { requiresAuth: true } //koruma isteği
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/auth-action',
+    name: 'AuthAction',
+    component: AuthAction
   }
 ]
 
