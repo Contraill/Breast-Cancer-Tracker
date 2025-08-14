@@ -30,6 +30,7 @@
                 title="Please enter a valid middle name (letters, spaces, hyphens, and apostrophes only)"
                 @input="validateNameInput"
               />
+              <div class="input-error" :class="{ show: errors.middleName }">{{ errors.middleName }}</div>
             </label>
             <label>Surname*
               <input 
@@ -52,6 +53,7 @@
                 title="Please enter a valid maiden name (letters, spaces, hyphens, and apostrophes only)"
                 @input="validateNameInput"
               />
+              <div class="input-error" :class="{ show: errors.maidenName }">{{ errors.maidenName }}</div>
             </label>
             <label>Date of Birth*
               <div class="date-input-wrapper">
@@ -431,9 +433,10 @@
                   required 
                   title="Please enter years (0.1-80, decimals allowed)"
                   @input="validateSmokingYears"
+                  @keypress="preventEKey"
                 /> 
                 <div class="input-error" :class="{ show: errors.smokingYears }">{{ errors.smokingYears }}</div>
-                <br><br>
+                
                 <input 
                   type="number" 
                   min="1" 
@@ -444,9 +447,9 @@
                   required 
                   title="Please enter a reasonable daily amount (1-200)"
                   @input="validateSmokedDaily"
+                  @keypress="preventEKey"
                 /> 
                 <div class="input-error" :class="{ show: errors.smokedDaily }">{{ errors.smokedDaily }}</div>
-                <br><br>
               </div>
 
               <div v-if="form.smokingStatus === 'Ex-Smoker'" class="extra-fields">
@@ -460,9 +463,9 @@
                   required 
                   title="Please enter years (0.1-80, decimals allowed)"
                   @input="validateStoppedSmokingYears"
+                  @keypress="preventEKey"
                 />
                 <div class="input-error" :class="{ show: errors.yearsStoppedSmoking }">{{ errors.yearsStoppedSmoking }}</div>
-                <br><br>
               </div>
 
               <!-- Vaping Status -->
@@ -487,9 +490,10 @@
                   required 
                   title="Please enter years (0.1-50, decimals allowed)"
                   @input="validateVapingYears"
+                  @keypress="preventEKey"
                 />
                 <div class="input-error" :class="{ show: errors.vapingYears }">{{ errors.vapingYears }}</div>
-                <br><br>
+                
                 <input 
                   type="number" 
                   min="1" 
@@ -500,9 +504,10 @@
                   required 
                   title="Please enter a reasonable weekly amount (1-100)"
                   @input="validateVapingPods"
+                  @keypress="preventEKey"
                 />
                 <div class="input-error" :class="{ show: errors.vapingPodsPerWeek }">{{ errors.vapingPodsPerWeek }}</div>
-                <br><br>
+                
                 <input 
                   type="number" 
                   min="1" 
@@ -513,9 +518,9 @@
                   required 
                   title="Please enter a reasonable nicotine strength (1-100 mg/ml)"
                   @input="validateNicotineStrength"
+                  @keypress="preventEKey"
                 />
                 <div class="input-error" :class="{ show: errors.nicotineStrength }">{{ errors.nicotineStrength }}</div>
-                <br><br>
               </div>
 
               <div v-if="form.vapingStatus === 'Ex-Vaper'" class="extra-fields">
@@ -529,9 +534,9 @@
                   required 
                   title="Please enter years (0.1-50, decimals allowed)"
                   @input="validateStoppedVapingYears"
+                  @keypress="preventEKey"
                 />
                 <div class="input-error" :class="{ show: errors.yearsStoppedVaping }">{{ errors.yearsStoppedVaping }}</div>
-                <br><br>
               </div>
 
               <!-- Alcohol Consumption -->
@@ -556,9 +561,10 @@
                   required 
                   title="Please enter years (0.1-80, decimals allowed)"
                   @input="validateDrinkingYears"
+                  @keypress="preventEKey"
                 />
                 <div class="input-error" :class="{ show: errors.drinkingYears }">{{ errors.drinkingYears }}</div>
-                <br><br>
+                
                 <input 
                   type="number" 
                   min="1" 
@@ -569,9 +575,10 @@
                   required 
                   title="Please enter a reasonable number of drinks per week (1-200)"
                   @input="validateDrinksPerWeek"
+                  @keypress="preventEKey"
                 />
                 <div class="input-error" :class="{ show: errors.standardDrinksPerWeek }">{{ errors.standardDrinksPerWeek }}</div>
-                <br><br>
+                
                 <input 
                   type="number" 
                   min="0" 
@@ -582,9 +589,9 @@
                   required 
                   title="Please enter frequency of binge drinking per month (0-30)"
                   @input="validateBingeDrinking"
+                  @keypress="preventEKey"
                 />
                 <div class="input-error" :class="{ show: errors.bingeDrinksPerMonth }">{{ errors.bingeDrinksPerMonth }}</div>
-                <br><br>
               </div>
 
               <div v-if="form.alcoholStatus === 'Ex-Drinker'" class="extra-fields">
@@ -598,9 +605,9 @@
                   required 
                   title="Please enter years (0.1-80, decimals allowed)"
                   @input="validateStoppedDrinkingYears"
+                  @keypress="preventEKey"
                 />
                 <div class="input-error" :class="{ show: errors.yearsStoppedDrinking }">{{ errors.yearsStoppedDrinking }}</div>
-                <br><br>
               </div>
 
 
@@ -657,7 +664,9 @@ export default {
       },
       errors: {
         firstName: '',
+        middleName: '',
         surname: '',
+        maidenName: '',
         city: '',
         address1: '',
         address2: '',
@@ -751,6 +760,13 @@ export default {
     };
   },
   methods: {
+    // Prevent 'e', 'E', '+', '-' characters in number inputs
+    preventEKey(event) {
+      if (['e', 'E', '+', '-'].includes(event.key)) {
+        event.preventDefault();
+      }
+    },
+
     validateForm() {
       if (
         !this.form.firstName ||
