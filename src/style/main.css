@@ -1,4 +1,13 @@
 /* ---------- GLOBAL RESET ---------- */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%; /* Prevents iOS text size adjustment */
+  -webkit-tap-highlight-color: transparent; /* Removes tap highlight on mobile */
+}
+
 body {
   font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
@@ -7,6 +16,9 @@ body {
   padding: 0;
   font-weight: 400;
   line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden; /* Prevents horizontal scroll on mobile */
 }
 
 h3 {
@@ -892,6 +904,7 @@ label {
 }
 
 @media (max-width: 480px) {
+  /* Enhanced mobile optimization - larger touch targets and better UX */
   input,
   textarea,
   select,
@@ -900,9 +913,38 @@ label {
   .auth-form input[type="password"],
   .auth-form .p-inputtext,
   .auth-form .p-password input,
-  .auth-form .p-password .p-inputtext {
+  .auth-form .p-password .p-inputtext,
+  .extra-fields input {
     min-width: 100%;
-    font-size: 16px; /* Prevents zoom on iOS */
+    font-size: 16px !important; /* Prevents zoom on iOS */
+    min-height: 44px !important; /* Apple's recommended touch target */
+    padding: 12px 16px !important;
+    line-height: 1.4;
+  }
+
+  /* Better body text */
+  body, 
+  .home-form-wrapper {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  /* Larger labels for better readability - all left aligned */
+  label {
+    font-size: 16px !important;
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-align: left !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+  }
+
+  .main-label {
+    font-size: 17px !important;
+    font-weight: 600;
+    margin-bottom: 12px !important;
+    text-align: left !important;
+    justify-content: flex-start !important;
   }
   
   .auth-form .p-password {
@@ -910,15 +952,84 @@ label {
   }
   
   .home-container {
-    padding: 1.5rem 1rem;
+    padding: 0.75rem !important;
     border-radius: 0;
-    margin: 0;
-    max-width: 100%;
+    margin: 0 !important;
+    max-width: 100% !important;
     box-shadow: none;
+    border: none;
+    min-height: 100vh;
+  }
+
+  /* Tab container optimization */
+  .tab-container-with-logout {
+    width: 100% !important;
+    overflow-x: visible !important;
+  }
+
+  /* PrimeVue TabView mobile optimization */
+  .p-tabview {
+    width: 100% !important;
+  }
+
+  .p-tabview .p-tabview-nav {
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important; /* Left align tabs */
+    padding: 0 !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .p-tabview .p-tabview-nav li {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    margin: 0 2px 4px 2px !important;
+  }
+
+  .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    padding: 12px 8px !important;
+    font-size: 14px !important;
+    min-height: 44px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .p-tabview .p-tabview-panels {
+    padding: 0 !important;
+  }
+
+  .p-tabview .p-tabview-panel {
+    padding: 1rem 0 !important;
+  }
+
+  /* Logout button mobile optimization */
+  .logout-tab-btn {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    width: 100% !important;
+    margin: 0 0 2rem 0 !important; /* Put margin-bottom before form content */
+    padding: 12px 16px !important;
+    font-size: 16px !important;
+    min-height: 48px !important;
+    border-radius: 6px !important;
+    justify-content: center !important;
+    order: -1 !important; /* Move to top */
+  }
+
+  .logout-tab-btn i {
+    margin-right: 8px !important;
+  }
+
+  /* Tab container reorder */
+  .tab-container-with-logout {
+    display: flex !important;
+    flex-direction: column !important;
   }
   
   .auth-container {
-    padding: 1.5rem 1rem;
+    padding: 1rem !important;
     border-radius: 0;
     margin: 0;
     max-width: 100%;
@@ -926,8 +1037,94 @@ label {
   }
   
   .title {
-    font-size: 1.5rem;
+    font-size: 2rem !important;
     margin-bottom: 1.5rem;
+    text-align: left !important; /* Left align title on mobile */
+    padding-left: 0.5rem !important;
+  }
+
+  h3 {
+    font-size: 1.4rem !important;
+    margin-bottom: 1rem;
+    text-align: left !important; /* Left align section headers */
+    padding-left: 0 !important;
+  }
+
+  /* Form grid - single column */
+  .form-grid {
+    gap: 1.25rem !important;
+    grid-template-columns: 1fr !important;
+    margin-bottom: 2rem !important;
+  }
+
+  /* All input elements mobile optimization */
+  input,
+  textarea,
+  select {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Date input wrapper mobile fix - INLINE-BLOCK FORCE */
+  .date-input-wrapper {
+    width: 100% !important;
+    display: block !important;
+    position: relative !important;
+    overflow: hidden !important;
+    height: 44px !important;
+    box-sizing: border-box !important;
+  }
+
+  .date-text-input {
+    display: inline-block !important;
+    width: calc(100% - 60px) !important;
+    height: 44px !important;
+    margin: 0 !important;
+    padding: 12px 16px !important;
+    box-sizing: border-box !important;
+    vertical-align: top !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+  }
+
+  .date-calendar-picker {
+    display: inline-block !important;
+    width: 52px !important;
+    height: 44px !important;
+    position: absolute !important;
+    right: 0 !important;
+    top: 0 !important;
+    vertical-align: top !important;
+  }
+
+  .date-calendar-picker .p-inputtext {
+    display: none !important;
+    position: absolute !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  .date-calendar-picker .p-button {
+    min-height: 44px !important;
+    height: 44px !important;
+    width: 44px !important;
+    padding: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 6px !important;
+    box-sizing: border-box !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  .date-calendar-picker .p-button .p-button-icon {
+    font-size: 18px !important;
+    line-height: 1 !important;
   }
   
   .tabs {
@@ -936,21 +1133,264 @@ label {
   }
   
   .tabs button {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
+    padding: 0.75rem 1rem;
+    font-size: 16px;
     flex: 1;
     min-width: 0;
+    min-height: 48px;
+  }
+
+  /* Radio buttons - larger touch targets */
+  .radio-group {
+    width: 100%;
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 0.4rem !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    padding: 0 0 2rem 0 !important; /* Increased from 1rem to 2rem */
+    margin: 0 0 1.5rem 0 !important; /* Added bottom margin */
+  }
+
+  .radio-group label {
+    font-size: 15px !important; /* Reduced from 16px */
+    padding: 10px 16px !important; /* Reduced proportionally */
+    min-height: 38px !important; /* Reduced from 44px */
+    min-width: 100px !important; /* Reduced from 120px */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    border-radius: 6px !important;
+    margin: 2px !important;
+    line-height: 1.3 !important;
+    flex: 0 1 auto !important;
+    white-space: nowrap !important;
+  }
+
+  .radio-group input[type="radio"] {
+    width: 16px !important; /* Reduced from 18px */
+    height: 16px !important; /* Reduced from 18px */
+    margin-right: 10px !important; /* Reduced from 12px */
+    flex-shrink: 0 !important;
   }
   
   .health-info-form .radio-group label {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.875rem;
+    padding: 10px 16px !important; /* Consistent with above */
+    font-size: 15px !important; /* Consistent with above */
+    min-height: 38px !important; /* Consistent with above */
+    min-width: 100px !important; /* Consistent with above */
+    line-height: 1.3 !important;
+    flex: 0 1 auto !important;
+    white-space: nowrap !important;
+  }
+
+  /* Extra fields optimization */
+  .extra-fields {
+    gap: 1rem !important;
+    padding: 1rem !important;
+    margin: 1rem 0 !important;
+  }
+
+  .extra-field-inline {
+    margin-top: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* Horizontal groups - better mobile layout */
+  .horizontal-group {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem !important; /* Increased gap */
+    margin-bottom: 3rem !important; /* Increased from 2.5rem to 3rem */
+  }
+
+  .health-info-form .horizontal-group {
+    width: 100% !important;
+    padding: 0 !important;
+    margin-bottom: 3rem !important; /* Increased spacing after radio groups */
+  }
+
+  .health-info-form .main-label {
+    width: 100% !important;
+    min-width: auto !important;
+    margin-bottom: 8px !important; /* Increased from 6px */
+    font-size: 17px !important;
+    font-weight: 600 !important;
+    line-height: 1.3 !important;
+  }
+
+  .health-info-form .form-group select {
+    width: 100% !important;
+    min-height: 44px !important;
+    font-size: 16px !important;
+    padding: 12px 16px !important;
+    margin-bottom: 1rem !important; /* Added bottom margin */
+  }
+
+  .health-info-form .extra-field {
+    width: 100% !important;
+    margin: 1rem 0 !important;
+    padding: 0 !important;
+  }
+
+  .health-info-form .extra-field input {
+    width: 100% !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* Buttons - larger touch targets */
+  button,
+  .submit-btn,
+  .logout-tab-btn,
+  .change-email-btn,
+  .save-email-btn,
+  .cancel-email-btn {
+    font-size: 16px !important;
+    min-height: 48px !important;
+    padding: 14px 20px !important;
+    margin: 8px 0 !important;
   }
   
   .submit-btn {
     width: 100%;
     padding: 1rem 2rem;
-    font-size: 1rem;
+    font-size: 16px !important;
+    min-height: 48px !important;
+  }
+
+  /* Tab headers - larger touch area */
+  .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+    font-size: 16px !important;
+    padding: 16px 12px !important;
+    min-height: 48px !important;
+  }
+
+  /* Dropdown and multiselect - larger touch targets */
+  .p-dropdown,
+  .p-multiselect {
+    min-height: 44px !important;
+    font-size: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important; /* Prevent overflow */
+  }
+
+  .p-dropdown .p-dropdown-label,
+  .p-multiselect .p-multiselect-label {
+    padding: 12px 16px !important;
+    font-size: 16px !important;
+    line-height: 1.4 !important;
+    min-height: 20px !important; /* Minimum height for content */
+  }
+
+  .p-multiselect .p-multiselect-label-container {
+    padding: 8px 16px !important; /* Better padding for chips */
+    max-height: none !important; /* Allow expansion */
+    overflow: visible !important;
+  }
+
+  /* MultiSelect chips mobile optimization */
+  .p-multiselect .p-multiselect-token {
+    padding: 8px 12px !important; /* Increased from 4px 8px */
+    margin: 4px !important; /* Increased from 2px */
+    font-size: 15px !important; /* Increased from 14px */
+    min-height: 32px !important; /* Added minimum height */
+    display: inline-flex !important;
+    align-items: center !important;
+    border-radius: 6px !important;
+  }
+
+  .p-multiselect .p-multiselect-token .p-multiselect-token-label {
+    font-size: 15px !important; /* Match parent */
+    line-height: 1.2 !important;
+    padding: 0 4px !important;
+  }
+
+  .p-multiselect .p-multiselect-token .p-multiselect-token-icon {
+    font-size: 14px !important;
+    margin-left: 6px !important;
+  }
+
+  /* Dropdown panel mobile optimization */
+  .p-dropdown-panel,
+  .p-multiselect-panel {
+    max-height: 50vh !important;
+    font-size: 16px !important;
+  }
+
+  .p-dropdown-panel .p-dropdown-item,
+  .p-multiselect-panel .p-multiselect-item {
+    padding: 12px 16px !important;
+    font-size: 16px !important;
+    min-height: 44px !important;
+  }
+
+  /* Calendar component */
+  .p-calendar input {
+    font-size: 16px !important;
+    min-height: 44px !important;
+    padding: 12px 16px !important;
+  }
+
+  /* Error messages - more visible */
+  .input-error {
+    font-size: 14px !important;
+    margin-top: 8px !important;
+    margin-bottom: 4px !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Section dividers */
+  .section-divider {
+    margin: 2.5rem 0 !important; /* Increased spacing */
+  }
+
+  /* Date input wrapper */
+  .date-input-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  /* Email change section */
+  .email-change-section {
+    width: 100% !important;
+    margin: 2rem 0 !important;
+  }
+
+  .current-email-display {
+    width: 100% !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .current-email {
+    padding: 12px 16px !important;
+    font-size: 16px !important;
+    word-break: break-all !important;
+  }
+  
+  .email-change-form {
+    margin-top: 1rem !important;
+    width: 100% !important;
+  }
+
+  .email-change-buttons {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+    margin-top: 1.5rem !important;
+    width: 100% !important;
+  }
+
+  .email-change-buttons button {
+    width: 100% !important;
+  }
+
+  /* Submit button container */
+  .submit-button {
+    width: 100% !important;
+    margin: 2rem 0 1rem 0 !important;
+    padding: 0 !important;
   }
 }
 
