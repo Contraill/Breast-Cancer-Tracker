@@ -4,6 +4,7 @@
     <p>Loading...</p>
   </div>
   <router-view v-else />
+  <Toast />
 </template>
 
 <script>

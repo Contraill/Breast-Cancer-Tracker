@@ -695,6 +695,72 @@ textarea:not([required]),
   box-shadow: none !important;
 }
 
+/* ---------- TAB ANIMATIONS ---------- */
+.p-tabview-nav-link {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.p-tabview-nav-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.15) !important;
+}
+
+.p-tabview-nav-link::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 3px;
+  background: linear-gradient(135deg, #4299e1, #3182ce);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(-50%);
+  border-radius: 2px 2px 0 0;
+}
+
+.p-tabview-nav .p-tabview-nav-link.p-highlight::before {
+  width: 100%;
+  animation: tabSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes tabSlideIn {
+  0% {
+    width: 0;
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+.p-tabview-nav .p-tabview-nav-link.p-highlight {
+  background: linear-gradient(135deg, rgba(66, 153, 225, 0.05), rgba(49, 130, 206, 0.05)) !important;
+  border-bottom-color: transparent !important;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(66, 153, 225, 0.1) !important;
+}
+
+.p-tabview-panels {
+  animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ---------- FORM GRID ---------- */
 .form-grid {
   display: grid;
