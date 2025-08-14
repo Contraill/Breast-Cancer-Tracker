@@ -65,6 +65,7 @@
                   required
                   class="date-text-input"
                   @input="handleDateTextInput"
+                  @keydown="handleDateKeydown"
                   @blur="validateDateOfBirth"
                 />
                 <Calendar 
@@ -273,6 +274,7 @@
                     placeholder="e.g. 2.5 years or 0.5 for 6 months"
                     @input="validateHrtYears"
                     @blur="validateHrtYears"
+                    @keypress="preventEKey"
                   />
                   <div class="input-error" :class="{ show: errors.hrtPastYears }">{{ errors.hrtPastYears }}</div>
                 </div>
@@ -347,6 +349,7 @@
                   title="Please enter a valid age (1-120)"
                   @input="validateAgeOfOnset"
                   @blur="validateAgeOfOnset"
+                  @keypress="preventEKey"
                 />
                 <div class="input-error" :class="{ show: errors.ageOfOnsetYoungestRelative }">{{ errors.ageOfOnsetYoungestRelative }}</div>
                 &nbsp;
@@ -658,6 +661,7 @@ export default {
       authUnsubscribe: null,
       lastEmailChangeTime: 0,
       emailChangeCooldown: 300000, // 5 minutes
+      previousDateOfBirth: null,
       emailChange: {
         newEmail: '',
         currentPassword: ''
@@ -961,18 +965,92 @@ export default {
       }
     },
 
+    handleDateKeydown(event) {
+      const allowedKeys = [
+        'Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 
+        'Home', 'End', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown',
+        'Shift', 'Control', 'Alt', 'Meta'
+      ];
+      
+      // Allow: backspace, delete, tab, escape, enter and arrow keys
+      if (allowedKeys.includes(event.key)) {
+        return;
+      }
+      
+      // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+      if (event.ctrlKey && ['a', 'c', 'v', 'x'].includes(event.key.toLowerCase())) {
+        return;
+      }
+      
+      // Allow: numbers 0-9
+      if (event.key >= '0' && event.key <= '9') {
+        return;
+      }
+      
+      // Allow: forward slash (/) but only if not already present at current position
+      if (event.key === '/') {
+        const input = event.target;
+        const value = input.value;
+        const cursorPos = input.selectionStart;
+        
+        // Allow / only at positions 2 and 5, and only if not already there
+        if ((cursorPos === 2 && !value.includes('/')) || 
+            (cursorPos === 5 && value.indexOf('/') === 2 && value.lastIndexOf('/') === 2)) {
+          return;
+        }
+      }
+      
+      // Prevent all other keys
+      event.preventDefault();
+    },
+
     handleDateTextInput(event) {
       let value = event.target.value;
       
       // Remove any non-numeric characters except /
       value = value.replace(/[^\d\/]/g, '');
       
+      // Prevent multiple consecutive slashes
+      value = value.replace(/\/+/g, '/');
+      
+      // Prevent invalid patterns like 0/0/0 or starting with /
+      if (value.startsWith('/') || value.includes('//')) {
+        value = value.replace(/^\/+|\/+/g, '/');
+        if (value.startsWith('/')) value = value.substring(1);
+      }
+      
       // Auto-format DD/MM/YYYY
-      if (value.length >= 2 && value.indexOf('/') !== 2) {
+      if (value.length >= 2 && value.indexOf('/') !== 2 && !value.includes('/')) {
         value = value.substring(0, 2) + '/' + value.substring(2);
       }
       if (value.length >= 5 && value.lastIndexOf('/') !== 5) {
-        value = value.substring(0, 5) + '/' + value.substring(5);
+        const parts = value.split('/');
+        if (parts.length >= 2 && parts[1].length >= 2) {
+          value = parts[0] + '/' + parts[1].substring(0, 2) + '/' + parts[1].substring(2) + (parts[2] || '');
+        }
+      }
+      
+      // Limit day to 31, month to 12
+      const parts = value.split('/');
+      if (parts.length >= 1 && parts[0].length >= 2) {
+        const day = parseInt(parts[0]);
+        if (day > 31) {
+          parts[0] = '31';
+          value = parts.join('/');
+        } else if (day < 1 && parts[0] === '00') {
+          parts[0] = '01';
+          value = parts.join('/');
+        }
+      }
+      if (parts.length >= 2 && parts[1].length >= 2) {
+        const month = parseInt(parts[1]);
+        if (month > 12) {
+          parts[1] = '12';
+          value = parts.join('/');
+        } else if (month < 1 && parts[1] === '00') {
+          parts[1] = '01';
+          value = parts.join('/');
+        }
       }
       
       // Update the input value
@@ -1067,6 +1145,21 @@ export default {
       if (!selectedDate || isNaN(selectedDate)) {
         return; // Don't show error for invalid/incomplete dates during typing
       }
+
+      // Doğum tarihi değişirken uyarı
+      if (this.previousDateOfBirth && selectedDate.getTime() !== this.previousDateOfBirth.getTime()) {
+        // Show confirmation dialog
+        const confirmed = confirm("This will update your age calculations. Continue?");
+        if (!confirmed) {
+          // Revert to previous date
+          this.form.dob = this.previousDateOfBirth;
+          this.dobString = this.formatDateToDMY(this.previousDateOfBirth);
+          return;
+        }
+      }
+
+      // Store previous date for future comparisons
+      this.previousDateOfBirth = new Date(selectedDate);
       
       this.errors.dob = '';
       
@@ -1396,6 +1489,11 @@ export default {
             this.form.maidenName = data.userInformation.maidenName || "";
             this.form.dob = data.userInformation.dob ? new Date(data.userInformation.dob) : null;
             
+            // Set initial previousDateOfBirth for change detection
+            if (this.form.dob) {
+              this.previousDateOfBirth = new Date(this.form.dob);
+            }
+            
             // Update dobString for display
             if (this.form.dob) {
               const day = this.form.dob.getDate().toString().padStart(2, '0');
@@ -1491,8 +1589,8 @@ export default {
         const remainingTime = Math.ceil((this.emailChangeCooldown - timeSinceLastAttempt) / 1000);
         this.$toast.add({
           severity: 'warn',
-          summary: 'Çok Hızlı!',
-          detail: `Email değişikliği için ${remainingTime} saniye bekleyiniz`,
+          summary: 'Too Fast!',
+          detail: `Please wait ${remainingTime} seconds before changing email again`,
           life: 3000
         });
         return;
@@ -1502,8 +1600,8 @@ export default {
       if (!this.emailChange.newEmail || !this.emailChange.currentPassword) {
         this.$toast.add({
           severity: 'error',
-          summary: 'Hata',
-          detail: 'Yeni email ve mevcut şifrenizi giriniz',
+          summary: 'Error',
+          detail: 'Please enter new email and current password',
           life: 3000
         });
         return;
@@ -1514,8 +1612,8 @@ export default {
       if (!emailRegex.test(this.emailChange.newEmail)) {
         this.$toast.add({
           severity: 'error',
-          summary: 'Hata',
-          detail: 'Geçerli bir email adresi giriniz',
+          summary: 'Error',
+          detail: 'Please enter a valid email address',
           life: 3000
         });
         return;
@@ -1524,8 +1622,8 @@ export default {
       if (this.emailChange.newEmail === this.currentUserEmail) {
         this.$toast.add({
           severity: 'error',
-          summary: 'Hata',
-          detail: 'Yeni email mevcut email ile aynı olamaz',
+          summary: 'Error',
+          detail: 'New email must be different from current email',
           life: 3000
         });
         return;
@@ -1539,8 +1637,8 @@ export default {
         if (!user) {
           this.$toast.add({
             severity: 'error',
-            summary: 'Hata',
-            detail: 'Önce giriş yapınız',
+            summary: 'Error',
+            detail: 'Please log in first',
             life: 3000
           });
           return;
@@ -1560,32 +1658,32 @@ export default {
         
         this.$toast.add({
           severity: 'success',
-          summary: 'Başarılı',
-          detail: `Email başarıyla güncellendi: ${newEmail}`,
+          summary: 'Success',
+          detail: `Email successfully updated: ${newEmail}`,
           life: 3000
         });
         
       } catch (error) {
-        let message = "Email güncellenirken hata: ";
+        let message = "Error updating email: ";
         
         switch (error.code) {
           case 'auth/wrong-password':
           case 'auth/invalid-credential':
-            message = "Mevcut şifreniz yanlış";
+            message = "Your current password is incorrect";
             break;
           case 'auth/email-already-in-use':
-            message = "Bu email adresi zaten kullanılıyor";
+            message = "This email address is already in use";
             break;
           case 'auth/requires-recent-login':
-            message = "Önce çıkış yapıp tekrar giriş yapınız";
+            message = "Please log out and log in again first";
             break;
           default:
-            message = error.message || "Bilinmeyen hata";
+            message = error.message || "Unknown error";
         }
         
         this.$toast.add({
           severity: 'error',
-          summary: 'Hata',
+          summary: 'Error',
           detail: message,
           life: 3000
         });
@@ -1612,6 +1710,14 @@ export default {
           this.errors.newEmail = 'Email address is too long';
         }
       }
+    },
+
+    formatDateToDMY(date) {
+      if (!date) return '';
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
     }
   },
 

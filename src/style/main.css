@@ -777,12 +777,41 @@ label {
   color: #2d3748;
 }
 
+/* ---------- EXTRA FIELDS SPACING ---------- */
+.extra-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border-left: 4px solid #4299e1;
+}
+
+.extra-fields input {
+  margin-bottom: 0 !important;
+}
+
+.extra-fields .input-error {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
 /* ---------- MOBILE RESPONSIVE BREAKPOINTS ---------- */
 @media (max-width: 768px) {
   .form-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
     margin-bottom: 2rem;
+  }
+  
+  .extra-fields {
+    gap: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
   }
   
   .home-container {
