@@ -437,7 +437,7 @@
                   title="Please enter years (0.1-80, decimals allowed)"
                   @input="validateSmokingYears"
                   @keypress="preventEKey"
-                /> 
+                />
                 <div class="input-error" :class="{ show: errors.smokingYears }">{{ errors.smokingYears }}</div>
                 
                 <input 
@@ -451,24 +451,25 @@
                   title="Please enter a reasonable daily amount (1-200)"
                   @input="validateSmokedDaily"
                   @keypress="preventEKey"
-                /> 
-                <div class="input-error" :class="{ show: errors.smokedDaily }">{{ errors.smokedDaily }}</div>
-              </div>
-
-              <div v-if="form.smokingStatus === 'Ex-Smoker'" class="extra-fields">
-                <input 
-                  type="number" 
-                  min="0.1" 
-                  max="80" 
-                  step="0.1" 
-                  v-model.number="form.yearsStoppedSmoking" 
-                  placeholder="Years stopped smoking* (0.5 = 6 months)" 
-                  required 
-                  title="Please enter years (0.1-80, decimals allowed)"
-                  @input="validateStoppedSmokingYears"
-                  @keypress="preventEKey"
                 />
-                <div class="input-error" :class="{ show: errors.yearsStoppedSmoking }">{{ errors.yearsStoppedSmoking }}</div>
+                <div class="input-error" :class="{ show: errors.smokedDaily }">{{ errors.smokedDaily }}</div>
+
+                <!-- Years stopped smoking field - only show for Ex-Smoker -->
+                <div v-if="form.smokingStatus === 'Ex-Smoker'" class="extra-field-inline">
+                  <input 
+                    type="number" 
+                    min="0.1" 
+                    max="80" 
+                    step="0.1" 
+                    v-model.number="form.yearsStoppedSmoking" 
+                    placeholder="Years stopped smoking* (0.5 = 6 months)" 
+                    required 
+                    title="Please enter years (0.1-80, decimals allowed)"
+                    @input="validateStoppedSmokingYears"
+                    @keypress="preventEKey"
+                  />
+                  <div class="input-error" :class="{ show: errors.yearsStoppedSmoking }">{{ errors.yearsStoppedSmoking }}</div>
+                </div>
               </div>
 
               <!-- Vaping Status -->
@@ -524,22 +525,23 @@
                   @keypress="preventEKey"
                 />
                 <div class="input-error" :class="{ show: errors.nicotineStrength }">{{ errors.nicotineStrength }}</div>
-              </div>
 
-              <div v-if="form.vapingStatus === 'Ex-Vaper'" class="extra-fields">
-                <input 
-                  type="number" 
-                  min="0.1" 
-                  max="50" 
-                  step="0.1" 
-                  v-model.number="form.yearsStoppedVaping" 
-                  placeholder="Years stopped vaping* (0.5 = 6 months)" 
-                  required 
-                  title="Please enter years (0.1-50, decimals allowed)"
-                  @input="validateStoppedVapingYears"
-                  @keypress="preventEKey"
-                />
-                <div class="input-error" :class="{ show: errors.yearsStoppedVaping }">{{ errors.yearsStoppedVaping }}</div>
+                <!-- Years stopped vaping field - only show for Ex-Vaper -->
+                <div v-if="form.vapingStatus === 'Ex-Vaper'" class="extra-field-inline">
+                  <input 
+                    type="number" 
+                    min="0.1" 
+                    max="50" 
+                    step="0.1" 
+                    v-model.number="form.yearsStoppedVaping" 
+                    placeholder="Years stopped vaping* (0.5 = 6 months)" 
+                    required 
+                    title="Please enter years (0.1-50, decimals allowed)"
+                    @input="validateStoppedVapingYears"
+                    @keypress="preventEKey"
+                  />
+                  <div class="input-error" :class="{ show: errors.yearsStoppedVaping }">{{ errors.yearsStoppedVaping }}</div>
+                </div>
               </div>
 
               <!-- Alcohol Consumption -->
@@ -595,22 +597,23 @@
                   @keypress="preventEKey"
                 />
                 <div class="input-error" :class="{ show: errors.bingeDrinksPerMonth }">{{ errors.bingeDrinksPerMonth }}</div>
-              </div>
 
-              <div v-if="form.alcoholStatus === 'Ex-Drinker'" class="extra-fields">
-                <input 
-                  type="number" 
-                  min="0.1" 
-                  max="80" 
-                  step="0.1" 
-                  v-model.number="form.yearsStoppedDrinking" 
-                  placeholder="Years stopped drinking* (0.5 = 6 months)" 
-                  required 
-                  title="Please enter years (0.1-80, decimals allowed)"
-                  @input="validateStoppedDrinkingYears"
-                  @keypress="preventEKey"
-                />
-                <div class="input-error" :class="{ show: errors.yearsStoppedDrinking }">{{ errors.yearsStoppedDrinking }}</div>
+                <!-- Years stopped drinking field - only show for Ex-Drinker -->
+                <div v-if="form.alcoholStatus === 'Ex-Drinker'" class="extra-field-inline">
+                  <input 
+                    type="number" 
+                    min="0.1" 
+                    max="80" 
+                    step="0.1" 
+                    v-model.number="form.yearsStoppedDrinking" 
+                    placeholder="Years stopped drinking* (0.5 = 6 months)" 
+                    required 
+                    title="Please enter years (0.1-80, decimals allowed)"
+                    @input="validateStoppedDrinkingYears"
+                    @keypress="preventEKey"
+                  />
+                  <div class="input-error" :class="{ show: errors.yearsStoppedDrinking }">{{ errors.yearsStoppedDrinking }}</div>
+                </div>
               </div>
 
 
