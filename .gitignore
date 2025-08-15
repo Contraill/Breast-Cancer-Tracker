@@ -1,4 +1,4 @@
-# Log dosyaları
+# Log files
 logs
 *.log
 npm-debug.log*
@@ -7,23 +7,23 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Node modülleri
+# Node modules
 node_modules
 
-# MacOS dosyaları
+# MacOS files
 .DS_Store
 
-# Build ve test çıktı klasörleri
+# Build and test output directories
 dist
 dist-ssr
 coverage
 *.local
 
-# Cypress test çıktı klasörleri
+# Cypress test output directories
 /cypress/videos/
 /cypress/screenshots/
 
-# IDE/editor klasörleri ve dosyaları
+# IDE/editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -36,5 +36,43 @@ coverage
 # TypeScript build info
 *.tsbuildinfo
 
-# Firebase config dosyası (gizli)
+# 🚨 CRITICAL: Environment files - NEVER ADD TO GIT!
 .env
+.env.local
+.env.production
+.env.staging
+.env.development
+
+# 🚨 CRITICAL: Firebase service account keys - NEVER ADD TO GIT!
+service-account-key.json
+*service-account*.json
+firebase-adminsdk-*.json
+*firebase-key*.json
+
+# 🚨 CRITICAL: Other sensitive files
+*.pem
+*.key
+*.p12
+*.pfx
+config/secrets.*
+secrets.*
+
+# Firebase debug logs and cache
+firebase-debug.log
+firebase-debug.*.log
+.firebase/
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Backup files
+*.bak
+*.tmp
+*.temp
+
+# Database files (if any local databases)
+*.db
+*.sqlite
+*.sqlite3

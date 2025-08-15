@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { AdminManager } from '../utils/AdminManager'
 import HomeView from '../views/HomeView.vue'
 import AuthView from '../views/AuthView.vue'
-import 'primeicons/primeicons.css'
+import AdminView from '../views/AdminView.vue'
 
 const routes = [
   {
@@ -15,6 +16,12 @@ const routes = [
     name: 'Home',
     component: HomeView,
     meta: { requiresAuth: true }
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: AdminView,
+    meta: { requiresAuth: true, requiresAdmin: true }
   }
 ]
 
@@ -43,8 +50,35 @@ router.beforeEach(async (to, from, next) => {
     try {
       const user = await getCurrentUser()
       if (user) {
-        next()
+        // Check if route requires admin access
+        if (to.meta.requiresAdmin) {
+          try {
+            // Use AdminManager for free admin check
+            const isAdmin = await AdminManager.isUserAdmin(user.email)
+            
+            if (isAdmin) {
+              console.log(`Admin access approved: ${user.email}`)
+              
+              // Initialize admin status if needed
+              await AdminManager.initializeAdminStatus()
+              
+              next()
+            } else {
+              console.warn(`Unauthorized admin access attempt: ${user.email}`)
+              // Redirect non-admin users to home
+              next({ name: 'Home' })
+            }
+          } catch (adminError) {
+            console.error('Admin check failed:', adminError)
+            // If there's an admin check problem, redirect to home
+            next({ name: 'Home' })
+          }
+        } else {
+          // Normal kullanıcı sayfası
+          next()
+        }
       } else {
+        // Kullanıcı giriş yapmamış
         next({ name: 'Auth' })
       }
     } catch (error) {

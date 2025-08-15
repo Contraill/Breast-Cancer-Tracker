@@ -1,10 +1,21 @@
 <template>
   <div class="home-form-wrapper">
     <br />
+    
+    <!-- Emergency Admin Warning -->
+    <div v-if="emergencyAdminMode" class="emergency-admin-warning">
+      <div class="emergency-icon">🚨</div>
+      <div class="emergency-content">
+        <h3>Emergency Admin Mode</h3>
+        <p>No administrators found in the system. You have been automatically granted admin privileges.</p>
+        <p class="emergency-note">This happens when the configured admin email is not registered yet.</p>
+      </div>
+    </div>
+    
     <h1 class="title">Health Tracker</h1>
 
     <div class="home-container">
-      <div class="tab-container-with-logout">
+      <div class="tab-container-with-logout" :class="{ 'has-admin': isCurrentUserAdmin }">
         <TabView v-model:activeIndex="activeIndex">
         <!-- USER INFO -->
         <TabPanel header="User Information">
@@ -97,20 +108,22 @@
           <!-- SECTION DIVIDER -->
           <div class="section-divider"></div>
 
-          <!-- EMAIL CHANGE SECTION -->
+          <!-- EMAIL & PASSWORD CHANGE SECTION -->
           <div class="email-change-section">
-            <h3>Change Email Address</h3>
+            <h3>Account Settings</h3>
             <div class="current-email-display">
               <label>Current Email</label>
               <div class="current-email">{{ currentUserEmail }}</div>
             </div>
-            
-            <div class="email-change-form" v-if="!showEmailChange">
+            <div class="email-change-form" v-if="!showEmailChange && !showPasswordChange">
               <button type="button" @click="showEmailChange = true" class="change-email-btn">
                 Change Email Address
+              </button>&nbsp;&nbsp;&nbsp;
+              <button type="button" @click="showPasswordChange = true" class="change-password-btn">
+                Change Password
               </button>
             </div>
-
+            <!-- Email Change Form -->
             <div class="email-change-form" v-if="showEmailChange">
               <div class="form-grid">
                 <label>New Email Address*
@@ -138,6 +151,60 @@
                   Update Email
                 </button>
                 <button type="button" @click="cancelEmailChange" class="cancel-email-btn">
+                  Cancel
+                </button>
+              </div>
+            </div>
+            <!-- Password Change Form -->
+            <div class="email-change-form" v-if="showPasswordChange">
+              <div class="form-grid password-change-grid">
+                <div class="form-group">
+                  <label>Current Password*
+                    <input 
+                      v-model="passwordChange.currentPassword" 
+                      type="password" 
+                      required 
+                      placeholder="Enter your current password"
+                      maxlength="30"
+                    />
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label>New Password*
+                    <input 
+                      v-model="passwordChange.newPassword" 
+                      type="password" 
+                      required 
+                      placeholder="Enter your new password"
+                      maxlength="30"
+                    />
+                    <div class="input-error" :class="{ show: errors.newPassword }">
+                      {{ errors.newPassword }}
+                    </div>
+                    <ul class="password-rules-list">
+                      <li :class="{ invalid: passwordChange.newPassword.length < 6 }">Minimum 6 characters</li>
+                      <li :class="{ invalid: !/[A-Z]/.test(passwordChange.newPassword) }">At least one uppercase letter</li>
+                      <li :class="{ invalid: !/\d/.test(passwordChange.newPassword) }">At least one number</li>
+                    </ul>
+                  </label>
+                </div>
+                <div class="form-group full-width">
+                  <label>Confirm New Password*
+                    <input 
+                      v-model="passwordChange.confirmPassword" 
+                      type="password" 
+                      required 
+                      placeholder="Confirm your new password"
+                      maxlength="30"
+                    />
+                  </label>
+                </div>
+              </div>
+              <div class="email-change-buttons">
+                <button type="button" @click="updatePassword" class="save-email-btn">
+                  Update Password
+                </button>
+                <button type="button" @click="cancelPasswordChange" class="cancel-email-btn">
                   Cancel
                 </button>
               </div>
@@ -208,7 +275,7 @@
                   v-model="form.country" 
                   :options="countries" 
                   optionLabel="name" 
-                  optionValue="code" 
+                  optionValue="name" 
                   placeholder="Select Country"
                   filter 
                   filterBy="name"
@@ -621,6 +688,12 @@
           </TabPanel>
         </TabView>
         
+        <!-- Admin Panel Button (only for admins) -->
+        <button v-if="isCurrentUserAdmin" class="admin-tab-btn" @click="goToAdminPanel">
+          <i class="pi pi-crown"></i>
+          <span>Admin Panel</span>
+        </button>
+        
         <!-- Logout Tab Button -->
         <button class="logout-tab-btn" @click="handleLogout">
           <i class="pi pi-sign-out"></i>
@@ -639,7 +712,8 @@
 <script>
 import { db, auth } from "../firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
-import { signOut, updateEmail, EmailAuthProvider, reauthenticateWithCredential, onAuthStateChanged } from "firebase/auth";
+import { signOut, updateEmail, updatePassword, EmailAuthProvider, reauthenticateWithCredential, onAuthStateChanged } from "firebase/auth";
+import { AdminManager } from "../utils/AdminManager";
 
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
@@ -660,14 +734,22 @@ export default {
       activeIndex: 0,
       countries: [],
       showEmailChange: false,
+      showPasswordChange: false,
       currentUserEmail: '',
       authUnsubscribe: null,
       lastEmailChangeTime: 0,
       emailChangeCooldown: 300000, // 5 minutes
       previousDateOfBirth: null,
+      isCurrentUserAdmin: false, // Admin status for current user
+      emergencyAdminMode: false, // Emergency admin mode indicator
       emailChange: {
         newEmail: '',
         currentPassword: ''
+      },
+      passwordChange: {
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: ''
       },
       errors: {
         firstName: '',
@@ -693,7 +775,9 @@ export default {
         standardDrinksPerWeek: '',
         bingeDrinksPerMonth: '',
         yearsStoppedDrinking: '',
-        newEmail: ''
+        newEmail: '',
+        newPassword: '',
+        confirmPassword: ''
       },
       minDate: '1900-01-01',
       maxDate: new Date().toISOString().split('T')[0],
@@ -1583,6 +1667,10 @@ export default {
       }
     },
 
+    goToAdminPanel() {
+      this.$router.push('/admin');
+    },
+
     async updateEmail() {
       // Check rate limiting first
       const now = Date.now();
@@ -1698,6 +1786,66 @@ export default {
       this.emailChange.newEmail = '';
       this.emailChange.currentPassword = '';
     },
+    cancelPasswordChange() {
+      this.showPasswordChange = false;
+      this.passwordChange.currentPassword = '';
+      this.passwordChange.newPassword = '';
+      this.passwordChange.confirmPassword = '';
+      this.errors.newPassword = '';
+      this.errors.confirmPassword = '';
+    },
+    async updatePassword() {
+      this.errors.newPassword = '';
+      this.errors.confirmPassword = '';
+      // Basic validation
+      if (!this.passwordChange.currentPassword || !this.passwordChange.newPassword || !this.passwordChange.confirmPassword) {
+        this.errors.newPassword = 'Please fill in all password fields.';
+        alert('Please fill in all password fields.');
+        return;
+      }
+      if (this.passwordChange.newPassword.length < 6) {
+        this.errors.newPassword = 'Password must be at least 6 characters.';
+        return;
+      }
+      if (!/[A-Z]/.test(this.passwordChange.newPassword)) {
+        this.errors.newPassword = 'Password must contain at least one uppercase letter.';
+        return;
+      }
+      if (!/\d/.test(this.passwordChange.newPassword)) {
+        this.errors.newPassword = 'Password must contain at least one number.';
+        return;
+      }
+      if (this.passwordChange.newPassword !== this.passwordChange.confirmPassword) {
+        this.errors.confirmPassword = 'Passwords do not match.';
+        alert('Passwords do not match.');
+        return;
+      }
+      try {
+        const user = auth.currentUser;
+        if (!user) {
+          alert('No user is currently signed in.');
+          return;
+        }
+        // Reauthenticate
+        const credential = EmailAuthProvider.credential(user.email, this.passwordChange.currentPassword);
+        await reauthenticateWithCredential(user, credential);
+        // Update password using firebase/auth API
+        await updatePassword(user, this.passwordChange.newPassword);
+        alert('Password updated successfully!');
+        this.cancelPasswordChange();
+      } catch (error) {
+        let msg = '';
+        if (error.code === 'auth/wrong-password') {
+          msg = 'Current password is incorrect.';
+        } else if (error.code === 'auth/weak-password') {
+          msg = 'Password is too weak.';
+        } else {
+          msg = error.message || 'An error occurred.';
+        }
+        this.errors.newPassword = msg;
+        alert(msg);
+      }
+    },
 
     validateNewEmail(event) {
       const value = event.target.value;
@@ -1722,6 +1870,7 @@ export default {
       const year = date.getFullYear();
       return `${day}/${month}/${year}`;
     }
+
   },
 
   mounted() {
@@ -1734,17 +1883,51 @@ export default {
     });
 
     // Set current user email with auth state listener
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         this.currentUserEmail = user.email;
+        
+        // Check admin status
+        try {
+          this.isCurrentUserAdmin = await AdminManager.isUserAdmin(user.email);
+          
+          // Check for emergency admin mode
+          const emergencyCheck = await AdminManager.checkEmergencyAdmin();
+          if (emergencyCheck.emergencyMode && AdminManager.isEmergencyModeEnabled()) {
+            this.emergencyAdminMode = true;
+            setTimeout(() => {
+              this.emergencyAdminMode = false;
+            }, 10000); // Hide after 10 seconds
+          }
+          
+          // Initialize admin status if needed
+          if (this.isCurrentUserAdmin) {
+            await AdminManager.initializeAdminStatus();
+          }
+        } catch (error) {
+          console.error('Error checking admin status:', error);
+          this.isCurrentUserAdmin = false;
+        }
       } else {
         this.currentUserEmail = '';
+        this.isCurrentUserAdmin = false;
       }
     });
 
     // Also set immediately if user is already available
     if (auth.currentUser) {
       this.currentUserEmail = auth.currentUser.email;
+      
+      // Check admin status immediately
+      AdminManager.isUserAdmin(auth.currentUser.email).then(async (isAdmin) => {
+        this.isCurrentUserAdmin = isAdmin;
+        if (isAdmin) {
+          await AdminManager.initializeAdminStatus();
+        }
+      }).catch(error => {
+        console.error('Error checking admin status:', error);
+        this.isCurrentUserAdmin = false;
+      });
     }
 
     this.loadForm();
@@ -1761,3 +1944,30 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.password-change-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px 24px;
+  align-items: start;
+}
+.password-change-grid .form-group {
+  display: flex;
+  flex-direction: column;
+}
+.password-change-grid .full-width {
+  grid-column: 1 / span 2;
+}
+.password-rules-list {
+  margin-top: 8px;
+  margin-bottom: 0;
+  padding-left: 18px;
+  font-size: 0.98em;
+  color: #444;
+}
+.password-rules-list .invalid {
+  color: #c0392b;
+  font-weight: 500;
+}
+</style>

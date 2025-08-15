@@ -112,8 +112,8 @@
         </form>
       </TabPanel>
 
-      <!-- Register Tab -->
-      <TabPanel header="Register">
+      <!-- Register Tab - Only show if registration is allowed -->
+      <TabPanel v-if="registrationAllowed" header="Register">
         <form @submit.prevent="handleRegister" class="auth-form">
           <label>Email</label>
           <InputText v-model="email" type="email" required class="input-field" />
@@ -196,6 +196,8 @@ import {
   confirmPasswordReset 
 } from 'firebase/auth'
 import app from '../firebase'
+import { db } from '../firebase'
+import { doc, getDoc } from 'firebase/firestore'
 
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
@@ -209,6 +211,7 @@ const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const consentGiven = ref(false)
+const registrationAllowed = ref(true) // Default to true
 const showVerificationSuccess = ref(false)
 const showVerificationError = ref(false)
 const lastPasswordResetTime = ref(0)
@@ -227,6 +230,9 @@ const isResetMode = ref(false)
 let resetOobCode = ''
 
 onMounted(async () => {
+  // Check registration settings
+  await checkRegistrationStatus();
+  
   const query = new URLSearchParams(window.location.search)
   const mode = query.get('mode')
   const oobCode = query.get('oobCode')
@@ -250,7 +256,6 @@ onMounted(async () => {
     } catch (err) {
       alert('Password reset link verification failed. Please request a new password reset.')
       
-      // Log detailed error for debugging
       if (process.env.NODE_ENV === 'development') {
         console.error('Password reset link verification error:', err)
       }
@@ -299,8 +304,19 @@ const validatePassword = () => {
 
 const handleLogin = async () => {
   try {
-    await signInWithEmailAndPassword(auth, email.value, password.value)
-    router.push('/home')
+    const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value)
+    const user = userCredential.user
+    
+    // Get the user's token to check for admin claims
+    const token = await user.getIdTokenResult()
+    const isAdmin = token.claims.admin || false
+    
+    // Redirect based on admin status
+    if (isAdmin) {
+      router.push('/admin')
+    } else {
+      router.push('/home')
+    }
   } catch (error) {
     // Generic error message to prevent user enumeration
     if (error.code === 'auth/user-not-found' || 
@@ -323,8 +339,54 @@ const handleLogin = async () => {
   }
 }
 
+// Check if user registration is allowed - for UI display
+const checkRegistrationStatus = async () => {
+  try {
+    const settingsRef = doc(db, 'appSettings', 'main');
+    const settingsSnap = await getDoc(settingsRef);
+    
+    if (settingsSnap.exists()) {
+      const settings = settingsSnap.data();
+      registrationAllowed.value = settings.allowRegistration !== false;
+    } else {
+      // Default to true if settings don't exist
+      registrationAllowed.value = true;
+    }
+  } catch (error) {
+    // If we can't check settings, be conservative and disable registration
+    console.warn('Could not check registration status, defaulting to disabled:', error.message);
+    registrationAllowed.value = false;
+  }
+};
+
+// Check if user registration is allowed - strict check
+const checkRegistrationAllowed = async () => {
+  try {
+    const settingsRef = doc(db, 'appSettings', 'main');
+    const settingsSnap = await getDoc(settingsRef);
+    
+    if (settingsSnap.exists()) {
+      const settings = settingsSnap.data();
+      if (settings.allowRegistration === false) {
+        throw new Error('New user registration is currently disabled by administrators.');
+      }
+    }
+    // If settings don't exist, allow registration (default behavior)
+  } catch (error) {
+    if (error.message.includes('disabled by administrators')) {
+      alert('🚫 Registration Disabled\n\nNew user registration is currently disabled. Please contact the administrator for access.');
+      throw error;
+    }
+    // If it's a permission error or other Firebase error, just log it and allow registration
+    console.warn('Could not check registration settings, allowing registration:', error.message);
+  }
+};
+
 const handleRegister = async () => {
   try {
+    // First check if registration is allowed
+    await checkRegistrationAllowed();
+    
     if (password.value !== confirmPassword.value) {
       alert('The passwords you entered don\'t match. Please make sure both password fields are identical.')
       return

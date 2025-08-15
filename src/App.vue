@@ -10,10 +10,8 @@
 <script>
 import { onMounted, ref } from 'vue'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import AuthView from './views/AuthView.vue'
 
 export default {
-  components: { AuthView },
   setup() {
     const authLoading = ref(true)
 
