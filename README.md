@@ -1,4 +1,4 @@
-# 🏥 Health Tracker
+# 🏥 Health Tracker - learning project
 
 A comprehensive web application for tracking personal health information, built with Vue.js 3 and Firebase. This application provides secure user authentication, detailed health data collection, and admin management capabilities.
 
