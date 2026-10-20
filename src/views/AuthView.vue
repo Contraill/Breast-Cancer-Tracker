@@ -179,6 +179,10 @@
         </form>
       </TabPanel>
     </TabView>
+
+    <p class="intended-use-note">
+      Questionnaire only — this app does not provide diagnosis or medical advice.
+    </p>
   </div>
 </template>
 
@@ -198,6 +202,7 @@ import {
 import app from '../firebase'
 import { db } from '../firebase'
 import { doc, getDoc } from 'firebase/firestore'
+import { AdminManager } from '../utils/AdminManager'
 
 import TabView from 'primevue/tabview'
 import TabPanel from 'primevue/tabpanel'
@@ -304,15 +309,10 @@ const validatePassword = () => {
 
 const handleLogin = async () => {
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value)
-    const user = userCredential.user
-    
-    // Get the user's token to check for admin claims
-    const token = await user.getIdTokenResult()
-    const isAdmin = token.claims.admin || false
-    
+    await signInWithEmailAndPassword(auth, email.value, password.value)
+
     // Redirect based on admin status
-    if (isAdmin) {
+    if (await AdminManager.isCurrentUserAdmin()) {
       router.push('/admin')
     } else {
       router.push('/home')

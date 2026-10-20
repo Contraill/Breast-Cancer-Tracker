@@ -53,18 +53,10 @@ router.beforeEach(async (to, from, next) => {
         // Check if route requires admin access
         if (to.meta.requiresAdmin) {
           try {
-            // Use AdminManager for free admin check
-            const isAdmin = await AdminManager.isUserAdmin(user.email)
-            
-            if (isAdmin) {
-              console.log(`Admin access approved: ${user.email}`)
-              
-              // Initialize admin status if needed
-              await AdminManager.initializeAdminStatus()
-              
+            // UI guard only; firestore.rules enforce admin access to data
+            if (await AdminManager.isCurrentUserAdmin()) {
               next()
             } else {
-              console.warn(`Unauthorized admin access attempt: ${user.email}`)
               // Redirect non-admin users to home
               next({ name: 'Home' })
             }

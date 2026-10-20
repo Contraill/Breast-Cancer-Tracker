@@ -1,0 +1,60 @@
+rules_version = '2';
+
+// Admin role = a document at /admins/{uid}. Clients can never create the first one:
+// it is bootstrapped with the Admin SDK (scripts/set-admin.mjs), which bypasses these rules.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function isAdmin() {
+      return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Shape written by src/utils/profilePayload.js. No role fields are accepted.
+    function validProfile() {
+      let data = request.resource.data;
+      let info = data.userInformation;
+      return data.keys().hasOnly(['userInformation', 'addressInformation', 'healthInformation'])
+        && info is map
+        && info.keys().hasOnly(['email', 'registerDate', 'lastUpdated', 'firstName', 'middleName',
+                                'surname', 'maidenName', 'dob', 'sex'])
+        && info.email == request.auth.token.email
+        && (!('addressInformation' in data) || data.addressInformation is map)
+        && (!('healthInformation' in data) || data.healthInformation is map);
+    }
+
+    // Health records: owner only. Admins may read (admin panel) but never write them.
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create, update: if isOwner(uid) && validProfile();
+      allow delete: if isOwner(uid);
+    }
+
+    // Role assignment. An admin can grant/revoke others but never self-revoke,
+    // so the last admin can't lock the project out.
+    match /admins/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['email', 'grantedBy', 'grantedAt'])
+        && request.resource.data.grantedBy == request.auth.uid;
+      allow delete: if isAdmin() && uid != request.auth.uid;
+      allow update: if false;
+    }
+
+    // Read before sign-in (registration toggle on the auth page), written by admins only.
+    match /appSettings/main {
+      allow read: if true;
+      allow write: if isAdmin()
+        && request.resource.data.keys().hasOnly(['allowRegistration', 'dataRetentionPeriod',
+                                                 'emailNotifications', 'lastUpdated', 'updatedBy'])
+        && request.resource.data.updatedBy == request.auth.uid;
+    }
+  }
+}

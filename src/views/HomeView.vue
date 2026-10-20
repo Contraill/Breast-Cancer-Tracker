@@ -2,16 +2,6 @@
   <div class="home-form-wrapper">
     <br />
     
-    <!-- Emergency Admin Warning -->
-    <div v-if="emergencyAdminMode" class="emergency-admin-warning">
-      <div class="emergency-icon">🚨</div>
-      <div class="emergency-content">
-        <h3>Emergency Admin Mode</h3>
-        <p>No administrators found in the system. You have been automatically granted admin privileges.</p>
-        <p class="emergency-note">This happens when the configured admin email is not registered yet.</p>
-      </div>
-    </div>
-    
     <h1 class="title">Health Tracker</h1>
 
     <div class="home-container">
@@ -714,6 +704,7 @@ import { db, auth } from "../firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { signOut, updateEmail, updatePassword, EmailAuthProvider, reauthenticateWithCredential, onAuthStateChanged } from "firebase/auth";
 import { AdminManager } from "../utils/AdminManager";
+import { buildProfilePayload } from "../utils/profilePayload";
 
 import TabView from 'primevue/tabview';
 import TabPanel from 'primevue/tabpanel';
@@ -741,7 +732,6 @@ export default {
       emailChangeCooldown: 300000, // 5 minutes
       previousDateOfBirth: null,
       isCurrentUserAdmin: false, // Admin status for current user
-      emergencyAdminMode: false, // Emergency admin mode indicator
       emailChange: {
         newEmail: '',
         currentPassword: ''
@@ -1480,72 +1470,7 @@ export default {
       try {
         const docRef = doc(db, "users", user.uid);
 
-        const payload = {
-          userInformation: {
-            email: user.email,
-            registerDate: this.form.registerDate || new Date().toISOString().split('T')[0],
-            lastUpdated: new Date().toISOString().split('T')[0],
-            firstName: this.form.firstName,
-            middleName: this.form.middleName,
-            surname: this.form.surname,
-            maidenName: this.form.maidenName,
-            dob: this.form.dob instanceof Date ? this.form.dob.toISOString().split('T')[0] : this.form.dob,
-            sex: this.form.sex,
-          },
-          addressInformation: {
-            addressLine: {
-              address1: this.form.address1,
-              address2: this.form.address2,
-              address3: this.form.address3,
-              address4: this.form.address4,
-            },
-            city: this.form.city,
-            country: this.form.country,
-          },
-          healthInformation: {
-            HRTMenopause: {
-              hrtPresent: this.form.hrtPresent,
-              hrtPresentLength: this.form.hrtPresent === 'yes' ? this.form.hrtPresentLength : '',
-              hrtPast: this.form.hrtPast,
-              hrtPastYears: this.form.hrtPast === 'yes' ? this.form.hrtPastYears : null,
-              menopauseStatus: this.form.menopauseStatus,
-            },
-            genetics: {
-              brcaKnown: this.form.brcaKnown,
-              brcaGenes: this.form.brcaKnown === 'yes' ? this.form.brcaGenes : [],
-            },
-            familyHistory: {
-              familyHistoryStatus: this.form.familyHistoryStatus,
-              ageOfOnsetYoungestRelative: this.form.familyHistoryStatus === 'Family History Known' ? this.form.ageOfOnsetYoungestRelative : null,
-              familyHistoryOptions: this.form.familyHistoryStatus === 'Family History Known' ? this.form.familyHistoryOptions : [],
-            },
-            allergies: {
-              allergies: this.form.allergies,
-              specifyDressing: this.form.allergies.includes('Dressing') ? this.form.specifyDressing : '',
-              specifyOtherAllergies: this.form.allergies.includes('Other') ? this.form.specifyOtherAllergies : '',
-            },
-            smoking: {
-              smokingStatus: this.form.smokingStatus,
-              smokingYears: (this.form.smokingStatus === 'Ex-Smoker' || this.form.smokingStatus === 'Smoking') ? this.form.smokingYears : null,
-              smokedDaily: (this.form.smokingStatus === 'Ex-Smoker' || this.form.smokingStatus === 'Smoking') ? this.form.smokedDaily : null,
-              yearsStoppedSmoking: this.form.smokingStatus === 'Ex-Smoker' ? this.form.yearsStoppedSmoking : null,
-            },
-            vaping: {
-              vapingStatus: this.form.vapingStatus,
-              vapingYears: (this.form.vapingStatus === 'Ex-Vaper' || this.form.vapingStatus === 'Vaping') ? this.form.vapingYears : null,
-              vapingPodsPerWeek: (this.form.vapingStatus === 'Ex-Vaper' || this.form.vapingStatus === 'Vaping') ? this.form.vapingPodsPerWeek : null,
-              nicotineStrength: (this.form.vapingStatus === 'Ex-Vaper' || this.form.vapingStatus === 'Vaping') ? this.form.nicotineStrength : null,
-              yearsStoppedVaping: this.form.vapingStatus === 'Ex-Vaper' ? this.form.yearsStoppedVaping : null,
-            },
-            alcohol: {
-              alcoholStatus: this.form.alcoholStatus,
-              drinkingYears: (this.form.alcoholStatus === 'Ex-Drinker' || this.form.alcoholStatus === 'Drinking') ? this.form.drinkingYears : null,
-              standardDrinksPerWeek: (this.form.alcoholStatus === 'Ex-Drinker' || this.form.alcoholStatus === 'Drinking') ? this.form.standardDrinksPerWeek : null,
-              bingeDrinksPerMonth: (this.form.alcoholStatus === 'Ex-Drinker' || this.form.alcoholStatus === 'Drinking') ? this.form.bingeDrinksPerMonth : null,
-              yearsStoppedDrinking: this.form.alcoholStatus === 'Ex-Drinker' ? this.form.yearsStoppedDrinking : null,
-            },
-          },
-        };
+        const payload = buildProfilePayload(this.form, user.email);
 
         await setDoc(docRef, payload);
         alert("Your health information has been saved successfully!");
@@ -1887,48 +1812,12 @@ export default {
       if (user) {
         this.currentUserEmail = user.email;
         
-        // Check admin status
-        try {
-          this.isCurrentUserAdmin = await AdminManager.isUserAdmin(user.email);
-          
-          // Check for emergency admin mode
-          const emergencyCheck = await AdminManager.checkEmergencyAdmin();
-          if (emergencyCheck.emergencyMode && AdminManager.isEmergencyModeEnabled()) {
-            this.emergencyAdminMode = true;
-            setTimeout(() => {
-              this.emergencyAdminMode = false;
-            }, 10000); // Hide after 10 seconds
-          }
-          
-          // Initialize admin status if needed
-          if (this.isCurrentUserAdmin) {
-            await AdminManager.initializeAdminStatus();
-          }
-        } catch (error) {
-          console.error('Error checking admin status:', error);
-          this.isCurrentUserAdmin = false;
-        }
+        this.isCurrentUserAdmin = await AdminManager.isCurrentUserAdmin();
       } else {
         this.currentUserEmail = '';
         this.isCurrentUserAdmin = false;
       }
     });
-
-    // Also set immediately if user is already available
-    if (auth.currentUser) {
-      this.currentUserEmail = auth.currentUser.email;
-      
-      // Check admin status immediately
-      AdminManager.isUserAdmin(auth.currentUser.email).then(async (isAdmin) => {
-        this.isCurrentUserAdmin = isAdmin;
-        if (isAdmin) {
-          await AdminManager.initializeAdminStatus();
-        }
-      }).catch(error => {
-        console.error('Error checking admin status:', error);
-        this.isCurrentUserAdmin = false;
-      });
-    }
 
     this.loadForm();
     

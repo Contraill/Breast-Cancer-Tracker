@@ -11,6 +11,7 @@ html {
 body {
   font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  min-height: 100vh;
   color: #1a202c;
   margin: 0;
   padding: 0;
@@ -26,66 +27,6 @@ h3 {
   font-weight: 600;
   color: #2d3748;
   letter-spacing: -0.025em;
-}
-
-/* ---------- EMERGENCY ADMIN WARNING ---------- */
-.emergency-admin-warning {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-  color: white;
-  padding: 1rem 1.5rem;
-  border-radius: 8px;
-  margin: 0 auto 2rem auto;
-  max-width: 600px;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-  animation: emergencyPulse 2s ease-in-out infinite;
-}
-
-.emergency-icon {
-  font-size: 2rem;
-  animation: emergencyShake 0.5s ease-in-out infinite alternate;
-}
-
-.emergency-content h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.emergency-content p {
-  margin: 0 0 0.25rem 0;
-  font-size: 0.95rem;
-  line-height: 1.4;
-}
-
-.emergency-note {
-  opacity: 0.9;
-  font-size: 0.85rem !important;
-  font-style: italic;
-}
-
-@keyframes emergencyPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-}
-
-@keyframes emergencyShake {
-  0% { transform: rotate(-2deg); }
-  100% { transform: rotate(2deg); }
-}
-
-@media (max-width: 768px) {
-  .emergency-admin-warning {
-    margin: 0 1rem 2rem 1rem;
-    padding: 1rem;
-    font-size: 0.9rem;
-  }
-  
-  .emergency-icon {
-    font-size: 1.5rem;
-  }
 }
 
 /* ---------- SECTION DIVIDER ---------- */
@@ -135,7 +76,7 @@ input[data-type="name"] {
   text-transform: capitalize;
 }
 
-input[data-type="name"]:invalid {
+input[data-type="name"]:user-invalid {
   border-color: #fed7d7 !important;
   background-color: #fff5f5 !important;
 }
@@ -153,20 +94,20 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 /* Age/Years validation styling */
-input[data-validation="age"]:invalid,
-input[data-validation="years"]:invalid {
+input[data-validation="age"]:user-invalid,
+input[data-validation="years"]:user-invalid {
   border-color: #fed7d7 !important;
   background-color: #fff5f5 !important;
 }
 
 /* Email validation */
-input[type="email"]:invalid {
+input[type="email"]:user-invalid {
   border-color: #fed7d7 !important;
   background-color: #fff5f5 !important;
 }
 
 /* Address validation - prevent special characters except basic punctuation */
-input[data-type="address"]:invalid {
+input[data-type="address"]:user-invalid {
   border-color: #fed7d7 !important;
   background-color: #fff5f5 !important;
 }
@@ -176,7 +117,7 @@ input[type="date"] {
   position: relative;
 }
 
-input[type="date"]:invalid {
+input[type="date"]:user-invalid {
   border-color: #fed7d7 !important;
   background-color: #fff5f5 !important;
 }
@@ -284,12 +225,12 @@ textarea:hover,
 }
 
 /* ---------- VALIDATION STATES ---------- */
-input[required]:invalid,
-select[required]:invalid,
-textarea[required]:invalid,
-.auth-form .p-inputtext:invalid,
-.auth-form .p-password input:invalid,
-.auth-form .p-password .p-inputtext:invalid {
+input[required]:user-invalid,
+select[required]:user-invalid,
+textarea[required]:user-invalid,
+.auth-form .p-inputtext:user-invalid,
+.auth-form .p-password input:user-invalid,
+.auth-form .p-password .p-inputtext:user-invalid {
   border-color: #e53e3e !important;
   box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1) !important;
 }
@@ -705,6 +646,14 @@ textarea:not([required]),
   font-size: 0.85rem;
   line-height: 1.4rem;
   color: #4a5568;
+}
+
+.intended-use-note {
+  margin: 1.5rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: #718096;
+  text-align: center;
 }
 
 /* ---------- HOME FORM CONTAINER ---------- */

@@ -1550,18 +1550,11 @@ Breast Cancer Tracker System`
           throw new Error('User authentication not found');
         }
         
-        // Use AdminManager for free admin check
-        const isAdmin = await AdminManager.isUserAdmin(user.email);
-        
-        if (!isAdmin) {
-          console.warn(`Unauthorized admin panel access: ${user.email}`);
+        if (!(await AdminManager.isCurrentUserAdmin())) {
           alert('You do not have permission to access this page!');
           this.$router.push('/home');
           return;
         }
-        
-        // Initialize admin status if user is in initial admins list
-        await AdminManager.initializeAdminStatus();
       } catch (error) {
         console.error('Admin verification error:', error);
         alert('Authorization verification failed!');
@@ -1984,17 +1977,12 @@ Breast Cancer Tracker System`
       console.log('🔄 Starting admin creation process for:', userEmail);
       
       try {
-        // SECURITY: Fresh admin check before any admin operation
-        const currentUserEmail = this.$store?.state?.auth?.user?.email || auth.currentUser?.email;
-        const isStillAdmin = await AdminManager.isUserAdmin(currentUserEmail);
-        
-        if (!isStillAdmin) {
+        // Fresh check for a clear message; firestore.rules reject the write anyway
+        if (!(await AdminManager.isCurrentUserAdmin())) {
           alert('❌ Yetkiniz kaldırıldı! Admin işlemi yapma yetkiniz yok.');
           this.$router.push('/');
           return;
         }
-        
-        console.log('✅ Fresh admin check passed for:', currentUserEmail);
         
         // Check if user exists
         const userExists = this.users.find(u => u.email.toLowerCase() === userEmail.toLowerCase());
@@ -2034,17 +2022,12 @@ Breast Cancer Tracker System`
       this.isProcessing = true;
       
       try {
-        // SECURITY: Fresh admin check before any admin operation
-        const currentUserEmail = this.$store?.state?.auth?.user?.email || auth.currentUser?.email;
-        const isStillAdmin = await AdminManager.isUserAdmin(currentUserEmail);
-        
-        if (!isStillAdmin) {
+        // Fresh check for a clear message; firestore.rules reject the write anyway
+        if (!(await AdminManager.isCurrentUserAdmin())) {
           alert('❌ Yetkiniz kaldırıldı! Admin işlemi yapma yetkiniz yok.');
           this.$router.push('/');
           return;
         }
-        
-        console.log('✅ Fresh admin check passed for:', currentUserEmail);
         // Check if user exists and is admin
         const userExists = this.users.find(u => u.email.toLowerCase() === userEmail.toLowerCase());
         if (!userExists) {
@@ -2055,61 +2038,8 @@ Breast Cancer Tracker System`
           throw new Error('Bu kullanıcı zaten admin değil!');
         }
 
-        // Check if trying to remove a hardcoded admin
-        const hardcodedAdmins = ['admin@example.com']; // Copy hardcoded list
-        if (hardcodedAdmins.includes(userEmail.toLowerCase())) {
-          throw new Error('Bu kullanıcı sistem yöneticisi! Yetkisi kaldırılamaz.');
-        }
-
-        // Get fresh admin count from database to ensure accuracy
-        const result = await AdminManager.getAllUsers();
-        const currentAdmins = result.users.filter(u => u.isAdmin);
-        
-        // Count removable admins (exclude hardcoded ones)
-        const removableAdmins = currentAdmins.filter(u => 
-          !hardcodedAdmins.includes(u.email.toLowerCase())
-        );
-        
-        // Also count hardcoded admins that exist in the system (even if not marked as admin in DB)
-        const hardcodedAdminsInSystem = result.users.filter(u => 
-          hardcodedAdmins.includes(u.email.toLowerCase())
-        );
-        
-        const totalEffectiveAdmins = currentAdmins.length + hardcodedAdminsInSystem.length;
-        
-        console.log('🔍 ADMIN DEBUG INFO:');
-        console.log('Target email:', userEmail);
-        console.log('Current admins:', currentAdmins.map(a => a.email));
-        console.log('Hardcoded admins:', hardcodedAdmins);
-        console.log('Hardcoded admins in system:', hardcodedAdminsInSystem.map(a => a.email));
-        console.log('Removable admins:', removableAdmins.map(a => a.email));
-        console.log('Total admin count:', currentAdmins.length);
-        console.log('Total effective admin count:', totalEffectiveAdmins);
-        console.log('Removable admin count:', removableAdmins.length);
-        
-        // If removing this admin would leave us with no removable admins, prevent it
-        // UNLESS there are hardcoded admins that can still manage the system
-        const hasHardcodedAdmins = hardcodedAdminsInSystem.length > 0;
-        
-        // Also check if current user is a hardcoded admin (even if not in user list)
-        // Use the currentUserEmail that was already defined above in the fresh admin check
-        const currentUserIsHardcoded = hardcodedAdmins.includes(currentUserEmail?.toLowerCase());
-        
-        console.log('Current user email:', currentUserEmail);
-        console.log('Current user is hardcoded admin:', currentUserIsHardcoded);
-        
-        if (removableAdmins.length <= 1 && !hasHardcodedAdmins && !currentUserIsHardcoded) {
-          throw new Error('At least one admin must remain! Another admin is required since you are not a system administrator.');
-        }
-        
-        if (removableAdmins.length <= 1 && (hasHardcodedAdmins || currentUserIsHardcoded)) {
-          console.log('⚠️ Last removable admin being removed but hardcoded admin exists, continuing...');
-        }
-
         // Use AdminManager for free admin removal
-        const adminResult = await AdminManager.setAdminRole(userEmail.toLowerCase(), false);
-        
-        console.log('✅ AdminManager result:', result);
+        await AdminManager.setAdminRole(userEmail.toLowerCase(), false);
         
         alert(`✅ ${userEmail} admin yetkisi başarıyla kaldırıldı!\n\n🔄 Kullanıcının sayfayı yenilemesi gerekiyor.`);
         
@@ -2261,18 +2191,12 @@ Breast Cancer Tracker System`
     async updateSettings() {
       console.log('🔧 updateSettings called at:', new Date().toISOString());
       try {
-        // First verify admin access
-        const isAdmin = AdminManager.isUserAdmin(this.currentUserEmail);
-        if (!isAdmin) {
-          throw new Error('Admin access required to update settings');
-        }
-
         // Save settings to Firestore
         const settingsRef = doc(db, 'appSettings', 'main');
         await setDoc(settingsRef, {
           ...this.settings,
           lastUpdated: new Date().toISOString(),
-          updatedBy: this.currentUserEmail
+          updatedBy: auth.currentUser.uid
         }, { merge: true });
 
         console.log('✅ Settings updated successfully:', this.settings);
@@ -2348,13 +2272,6 @@ Breast Cancer Tracker System`
 
     async loadSettings() {
       try {
-        // First verify admin access
-        const isAdmin = AdminManager.isUserAdmin(this.currentUserEmail);
-        if (!isAdmin) {
-          console.warn('⚠️ Non-admin user, using default settings');
-          return;
-        }
-
         const settingsRef = doc(db, 'appSettings', 'main');
         const settingsSnap = await getDoc(settingsRef);
         
