@@ -1,318 +1,203 @@
-# 🏥 Health Tracker - learning project
+# 🏥 Health Tracker — Breast Cancer Screening Questionnaire
 
-A comprehensive web application for tracking personal health information, built with Vue.js 3 and Firebase. This application provides secure user authentication, detailed health data collection, and admin management capabilities.
+> **Internship Project.** This application was started during my summer 2025 software internship
+> (27 July – 15 August 2025). The state of the code at the end of the internship is preserved under the Git tag
+> [`internship-final`](../../tree/internship-final). Everything after that tag is my own follow-up work,
+> documented in [Post-Internship Improvements](#-post-internship-improvements).
 
-## ✨ Features
+A Vue 3 + Firebase web application where a participant creates an account and fills in a breast-cancer
+screening questionnaire (personal details, HRT/menopause, BRCA genetics, family history, allergies,
+smoking, vaping and alcohol use). Administrators can review submissions in an admin panel.
 
-### 🔐 Authentication System
-- **User Registration & Login** with email/password
-- **Password Reset** functionality with email verification
-- **Email Change** with re-authentication security
-- **Rate Limiting** to prevent spam and abuse
-- **Secure Session Management** with Firebase Auth
-- **Admin Panel** with role-based access control
+| Sign in | Questionnaire | Admin panel |
+|---|---|---|
+| ![Sign in](docs/screenshots/sign-in.png) | ![Questionnaire](docs/screenshots/questionnaire.png) | ![Admin panel](docs/screenshots/admin-panel.png) |
 
-### 📋 Health Data Management
-- **Personal Information** collection and validation
-- **Health History** tracking with decimal year support (e.g., 0.5 = 6 months)
-- **Medical Conditions** and treatment history
-- **Lifestyle Factors** (smoking, alcohol, exercise)
-- **Family Medical History** documentation
-- **Real-time Data Synchronization** with Firebase Firestore
+<sub>Screenshots taken against the local Firebase Emulator with synthetic accounts only.</sub>
 
-### 👑 Admin Features
-- **User Management** - View all registered users with detailed profiles
-- **Admin Assignment** - Promote users to admin status
-- **Email System** - Professional email simulation for development/testing
-- **Batch Messaging** - Send emails to multiple users with templates
-- **Statistics Dashboard** - Monitor app usage and user activity
-- **Security Controls** - Secure admin authentication and permissions
+## ⚠️ Privacy & Intended Use
 
-### 📧 Email System (Simulation Mode)
-- **Individual Emails** - Send appointment reminders to specific users
-- **Batch Emails** - Send to multiple recipients with personalization
-- **Email Templates** - Pre-built professional healthcare templates
-  - 📅 Appointment Reminder
-  - 📰 Health Newsletter  
-  - 💝 Follow-up Care
-  - 🛡️ Wellness Check
-- **Simulation Mode** - Cost-effective development and testing solution
-- **Console Logging** - Detailed email content for development review
-- **Professional UI** - Realistic email sending notifications
+- **This is not a medical device.** It does **not** provide clinical diagnosis, risk scores, screening
+  decisions or medical advice. It only collects questionnaire answers. Always consult a qualified healthcare
+  professional.
+- **Demo / educational use.** Do not enter real patient data into a public deployment of this repository.
+  Handling real health data requires a proper legal basis (e.g. KVKK / GDPR), a data processing agreement,
+  audit logging, retention and deletion procedures, and a security review that this project has not had.
+- **No real data in this repository.** The repository, tests, fixtures and screenshots contain only
+  synthetic data (`*@example.test` accounts, "Test User", "Exampleville"). Tests run against the local
+  Firebase Emulator with a `demo-*` project ID, which can never reach a real Firebase project.
 
-### 🎨 User Interface
-- **Responsive Design** optimized for all devices
-- **Modern UI Components** using PrimeVue library
-- **Real-time Form Validation** with instant feedback
-- **Professional Styling** with custom CSS
-- **Accessible Design** following WCAG guidelines
-- **Mobile-First Design** with touch-friendly components
+## 🎓 Internship Scope
 
-### 🔒 Security Features
-- **Input Validation** with pattern matching and sanitization
-- **XSS Protection** through proper data handling
-- **User Enumeration Prevention** with generic error messages
-- **Role-Based Access Control** for admin features
-- **Secure Authentication** with Firebase Auth
+Built during the internship (commits up to `internship-final`):
 
-## 💻 Email System Usage
+- **Project setup** — Vue 3 + Vite SPA, Firebase Auth / Firestore / Hosting, GitHub Actions that build and
+  deploy to Firebase Hosting on merge and create preview channels on pull requests.
+- **Authentication** — email/password registration with consent checkbox, email verification, custom
+  in-app password-reset and verify-email pages, password rules (6–30 chars, an uppercase letter, a number),
+  email and password change with re-authentication, generic error messages to avoid account enumeration,
+  client-side cooldowns for password-reset (60 s) and email-change (5 min) requests.
+- **Health questionnaire** — personal and address information (country list), HRT & menopause, BRCA
+  genes, family history, allergies, smoking / vaping / alcohol history with decimal-year durations
+  (e.g. `0.5` = 6 months), conditional fields, real-time field validation, saving and reloading the user's
+  own record from Firestore.
+- **Mobile optimisation** — responsive layout, date picker, radio buttons and multi-select chips tuned for
+  touch screens.
+- **Admin panel** — user list and search, per-user detail view, aggregate statistics (age groups, HRT,
+  BRCA, family history, lifestyle), CSV export, registration toggle and data-retention setting, and an
+  **email simulation** (messages and templates are logged to the browser console, nothing is sent).
 
-### For Admins
-1. **Login** to the admin panel
-2. **Navigate** to User Management → Select user → Click "Send Mail"
-3. **Use Batch Emails** for sending to multiple users
-4. **Choose Templates** or write custom messages
-5. **Check Console** (F12) for detailed simulation logs
+Known limitations of the internship version (fixed afterwards): admin rights were decided in the browser
+(a hard-coded email list, `VITE_*` variables and an "emergency mode" that made the first visitor an admin),
+and the `firestore.rules` file referenced by `firebase.json` was missing from the repository.
 
-### Sample Console Output
-```
-📧 EMAIL SIMULATION MODE ACTIVATED
-=====================================
-To: user@example.com
-Subject: Important: Appointment Reminder - Health Tracker
-From Admin: admin@healthtracker.com
----
-Message Preview:
-Hello John Doe,
-We hope this email finds you in good health...
-```
+## 🔧 Post-Internship Improvements
+
+Security and testing work done after the internship, without redesigning the UI:
+
+- **Server-side authorization.** Added [`firestore.rules`](firestore.rules):
+  - a user can read and write **only their own** `users/{uid}` record; the record's shape is validated and
+    its email must match the signed-in account, so role fields cannot be smuggled in;
+  - admins can **read** records for the admin panel but cannot modify anyone's health data;
+  - the admin role is a document in `admins/{uid}`. Clients cannot create the first admin; existing admins
+    can grant/revoke others but cannot revoke themselves (no lock-out);
+  - `appSettings/main` is world-readable (needed on the sign-in page) and writable only by admins.
+- **Trusted admin bootstrap.** Admins are created with the Firebase Admin SDK
+  ([`scripts/set-admin.mjs`](scripts/set-admin.mjs)), which runs with service-account credentials and
+  never in the browser.
+- **Removed client-side privilege escalation.** Deleted the hard-coded admin email list, the
+  `VITE_SUPER_ADMIN_EMAILS` / `VITE_EMERGENCY_ADMIN_ENABLED` variables and "emergency admin" mode. The
+  router guard and admin checks now only drive the UI; Firestore Rules make the actual decision.
+- **Tests with the Firebase Emulator** ([`tests/`](tests)):
+  - security tests: unauthenticated access denied, users can access only their own data, users cannot make
+    themselves (or anyone) admin, admins cannot edit health records or remove themselves;
+  - smoke tests: registration, login, password and email change, saving and updating the questionnaire,
+    and admin bootstrap through the Admin SDK script.
+- **Deployment gates.** GitHub Actions run the test suite before any Hosting deploy or preview, and
+  `firebase deploy` runs the rules tests as a `predeploy` step, so rules cannot be deployed with failing
+  tests. Rules are never deployed automatically by CI.
+- **Smaller fixes.** Settings writes no longer publish the admin's email address; the save-payload builder
+  was moved to [`src/utils/profilePayload.js`](src/utils/profilePayload.js) so the tests exercise exactly
+  what the app writes; README claims were corrected to match what is actually enforced.
+- **Light UI polish only.** Required fields no longer show as invalid before the user has touched them,
+  the page background now covers the full viewport, and the sign-in page states that the app gives no
+  medical advice. No redesign.
+
+## 🔒 Security Model
+
+| Concern | Enforced by | Notes |
+|---|---|---|
+| Who can read/write a health record | Firestore Rules | Owner only; admins read-only |
+| Who is an admin | `admins/{uid}` + Firestore Rules | First admin via Admin SDK only |
+| Record shape / no role fields in user data | Firestore Rules | Field values (ranges, formats) are validated in the UI only |
+| Password strength | Firebase Auth + UI | UI rules are stricter than Firebase's default |
+| Password-reset / email-change cooldowns | UI only | Firebase Auth applies its own server-side rate limits |
+| "Allow registration" toggle | UI only | Firebase Auth sign-up itself cannot be blocked from Firestore Rules |
+| XSS | Vue template escaping | No `v-html` with user input |
+
+The Firebase web config (`VITE_FIREBASE_*`) is public by design; protection comes from the rules above.
+Restrict the API key to your domains in Google Cloud Console for production.
 
 ## 🛠️ Tech Stack
 
-### Frontend
-- **Vue.js 3** - Progressive JavaScript framework
-- **PrimeVue** - Rich UI component library
-- **Vite** - Fast build tool and development server
-- **CSS3** - Modern styling with Flexbox and Grid
-
-### Backend & Services
-- **Firebase Authentication** - Secure user management
-- **Firebase Firestore** - Real-time NoSQL database
-- **Firebase Hosting** - Fast and secure web hosting
-
-### Development & Deployment
-- **GitHub Actions** - Automated CI/CD pipeline
-- **Environment Variables** - Secure configuration management
-- **ESLint** - Code quality and consistency
-- **Git** - Version control with detailed commit history
+- **Vue 3**, **Vue Router**, **PrimeVue**, **Vite**
+- **Firebase Authentication**, **Cloud Firestore**, **Firebase Hosting**
+- **Firebase Emulator Suite**, `@firebase/rules-unit-testing`, Node's built-in test runner
+- **GitHub Actions** for tests, preview channels and deployment
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- **Node.js** (v18.0.0 or higher)
-- **npm** (v8.0.0 or higher) 
-- **Firebase project** with Authentication and Firestore enabled
-- **Firebase CLI** (for deployment): `npm install -g firebase-tools`
 
-### Quick Start
+- Node.js 20+ and npm
+- Java 21+ (required by the Firebase Emulator)
+- A Firebase project with Email/Password Authentication and Firestore enabled (only for real deployments)
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Contraill/Breast-Cancer-Tracker.git
-   cd health-tracker
-   ```
+### Local development with the emulators (no Firebase project needed)
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+```bash
+git clone https://github.com/Contraill/Breast-Cancer-Tracker.git
+cd Breast-Cancer-Tracker
+npm install
+cp .env.example .env            # set VITE_USE_EMULATORS="true"
+npm run emulators               # terminal 1: Auth + Firestore emulators
+npm run dev                     # terminal 2: http://localhost:5173
+```
 
-3. **Environment Configuration**
-   ```bash
-   # Copy the example environment file
-   cp .env.example .env
-   
-   # Edit .env with your Firebase configuration
-   # Get these values from Firebase Console > Project Settings > General
-   ```
+To open the admin panel locally, register an account in the app and then:
 
-4. **Firebase Setup** (if deploying)
-   ```bash
-   # Login to Firebase
-   firebase login
-   
-   # Deploy Firestore security rules
-   firebase deploy --only firestore:rules
-   ```
+```bash
+FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 \
+GCLOUD_PROJECT=demo-bct npm run admin:grant -- you@example.test
+```
 
-5. **Start development server**
-   ```bash
-   npm run dev
-   # Opens at http://localhost:5173
-   ```
+### Tests
+
+```bash
+npm test             # security rules + smoke tests (starts the emulators automatically)
+npm run test:rules   # security rules only
+```
+
+### Admin Setup (real Firebase project)
+
+Admin rights are never configured through environment variables. Grant the first admin with the Admin SDK:
+
+```bash
+# Service account key from Firebase Console > Project settings > Service accounts (keep it out of git)
+export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
+npm run admin:grant -- admin@your-domain.com
+npm run admin:revoke -- admin@your-domain.com
+```
+
+The user must have registered first. After that, admins can grant or revoke other admins from the admin panel.
+
+### Deployment
+
+Deploy the rules **before** a frontend that depends on them:
+
+```bash
+firebase login
+npm run deploy-rules      # runs the rules tests first (predeploy), then deploys firestore.rules
+npm run deploy-hosting    # or push to main and let GitHub Actions deploy after the tests pass
+```
 
 ### Available Scripts
 
-- **`npm run dev`** - Start development server
-- **`npm run build`** - Build for production
-- **`npm run preview`** - Preview production build
-- **`npm run deploy`** - Build and deploy to Firebase
-- **`npm run deploy-rules`** - Deploy only Firestore rules
-- **`npm run deploy-hosting`** - Deploy only hosting
-
-### Admin Setup
-
-First user can become admin automatically (Emergency Admin Mode):
-1. **Register** a new account with your email
-2. **Emergency Mode** activates if no admins exist
-3. **Automatic Admin** privileges granted
-4. **Configure** `VITE_SUPER_ADMIN_EMAILS` in `.env` for permanent admin access
-
-### Environment Variables
-
-```env
-# Firebase Configuration (required)
-VITE_FIREBASE_API_KEY="your-api-key"
-VITE_FIREBASE_AUTH_DOMAIN="your-project.firebaseapp.com"  
-VITE_FIREBASE_PROJECT_ID="your-project-id"
-VITE_FIREBASE_STORAGE_BUCKET="your-project.firebasestorage.app"
-VITE_FIREBASE_MESSAGING_SENDER_ID="your-sender-id"
-VITE_FIREBASE_APP_ID="your-app-id"
-
-# Admin Configuration (optional)
-VITE_SUPER_ADMIN_EMAILS="admin@example.com,admin2@example.com"
-VITE_EMERGENCY_ADMIN_ENABLED="true"
-```
+| Script | Description |
+|---|---|
+| `npm run dev` | Start the Vite dev server |
+| `npm run build` / `npm run preview` | Production build / preview it |
+| `npm run emulators` | Start the Auth + Firestore emulators (`demo-bct` project) |
+| `npm test` / `npm run test:rules` | All tests / rules tests only |
+| `npm run admin:grant -- <email>` / `admin:revoke` | Assign or remove admin with the Admin SDK |
+| `npm run deploy-rules` / `deploy-hosting` / `deploy` | Firebase deploys (rules deploys are test-gated) |
 
 ## 📁 Project Structure
 
 ```
-health-tracker/
-├── public/
-│   ├── icon.svg                 # Application icon
-│   └── index.html              # HTML template
-├── src/
-│   ├── assets/
-│   │   └── countries.js        # Country list data
-│   ├── router/
-│   │   └── index.js            # Vue Router configuration
-│   ├── style/
-│   │   └── main.css            # Global styles (1,450+ lines)
-│   ├── views/
-│   │   ├── AuthView.vue        # Authentication page (445 lines)
-│   │   └── HomeView.vue        # Main application (1,531 lines)
-│   ├── App.vue                 # Root component
-│   ├── firebase.js             # Firebase configuration
-│   └── main.js                 # Application entry point
-├── .firebaserc                 # Firebase project configuration
-├── firebase.json               # Firebase hosting configuration
-├── package.json                # Dependencies and scripts
-└── vite.config.js             # Vite configuration
+├── firestore.rules              # Server-side authorization (tested in tests/)
+├── firebase.json                # Hosting, Firestore and emulator configuration
+├── scripts/set-admin.mjs        # Admin SDK role assignment
+├── tests/
+│   ├── firestore.rules.test.mjs # Security rules tests
+│   ├── smoke.test.mjs           # Auth + data flow smoke tests
+│   └── fakeForm.mjs             # Synthetic questionnaire data
+└── src/
+    ├── firebase.js              # Firebase init (+ optional emulator connection)
+    ├── router/index.js          # Routes and UI guards
+    ├── utils/AdminManager.js    # Admin UI helpers (rules make the real decision)
+    ├── utils/profilePayload.js  # Firestore shape of a user's record
+    ├── views/AuthView.vue       # Sign in, registration, password reset
+    ├── views/HomeView.vue       # Questionnaire and account settings
+    ├── views/AdminView.vue      # Admin panel
+    └── style/                   # Global and admin styles
 ```
 
-## 🎯 Key Features Detail
+## 📄 License
 
-### Form Validation System
-- **Real-time validation** with instant feedback
-- **Pattern matching** for names, emails, and phone numbers
-- **Date validation** with calendar picker support
-- **Decimal number support** for duration fields
-- **Required field highlighting** and error messages
-
-### Database Optimization
-- **Conditional saving** - only saves relevant data fields
-- **Data type validation** before database operations
-- **Optimized queries** for better performance
-- **Real-time synchronization** across devices
-
-### Security Implementations
-- **Rate limiting**: 60-second cooldown for password reset
-- **Email change protection**: 5-minute cooldown between attempts
-- **Input sanitization** to prevent injection attacks
-- **Secure authentication** with Firebase best practices
-
-## 🔧 Development Highlights
-
-### Recent Achievements (Aug 11-14, 2025)
-- ✅ **24 commits** with comprehensive feature additions
-- ✅ **3,328 lines** of new code added
-- ✅ **17 files** enhanced and optimized
-- ✅ **Complete authentication system** implemented
-- ✅ **Production deployment** with CI/CD pipeline
-
-### Code Quality
-- **Modular architecture** with reusable components
-- **Consistent coding standards** throughout the project
-- **Comprehensive error handling** and user feedback
-- **Performance optimized** with efficient data loading
-
-## 🌐 Deployment
-
-## 🔒 Security & Best Practices
-
-### Security Considerations:
-- **Environment Variables**: Never commit `.env` files - use `.env.example` as template
-- **Firebase Configuration**: API keys are client-safe but restrict by domain in production
-- **Admin Access**: First user becomes admin automatically if none exist (Emergency Mode)
-- **Input Validation**: All data validated client and server-side
-- **Authentication**: Firebase Auth provides secure session management
-
-### Production Checklist:
-- ✅ Set environment variables in hosting platform
-- ✅ Configure Firebase security rules
-- ✅ Use separate Firebase projects for dev/staging/prod
-- ✅ Monitor Firebase usage and set quotas
-- ✅ Test email simulation thoroughly
-
-## 🚀 Deployment
-
-The application is automatically deployed using GitHub Actions:
-
-1. **Push to main branch** triggers deployment
-2. **Build process** runs automatically  
-3. **Firebase Hosting** serves the application
-4. **Environment variables** are securely managed
-
-## 🤝 Contributing
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
-
-### Development Guidelines:
-- Follow Vue.js 3 Composition API patterns
-- Use PrimeVue components consistently
-- Validate all user inputs properly
-- Test email simulation thoroughly
-- Add proper error handling
-
-## 📞 Support
-
-- **Issues**: Create an issue on GitHub for bugs or feature requests
-- **Documentation**: All setup instructions are in this README
-- **Email Simulation**: Check browser console (F12) for detailed logs
-
-## � License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-**🏥 Built with ❤️ for healthcare professionals and patients**
+No license has been chosen yet, so all rights are reserved by default. A license will be added once it is
+confirmed that the internship organization permits publishing this code.
 
 ## 👨‍💻 Developer
 
-**Contrail** - [GitHub Profile](https://github.com/Contraill)
-
----
-
-### 📊 Project Statistics
-- **Languages**: JavaScript (Vue.js), HTML, CSS
-- **Framework**: Vue.js 3 with Options API
-- **Database**: Firebase Firestore
-- **Authentication**: Firebase Auth
-- **UI Library**: PrimeVue
-- **Build Tool**: Vite
-- **Deployment**: Firebase Hosting + GitHub Actions
-
-### 🏗️ Architecture Decisions
-- **Single Page Application (SPA)** for smooth user experience
-- **Component-based architecture** for maintainability
-- **Real-time database** for instant data synchronization
-- **Progressive Web App** capabilities for mobile experience
-
----
-
-*Built with ❤️ for better health tracking and management*
+**Contrail** — [GitHub Profile](https://github.com/Contraill)
