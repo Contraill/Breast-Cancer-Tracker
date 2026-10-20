@@ -1,7 +1,9 @@
 # 🏥 Health Tracker — Breast Cancer Screening Questionnaire
 
 > **Internship Project.** This application was started during my summer 2025 software internship
-> (27 July – 15 August 2025). The state of the code at the end of the internship is preserved under the Git tag
+> (27 July – 15 August 2025). The host organization asked me to build my own version, inspired by one of
+> their projects; they did not contribute code, and none of their code or data is included here.
+> The state of the code at the end of the internship is preserved under the Git tag
 > [`internship-final`](../../tree/internship-final). Everything after that tag is my own follow-up work,
 > documented in [Post-Internship Improvements](#-post-internship-improvements).
 
@@ -235,8 +237,7 @@ npm run deploy-hosting    # or push to main and let GitHub Actions deploy after 
 
 ## 📄 License
 
-No license has been chosen yet, so all rights are reserved by default. A license will be added once it is
-confirmed that the internship organization permits publishing this code.
+Released under the [MIT License](LICENSE).
 
 ## 👨‍💻 Developer
 
