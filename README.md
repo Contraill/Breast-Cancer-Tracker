@@ -238,7 +238,3 @@ npm run deploy-hosting    # or push to main and let GitHub Actions deploy after 
 ## 📄 License
 
 Released under the [MIT License](LICENSE).
-
-## 👨‍💻 Developer
-
-**Contrail** — [GitHub Profile](https://github.com/Contraill)
