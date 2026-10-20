@@ -44,16 +44,16 @@
         />
         <div class="password-requirements">
           <small :class="{ 'valid': passwordValidation.length }" class="requirement">
-            ✓ At least 6 characters long
+            At least 6 characters long
           </small>
           <small :class="{ 'valid': passwordValidation.uppercase }" class="requirement">
-            ✓ Contains uppercase letter
+            Contains uppercase letter
           </small>
           <small :class="{ 'valid': passwordValidation.number }" class="requirement">
-            ✓ Contains at least one number
+            Contains at least one number
           </small>
           <small :class="{ 'valid': passwordValidation.maxLength }" class="requirement">
-            ✓ Maximum 30 characters
+            Maximum 30 characters
           </small>
         </div>
 
@@ -107,7 +107,7 @@
             label="Forgot Password?" 
             link 
             @click="handleForgotPassword" 
-            style="margin-top: 10px; font-size: 0.9rem; outline: none !important; border: none !important; box-shadow: none !important;" 
+            style="margin-top: 10px; font-size: 0.9rem; border: none !important;" 
           />
         </form>
       </TabPanel>
@@ -137,16 +137,16 @@
           />
           <div class="password-requirements">
             <small :class="{ 'valid': passwordValidation.length }" class="requirement">
-              ✓ At least 6 characters long
+              At least 6 characters long
             </small>
             <small :class="{ 'valid': passwordValidation.uppercase }" class="requirement">
-              ✓ Contains uppercase letter
+              Contains uppercase letter
             </small>
             <small :class="{ 'valid': passwordValidation.number }" class="requirement">
-              ✓ Contains at least one number
+              Contains at least one number
             </small>
             <small :class="{ 'valid': passwordValidation.maxLength }" class="requirement">
-              ✓ Maximum 30 characters
+              Maximum 30 characters
             </small>
           </div>
 

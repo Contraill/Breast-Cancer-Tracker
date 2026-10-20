@@ -38,14 +38,14 @@ export default {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background-color: #f0f2f5;
+  background-color: var(--color-surface-soft);
 }
 
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #e3e3e3;
-  border-top: 4px solid #4a90e2;
+  border: 4px solid var(--color-border);
+  border-top: 4px solid var(--color-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
@@ -57,7 +57,7 @@ export default {
 }
 
 .auth-loading p {
-  color: #666;
+  color: var(--color-text-muted);
   font-size: 1.1rem;
   margin: 0;
 }

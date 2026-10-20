@@ -1,3 +1,63 @@
+/* ---------- THEME TOKENS (soft pink / rose) ----------
+   Every color in the app comes from here. Text tokens are AA (>= 4.5:1) on
+   --color-bg, --color-surface and --color-surface-soft; --color-text-subtle is
+   for placeholders/disabled only. --color-primary-bright is decorative only. */
+:root {
+  --color-bg: #FFF4F6;
+  --color-surface: #FFFFFF;
+  --color-surface-soft: #FFF9FA;
+  --color-surface-blush: #F5DCE4;
+  --color-border: #F0DCE3;
+  --color-border-strong: #AD8091; /* form controls: >= 3:1 on white and on --color-bg */
+
+  --color-text: #27232B;
+  --color-text-muted: #5E5259;
+  --color-text-subtle: #7A6B72;
+  --color-on-primary: #FFFFFF;
+
+  --color-primary: #B03F67;
+  --color-primary-strong: #923657;
+  --color-primary-bright: #C34D75;
+  --color-primary-soft: #FBE8EE;
+  --color-primary-border: #E7B3C5;
+  --color-accent: #6E4A7E;
+
+  --color-success: #1E7A4E;
+  --color-success-strong: #155C3A;
+  --color-success-soft: #E6F4EC;
+  --color-success-border: #A8D5BC;
+  --color-danger: #B42318;
+  --color-danger-strong: #8F1C13;
+  --color-danger-soft: #FDECEA;
+  --color-danger-border: #F1AFA9;
+  --color-warning: #8A5300;
+  --color-warning-solid: #D98E04;
+  --color-warning-soft: #FFF4DB;
+  --color-warning-border: #F0C877;
+
+  /* Channels for translucent tints: rgb(var(--rgb-primary) / 0.1) */
+  --rgb-primary: 176 63 103;
+  --rgb-accent: 110 74 126;
+  --rgb-success: 30 122 78;
+  --rgb-danger: 180 35 24;
+  --rgb-warning: 217 142 4;
+  --rgb-shadow: 74 35 52;
+
+  --focus-ring: 0 0 0 3px rgb(var(--rgb-primary) / 0.35);
+
+  /* PrimeVue (saga) theme variables */
+  --primary-color: var(--color-primary);
+  --primary-color-text: var(--color-on-primary);
+  --text-color: var(--color-text);
+  --text-color-secondary: var(--color-text-muted);
+  --surface-ground: var(--color-bg);
+  --surface-border: var(--color-border);
+  --surface-hover: var(--color-primary-soft);
+  --highlight-bg: var(--color-primary-soft);
+  --highlight-text-color: var(--color-primary-strong);
+  --maskbg: rgb(var(--rgb-shadow) / 0.45);
+}
+
 /* ---------- GLOBAL RESET ---------- */
 * {
   box-sizing: border-box;
@@ -10,9 +70,9 @@ html {
 
 body {
   font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  background: var(--color-bg);
   min-height: 100vh;
-  color: #1a202c;
+  color: var(--color-text);
   margin: 0;
   padding: 0;
   font-weight: 400;
@@ -25,14 +85,14 @@ body {
 h3 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #2d3748;
+  color: var(--color-text);
   letter-spacing: -0.025em;
 }
 
 /* ---------- SECTION DIVIDER ---------- */
 .section-divider {
   margin: 2.5rem 0 1.5rem 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--color-border);
   position: relative;
 }
 
@@ -43,7 +103,7 @@ h3 {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, #718096, transparent);
+  background: linear-gradient(90deg, transparent, var(--color-text-muted), transparent);
   opacity: 0.3;
 }
 
@@ -60,8 +120,8 @@ select,
   padding: 0.75rem 1rem;
   font-size: 0.95rem;
   border-radius: 6px;
-  border: 1px solid #cbd5e0;
-  background-color: #ffffff;
+  border: 1px solid var(--color-border-strong);
+  background-color: var(--color-surface);
   box-sizing: border-box;
   transition: all 0.2s ease-in-out;
   width: auto;
@@ -77,8 +137,8 @@ input[data-type="name"] {
 }
 
 input[data-type="name"]:user-invalid {
-  border-color: #fed7d7 !important;
-  background-color: #fff5f5 !important;
+  border-color: var(--color-danger-border) !important;
+  background-color: var(--color-danger-soft) !important;
 }
 
 /* Number fields with reasonable limits */
@@ -96,20 +156,20 @@ input[type="number"]::-webkit-inner-spin-button {
 /* Age/Years validation styling */
 input[data-validation="age"]:user-invalid,
 input[data-validation="years"]:user-invalid {
-  border-color: #fed7d7 !important;
-  background-color: #fff5f5 !important;
+  border-color: var(--color-danger-border) !important;
+  background-color: var(--color-danger-soft) !important;
 }
 
 /* Email validation */
 input[type="email"]:user-invalid {
-  border-color: #fed7d7 !important;
-  background-color: #fff5f5 !important;
+  border-color: var(--color-danger-border) !important;
+  background-color: var(--color-danger-soft) !important;
 }
 
 /* Address validation - prevent special characters except basic punctuation */
 input[data-type="address"]:user-invalid {
-  border-color: #fed7d7 !important;
-  background-color: #fff5f5 !important;
+  border-color: var(--color-danger-border) !important;
+  background-color: var(--color-danger-soft) !important;
 }
 
 /* Date validation */
@@ -118,20 +178,19 @@ input[type="date"] {
 }
 
 input[type="date"]:user-invalid {
-  border-color: #fed7d7 !important;
-  background-color: #fff5f5 !important;
+  border-color: var(--color-danger-border) !important;
+  background-color: var(--color-danger-soft) !important;
 }
 
 /* Valid input styling */
-input:valid:not(:placeholder-shown) {
-  border-color: #9ae6b4 !important;
-  background-color: #f0fff4 !important;
+input:user-valid:not(.p-password-input) {
+  border-color: var(--color-success) !important;
 }
 
 /* Input length warnings */
 .input-warning {
   font-size: 0.75rem;
-  color: #d69e2e;
+  color: var(--color-warning-solid);
   margin-top: 0.25rem;
   display: none;
 }
@@ -142,7 +201,7 @@ input:valid:not(:placeholder-shown) {
 
 .input-error {
   font-size: 0.75rem;
-  color: #e53e3e;
+  color: var(--color-danger);
   margin-top: 0.25rem;
   min-height: 1rem; /* Reserve space to prevent form jumping */
   display: block; /* Always show the container */
@@ -175,7 +234,7 @@ input:valid:not(:placeholder-shown) {
   right: 1rem !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
-  color: #718096 !important;
+  color: var(--color-text-muted) !important;
   cursor: pointer !important;
   font-size: 1rem !important;
 }
@@ -189,7 +248,7 @@ select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5H7z' fill='%23718096'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5H7z' fill='%235E5259'/></svg>");
   background-repeat: no-repeat;
   background-position: right 0.75rem center;
   background-size: 20px;
@@ -219,8 +278,8 @@ textarea:hover,
 .p-multiselect:hover,
 .p-multiselect.p-focus {
   outline: none;
-  border-color: #4299e1;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgb(var(--rgb-primary) / 0.1);
   transition: all 0.2s ease-in-out !important;
 }
 
@@ -231,8 +290,8 @@ textarea[required]:user-invalid,
 .auth-form .p-inputtext:user-invalid,
 .auth-form .p-password input:user-invalid,
 .auth-form .p-password .p-inputtext:user-invalid {
-  border-color: #e53e3e !important;
-  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1) !important;
+  border-color: var(--color-danger) !important;
+  box-shadow: 0 0 0 3px rgb(var(--rgb-danger) / 0.1) !important;
 }
 
 input[required]:valid,
@@ -244,20 +303,20 @@ textarea:not([required]),
 .auth-form .p-inputtext:valid,
 .auth-form .p-password input:valid,
 .auth-form .p-password .p-inputtext:valid {
-  border-color: #cbd5e0;
+  border-color: var(--color-border-strong);
 }
 
 /* ---------- MULTISELECT (PrimeVue) ---------- */
 .p-multiselect {
   border-radius: 6px !important;
-  border: 1px solid #cbd5e0 !important;
-  background-color: #ffffff !important;
+  border: 1px solid var(--color-border-strong) !important;
+  background-color: var(--color-surface) !important;
   transition: all 0.2s ease-in-out !important;
   box-sizing: border-box !important;
   width: auto !important;
   max-width: 400px !important;
   min-width: 320px !important;
-  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5H7z' fill='%23718096'/></svg>") !important;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5H7z' fill='%235E5259'/></svg>") !important;
   background-repeat: no-repeat !important;
   background-position: right 0.75rem center !important;
   background-size: 16px !important;
@@ -298,7 +357,7 @@ textarea:not([required]),
 }
 
 .p-multiselect-label {
-  color: #2d3748 !important;
+  color: var(--color-text) !important;
   font-size: 0.95rem !important;
   line-height: 1.4 !important;
   font-weight: 400 !important;
@@ -314,9 +373,9 @@ textarea:not([required]),
 }
 
 .p-multiselect-token {
-  background-color: #edf2f7 !important;
+  background-color: var(--color-surface-soft) !important;
   border-radius: 4px !important;
-  color: #2d3748 !important;
+  color: var(--color-text) !important;
   font-weight: 500 !important;
   padding: 0.2rem 0.4rem !important;
   margin: 0 !important;
@@ -342,7 +401,7 @@ textarea:not([required]),
 }
 
 .p-multiselect.invalid-border {
-  border-color: #e53e3e !important;
+  border-color: var(--color-danger) !important;
 }
 
 .p-tabview-nav-link:focus {
@@ -350,8 +409,8 @@ textarea:not([required]),
 }
 .p-multiselect.p-focus,
 .p-multiselect.p-inputwrapper-focus {
-  border-color: #4299e1 !important;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgb(var(--rgb-primary) / 0.1) !important;
 }
 
 /* ---------- MULTI-CHECKBOX DROPDOWN ---------- */
@@ -365,8 +424,8 @@ textarea:not([required]),
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #ffffff;
-  border: 1px solid #cbd5e0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
   border-radius: 6px;
   padding: 0.75rem 1rem;
   cursor: pointer;
@@ -378,14 +437,14 @@ textarea:not([required]),
 .multi-checkbox-dropdown > label.inline-label:focus,
 .multi-checkbox-dropdown > label.inline-label:hover {
   outline: none;
-  border-color: #4299e1;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgb(var(--rgb-primary) / 0.1);
 }
 
 .selected-items {
   flex-grow: 1;
   margin-left: 10px;
-  color: #2d3748;
+  color: var(--color-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -396,7 +455,7 @@ textarea:not([required]),
   transition: transform 0.2s ease;
   font-size: 1rem;
   user-select: none;
-  color: #718096;
+  color: var(--color-text-muted);
 }
 
 .dropdown-arrow.open {
@@ -408,11 +467,11 @@ textarea:not([required]),
   top: 100%;
   left: 0;
   width: 100%;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   margin-top: 4px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgb(var(--rgb-shadow) / 0.1), 0 2px 4px -1px rgb(var(--rgb-shadow) / 0.06);
   z-index: 10;
   max-height: 150px;
   overflow-y: auto;
@@ -428,7 +487,7 @@ textarea:not([required]),
 }
 
 .dropdown-options label:hover {
-  background-color: #f7fafc;
+  background-color: var(--color-surface-soft);
 }
 
 .dropdown-options input[type="checkbox"] {
@@ -439,8 +498,8 @@ textarea:not([required]),
 .verification-success {
   text-align: center;
   padding: 2.5rem 2rem;
-  background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
-  border: 1px solid #9ae6b4;
+  background: linear-gradient(135deg, var(--color-success-soft) 0%, var(--color-success-soft) 100%);
+  border: 1px solid var(--color-success-border);
   border-radius: 8px;
   margin-bottom: 2rem;
 }
@@ -455,12 +514,12 @@ textarea:not([required]),
 
 .requirement {
   font-size: 0.75rem;
-  color: #e53e3e;
+  color: var(--color-danger);
   transition: color 0.2s ease-in-out;
 }
 
 .requirement.valid {
-  color: #38a169;
+  color: var(--color-success);
 }
 
 .requirement:before {
@@ -475,20 +534,20 @@ textarea:not([required]),
 
 .verification-success .success-icon {
   font-size: 3rem;
-  color: #38a169;
+  color: var(--color-success);
   margin-bottom: 1rem;
   font-weight: bold;
 }
 
 .verification-success h3 {
-  color: #2f855a;
+  color: var(--color-success-strong);
   font-size: 1.5rem;
   margin-bottom: 1rem;
   font-weight: 600;
 }
 
 .verification-success p {
-  color: #2d3748;
+  color: var(--color-text);
   font-size: 1rem;
   line-height: 1.6;
   margin-bottom: 2rem;
@@ -498,8 +557,8 @@ textarea:not([required]),
 }
 
 .success-btn {
-  background: linear-gradient(135deg, #38a169 0%, #2f855a 100%) !important;
-  color: #ffffff !important;
+  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-strong) 100%) !important;
+  color: var(--color-on-primary) !important;
   border: none !important;
   padding: 0.875rem 2.5rem !important;
   font-weight: 500 !important;
@@ -508,36 +567,36 @@ textarea:not([required]),
 }
 
 .success-btn:hover {
-  background: linear-gradient(135deg, #2f855a 0%, #276749 100%) !important;
+  background: linear-gradient(135deg, var(--color-success-strong) 0%, var(--color-success-strong) 100%) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(56, 161, 105, 0.25) !important;
+  box-shadow: 0 4px 8px rgb(var(--rgb-success) / 0.25) !important;
 }
 
 .verification-error {
   text-align: center;
   padding: 2.5rem 2rem;
-  background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
-  border: 1px solid #feb2b2;
+  background: linear-gradient(135deg, var(--color-danger-soft) 0%, var(--color-danger-border) 100%);
+  border: 1px solid var(--color-danger-border);
   border-radius: 8px;
   margin-bottom: 2rem;
 }
 
 .verification-error .error-icon {
   font-size: 3rem;
-  color: #e53e3e;
+  color: var(--color-danger);
   margin-bottom: 1rem;
   font-weight: bold;
 }
 
 .verification-error h3 {
-  color: #c53030;
+  color: var(--color-danger-strong);
   font-size: 1.5rem;
   margin-bottom: 1rem;
   font-weight: 600;
 }
 
 .verification-error p {
-  color: #2d3748;
+  color: var(--color-text);
   font-size: 1rem;
   line-height: 1.6;
   margin-bottom: 2rem;
@@ -554,8 +613,8 @@ textarea:not([required]),
 }
 
 .resend-btn {
-  background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%) !important;
-  color: #ffffff !important;
+  background: linear-gradient(135deg, var(--color-primary-strong) 0%, var(--color-primary-strong) 100%) !important;
+  color: var(--color-on-primary) !important;
   border: none !important;
   padding: 0.875rem 2rem !important;
   font-weight: 500 !important;
@@ -564,15 +623,15 @@ textarea:not([required]),
 }
 
 .resend-btn:hover {
-  background: linear-gradient(135deg, #2c5282 0%, #2a4365 100%) !important;
+  background: linear-gradient(135deg, var(--color-primary-strong) 0%, var(--color-text) 100%) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 8px rgba(49, 130, 206, 0.25) !important;
+  box-shadow: 0 4px 8px rgb(var(--rgb-primary) / 0.25) !important;
 }
 
 .continue-btn {
-  background: #ffffff !important;
-  color: #718096 !important;
-  border: 1px solid #cbd5e0 !important;
+  background: var(--color-surface) !important;
+  color: var(--color-text-muted) !important;
+  border: 1px solid var(--color-border-strong) !important;
   padding: 0.875rem 2rem !important;
   font-weight: 500 !important;
   border-radius: 6px !important;
@@ -580,11 +639,11 @@ textarea:not([required]),
 }
 
 .continue-btn:hover {
-  color: #2d3748 !important;
-  background: #f7fafc !important;
-  border-color: #a0aec0 !important;
+  color: var(--color-text) !important;
+  background: var(--color-surface-soft) !important;
+  border-color: var(--color-text-subtle) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 2px 4px rgb(var(--rgb-shadow) / 0.05) !important;
 }
 
 @media (max-width: 768px) {
@@ -608,11 +667,11 @@ textarea:not([required]),
   max-width: 420px;
   margin: 0 auto;
   padding: 3rem 2.5rem;
-  background: #ffffff;
+  background: var(--color-surface);
   border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgb(var(--rgb-shadow) / 0.1), 0 2px 4px -1px rgb(var(--rgb-shadow) / 0.06);
   text-align: center;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
 }
 
 .auth-form {
@@ -627,7 +686,7 @@ textarea:not([required]),
   font-weight: 500;
   margin-bottom: 5px;
   display: block;
-  color: #2d3748;
+  color: var(--color-text);
   font-size: 0.95rem;
 }
 
@@ -637,22 +696,22 @@ textarea:not([required]),
   gap: 0.75rem;
   margin-top: 1rem;
   padding: 1rem;
-  background-color: #f7fafc;
+  background-color: var(--color-surface-soft);
   border-radius: 6px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--color-border);
 }
 
 .consent-label {
   font-size: 0.85rem;
   line-height: 1.4rem;
-  color: #4a5568;
+  color: var(--color-text-muted);
 }
 
 .intended-use-note {
   margin: 1.5rem 0 0;
   font-size: 0.8rem;
   line-height: 1.4;
-  color: #718096;
+  color: var(--color-text-muted);
   text-align: center;
 }
 
@@ -662,10 +721,10 @@ textarea:not([required]),
   max-width: 960px;
   margin: 0 auto;
   padding: 3rem 2.5rem;
-  background: #ffffff;
+  background: var(--color-surface);
   border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgb(var(--rgb-shadow) / 0.1), 0 2px 4px -1px rgb(var(--rgb-shadow) / 0.06);
+  border: 1px solid var(--color-border);
 }
 
 .title {
@@ -673,7 +732,7 @@ textarea:not([required]),
   margin-bottom: 2.5rem;
   font-size: 2.25rem;
   font-weight: 700;
-  color: #1a202c;
+  color: var(--color-text);
   letter-spacing: -0.025em;
 }
 
@@ -687,29 +746,29 @@ textarea:not([required]),
 
 .tabs button {
   padding: 0.75rem 1.5rem;
-  border: 1px solid #e2e8f0;
-  background: #f7fafc;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-soft);
   border-radius: 6px 6px 0 0;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   font-weight: 500;
   font-size: 0.95rem;
-  color: #4a5568;
+  color: var(--color-text-muted);
   outline: none;
 }
 
 .tabs button:hover {
-  background-color: #edf2f7;
-  color: #2d3748;
+  background-color: var(--color-surface-soft);
+  color: var(--color-text);
 }
 
 .tabs button.active {
-  background-color: #ffffff;
-  border-bottom-color: #ffffff;
-  border-top: 2px solid #4299e1;
-  color: #2d3748;
+  background-color: var(--color-surface);
+  border-bottom-color: var(--color-surface);
+  border-top: 2px solid var(--color-primary);
+  color: var(--color-text);
   font-weight: 600;
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 -2px 4px rgb(var(--rgb-shadow) / 0.05);
 }
 
 .p-tabview-nav-link:focus {
@@ -725,7 +784,7 @@ textarea:not([required]),
 
 .p-tabview-nav-link:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.15) !important;
+  box-shadow: 0 4px 12px rgb(var(--rgb-primary) / 0.15) !important;
 }
 
 .p-tabview-nav-link::before {
@@ -735,7 +794,7 @@ textarea:not([required]),
   left: 50%;
   width: 0;
   height: 3px;
-  background: linear-gradient(135deg, #4299e1, #3182ce);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-strong));
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translateX(-50%);
   border-radius: 2px 2px 0 0;
@@ -761,10 +820,10 @@ textarea:not([required]),
 }
 
 .p-tabview-nav .p-tabview-nav-link.p-highlight {
-  background: linear-gradient(135deg, rgba(66, 153, 225, 0.05), rgba(49, 130, 206, 0.05)) !important;
+  background: linear-gradient(135deg, rgb(var(--rgb-primary) / 0.05), rgb(var(--rgb-primary) / 0.05)) !important;
   border-bottom-color: transparent !important;
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(66, 153, 225, 0.1) !important;
+  box-shadow: 0 2px 8px rgb(var(--rgb-primary) / 0.1) !important;
 }
 
 .p-tabview-panels {
@@ -795,7 +854,7 @@ label {
   flex-direction: column;
   font-weight: 500;
   font-size: 0.95rem;
-  color: #2d3748;
+  color: var(--color-text);
 }
 
 /* ---------- EXTRA FIELDS SPACING ---------- */
@@ -1413,30 +1472,30 @@ label {
   padding: 0.875rem 2.5rem;
   font-size: 1rem;
   font-weight: 500;
-  color: #ffffff;
-  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  color: var(--color-on-primary);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-strong) 100%);
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   letter-spacing: 0.025em;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgb(var(--rgb-shadow) / 0.1);
 }
 
 .submit-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(66, 153, 225, 0.25);
-  background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+  box-shadow: 0 4px 8px rgb(var(--rgb-primary) / 0.25);
+  background: linear-gradient(135deg, var(--color-primary-strong) 0%, var(--color-primary-strong) 100%);
 }
 
 .submit-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgb(var(--rgb-shadow) / 0.1);
 }
 
 .submit-btn:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
+  box-shadow: 0 0 0 3px rgb(var(--rgb-primary) / 0.3);
 }
 
 /* ---------- HEALTH INFO ---------- */
@@ -1452,7 +1511,7 @@ label {
   min-width: 150px;
   font-weight: 500;
   white-space: nowrap;
-  color: #2d3748;
+  color: var(--color-text);
 }
 
 .health-info-form .radio-group {
@@ -1464,20 +1523,20 @@ label {
 .health-info-form .radio-group label {
   cursor: pointer;
   padding: 0.5rem 1.25rem;
-  border: 1px solid #cbd5e0;
+  border: 1px solid var(--color-border-strong);
   border-radius: 6px;
   transition: all 0.2s ease-in-out;
-  background-color: #ffffff;
+  background-color: var(--color-surface);
   font-weight: 500;
-  color: #4a5568;
+  color: var(--color-text-muted);
   display: flex;
   align-items: center;
 }
 
 .health-info-form .radio-group label:hover {
-  border-color: #4299e1;
-  color: #2d3748;
-  background-color: #f7fafc;
+  border-color: var(--color-primary);
+  color: var(--color-text);
+  background-color: var(--color-surface-soft);
 }
 
 .health-info-form .radio-group input[type="radio"] {
@@ -1485,9 +1544,9 @@ label {
 }
 
 .health-info-form .radio-group input[type="radio"]:checked + label {
-  border-color: #4299e1;
-  color: #2d3748;
-  background-color: #ebf8ff;
+  border-color: var(--color-primary);
+  color: var(--color-text);
+  background-color: var(--color-primary-soft);
   font-weight: 600;
 }
 
@@ -1503,7 +1562,7 @@ label {
 .health-info-form .extra-field .inline-label {
   font-weight: 500;
   white-space: nowrap;
-  color: #2d3748;
+  color: var(--color-text);
 }
 
 .health-info-form .extra-field input {
@@ -1533,7 +1592,7 @@ label {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  color: #2d3748;
+  color: var(--color-text);
 }
 
 .health-info-form .horizontal-group.client-genetics .radio-group {
@@ -1546,10 +1605,10 @@ label {
 .health-info-form .horizontal-group.client-genetics .radio-group label {
   cursor: pointer;
   padding: 0.5rem 1rem;
-  border: 1px solid #cbd5e0;
+  border: 1px solid var(--color-border-strong);
   border-radius: 6px;
-  background-color: #ffffff;
-  color: #4a5568;
+  background-color: var(--color-surface);
+  color: var(--color-text-muted);
   font-weight: 500;
   transition: all 0.2s ease-in-out;
   display: flex;
@@ -1557,9 +1616,9 @@ label {
 }
 
 .health-info-form .horizontal-group.client-genetics .radio-group label:hover {
-  border-color: #4299e1;
-  color: #2d3748;
-  background-color: #f7fafc;
+  border-color: var(--color-primary);
+  color: var(--color-text);
+  background-color: var(--color-surface-soft);
 }
 
 .health-info-form .horizontal-group.client-genetics .radio-group input[type="radio"] {
@@ -1567,9 +1626,9 @@ label {
 }
 
 .health-info-form .horizontal-group.client-genetics .radio-group input[type="radio"]:checked + label {
-  border-color: #4299e1;
-  color: #2d3748;
-  background-color: #ebf8ff;
+  border-color: var(--color-primary);
+  color: var(--color-text);
+  background-color: var(--color-primary-soft);
   font-weight: 600;
 }
 
@@ -1578,8 +1637,8 @@ label {
   padding: 0.75rem 1rem;
   font-size: 0.95rem;
   border-radius: 6px;
-  border: 1px solid #cbd5e0;
-  background-color: #ffffff;
+  border: 1px solid var(--color-border-strong);
+  background-color: var(--color-surface);
   box-sizing: border-box;
   width: 290px;
   height: 42px;
@@ -1591,8 +1650,8 @@ label {
 .p-multiselect {
   margin-top: 0.4rem !important;
   border-radius: 6px !important;
-  border: 1px solid #cbd5e0 !important;
-  background-color: #ffffff !important;
+  border: 1px solid var(--color-border-strong) !important;
+  background-color: var(--color-surface) !important;
   box-sizing: border-box !important;
   transition: all 0.2s ease-in-out !important;
   min-width: 320px !important;
@@ -1627,7 +1686,7 @@ label {
 .p-multiselect-label {
   background: transparent !important;
   border: none !important;
-  color: #2d3748 !important;
+  color: var(--color-text) !important;
   font-size: 0.95rem !important;
   font-weight: 400 !important;
 }
@@ -1642,9 +1701,9 @@ label {
 
 /* Override for multiselect tokens */
 .p-multiselect-token {
-  background-color: #edf2f7 !important;
+  background-color: var(--color-surface-soft) !important;
   border-radius: 4px !important;
-  color: #2d3748 !important;
+  color: var(--color-text) !important;
   font-weight: 500 !important;
   padding: 0.2rem 0.4rem !important;
   margin: 0 !important;
@@ -1668,13 +1727,13 @@ label {
 .p-dropdown:hover,
 .p-multiselect:hover {
   outline: none !important;
-  border-color: #4299e1 !important;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgb(var(--rgb-primary) / 0.1) !important;
 }
 
 .p-dropdown-label.p-placeholder,
 .p-multiselect-label.p-placeholder {
-  color: #a0aec0 !important;
+  color: var(--color-text-subtle) !important;
 }
 
 /* ---------- HOME CONTAINER ---------- */
@@ -1710,9 +1769,9 @@ label {
 
 .admin-tab-btn {
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
-  color: #ffffff;
-  border: 1px solid #9f7aea;
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent) 100%);
+  color: var(--color-on-primary);
+  border: 1px solid var(--color-accent);
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
@@ -1724,36 +1783,36 @@ label {
   height: 44px;
   letter-spacing: 0.025em;
   white-space: nowrap;
-  box-shadow: 0 2px 4px rgba(159, 122, 234, 0.2);
+  box-shadow: 0 2px 4px rgb(var(--rgb-accent) / 0.2);
   margin-top: 4px;
   flex-shrink: 0; /* Prevent shrinking */
 }
 
 .admin-tab-btn:hover,
 .admin-tab-btn:focus {
-  background: linear-gradient(135deg, #805ad5 0%, #6b46c1 100%);
-  border-color: #805ad5;
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent) 100%);
+  border-color: var(--color-accent);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(159, 122, 234, 0.35);
+  box-shadow: 0 4px 12px rgb(var(--rgb-accent) / 0.35);
   outline: none;
 }
 
 .admin-tab-btn:active {
   transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(159, 122, 234, 0.25);
+  box-shadow: 0 2px 6px rgb(var(--rgb-accent) / 0.25);
 }
 
 .admin-tab-btn i {
   font-size: 1rem;
-  color: #ffd700;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  color: var(--color-warning-solid);
+  text-shadow: 0 1px 2px rgb(var(--rgb-shadow) / 0.1);
 }
 
 .logout-tab-btn {
   padding: 0.75rem 1.5rem;
-  background: #ffffff;
-  color: #e53e3e;
-  border: 1px solid #e53e3e;
+  background: var(--color-surface);
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
   border-radius: 8px;
   cursor: pointer;
   font-weight: 500;
@@ -1771,17 +1830,17 @@ label {
 
 .logout-tab-btn:hover,
 .logout-tab-btn:focus {
-  color: #ffffff;
-  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
-  border-color: #e53e3e;
+  color: var(--color-on-primary);
+  background: linear-gradient(135deg, var(--color-danger) 0%, var(--color-danger-strong) 100%);
+  border-color: var(--color-danger);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(229, 62, 62, 0.25);
+  box-shadow: 0 2px 8px rgb(var(--rgb-danger) / 0.25);
   outline: none;
 }
 
 .logout-tab-btn:active {
   transform: translateY(0);
-  box-shadow: 0 1px 4px rgba(229, 62, 62, 0.25);
+  box-shadow: 0 1px 4px rgb(var(--rgb-danger) / 0.25);
 }
 
 .logout-tab-btn i {
@@ -1848,12 +1907,12 @@ label {
 .email-change-section {
   margin-top: 2.5rem;
   padding-top: 2rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--color-border);
 }
 
 .email-change-section h3 {
   margin-bottom: 2rem;
-  color: #2d3748;
+  color: var(--color-text);
   font-size: 1.25rem;
   font-weight: 600;
 }
@@ -1865,26 +1924,26 @@ label {
 .current-email-display label {
   display: block;
   font-weight: 500;
-  color: #2d3748;
+  color: var(--color-text);
   margin-bottom: 0.75rem;
   font-size: 0.95rem;
 }
 
 .current-email {
   padding: 0.875rem 1rem;
-  background-color: #f7fafc;
-  border: 1px solid #e2e8f0;
+  background-color: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
-  color: #4a5568;
+  color: var(--color-text-muted);
   font-size: 0.95rem;
   font-weight: 500;
 }
 
 .change-email-btn,
 .change-password-btn {
-  background: #ffffff;
-  color: #38a169;
-  border: 1px solid #38a169;
+  background: var(--color-surface);
+  color: var(--color-success);
+  border: 1px solid var(--color-success);
   padding: 0.875rem 2rem;
   border-radius: 6px;
   cursor: pointer;
@@ -1896,10 +1955,10 @@ label {
 
 .change-email-btn:hover,
 .change-password-btn:hover {
-  color: #ffffff;
-  background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+  color: var(--color-on-primary);
+  background: linear-gradient(135deg, var(--color-success) 0%, var(--color-success-strong) 100%);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(56, 161, 105, 0.25);
+  box-shadow: 0 2px 8px rgb(var(--rgb-success) / 0.25);
 }
 
 .email-change-buttons {
@@ -1910,9 +1969,9 @@ label {
 }
 
 .save-email-btn {
-  background: #ffffff;
-  color: #3182ce;
-  border: 1px solid #3182ce;
+  background: var(--color-surface);
+  color: var(--color-primary-strong);
+  border: 1px solid var(--color-primary-strong);
   padding: 0.875rem 2rem;
   border-radius: 6px;
   cursor: pointer;
@@ -1923,16 +1982,16 @@ label {
 }
 
 .save-email-btn:hover {
-  color: #ffffff;
-  background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+  color: var(--color-on-primary);
+  background: linear-gradient(135deg, var(--color-primary-strong) 0%, var(--color-primary-strong) 100%);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(49, 130, 206, 0.25);
+  box-shadow: 0 2px 8px rgb(var(--rgb-primary) / 0.25);
 }
 
 .cancel-email-btn {
-  background: #ffffff;
-  color: #718096;
-  border: 1px solid #cbd5e0;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border-strong);
   padding: 0.875rem 2rem;
   border-radius: 6px;
   cursor: pointer;
@@ -1943,11 +2002,11 @@ label {
 }
 
 .cancel-email-btn:hover {
-  color: #2d3748;
-  background: #f7fafc;
-  border-color: #a0aec0;
+  color: var(--color-text);
+  background: var(--color-surface-soft);
+  border-color: var(--color-text-subtle);
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgb(var(--rgb-shadow) / 0.05);
 }
 
 @media (max-width: 768px) {
@@ -1965,39 +2024,39 @@ label {
 
 /* ---------- PRIMEVUE BUTTON OVERRIDES ---------- */
 .p-button {
-  background: #ffffff !important;
-  color: #3182ce !important;
-  border: 1px solid #3182ce !important;
+  background: var(--color-surface) !important;
+  color: var(--color-primary-strong) !important;
+  border: 1px solid var(--color-primary-strong) !important;
   border-radius: 6px !important;
   padding: 0.875rem 2rem !important;
   font-weight: 500 !important;
   font-size: 0.95rem !important;
   letter-spacing: 0.025em !important;
   transition: all 0.2s ease-in-out !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 1px 3px rgb(var(--rgb-shadow) / 0.1) !important;
 }
 
 .p-button:hover {
-  color: #ffffff !important;
-  background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%) !important;
+  color: var(--color-on-primary) !important;
+  background: linear-gradient(135deg, var(--color-primary-strong) 0%, var(--color-primary-strong) 100%) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 2px 8px rgba(49, 130, 206, 0.25) !important;
+  box-shadow: 0 2px 8px rgb(var(--rgb-primary) / 0.25) !important;
 }
 
 .p-button:active {
   transform: translateY(0) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 1px 3px rgb(var(--rgb-shadow) / 0.1) !important;
 }
 
 .p-button:focus {
-  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.25) !important;
+  box-shadow: 0 0 0 3px rgb(var(--rgb-primary) / 0.25) !important;
   outline: none !important;
 }
 
 /* Link Button Variant */
 .p-button.p-button-link {
   background: none !important;
-  color: #3182ce !important;
+  color: var(--color-primary-strong) !important;
   box-shadow: none !important;
   text-decoration: none !important;
   border: 1px solid transparent !important;
@@ -2006,8 +2065,8 @@ label {
 }
 
 .p-button.p-button-link:hover {
-  background: #f7fafc !important;
-  color: #2c5282 !important;
+  background: var(--color-surface-soft) !important;
+  color: var(--color-primary-strong) !important;
   transform: none !important;
   box-shadow: none !important;
 }
@@ -2034,7 +2093,7 @@ button {
 
 button:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.25);
+  box-shadow: 0 0 0 3px rgb(var(--rgb-primary) / 0.25);
 }
 
 button:disabled {
@@ -2072,12 +2131,12 @@ button:disabled {
     .cancel-email-btn:hover,
     .logout-tab-btn:hover {
       transform: none !important;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+      box-shadow: 0 1px 3px rgb(var(--rgb-shadow) / 0.1) !important;
     }
     
     .health-info-form .radio-group label:hover {
-      background-color: #ffffff !important;
-      border-color: #cbd5e0 !important;
+      background-color: var(--color-surface) !important;
+      border-color: var(--color-border-strong) !important;
     }
   }
   
@@ -2118,20 +2177,20 @@ button:disabled {
 .date-input-field .p-inputtext {
   width: 100% !important;
   padding: 0.75rem !important;
-  border: 1px solid #cbd5e0 !important;
+  border: 1px solid var(--color-border-strong) !important;
   border-radius: 6px 0 0 6px !important;
   font-size: 1rem !important;
-  background-color: #ffffff !important;
+  background-color: var(--color-surface) !important;
   height: 3rem !important;
   box-sizing: border-box !important;
 }
 
 .date-input-field .p-button {
-  border: 1px solid #cbd5e0 !important;
+  border: 1px solid var(--color-border-strong) !important;
   border-left: none !important;
   border-radius: 0 6px 6px 0 !important;
-  background: #f7fafc !important;
-  color: #4a5568 !important;
+  background: var(--color-surface-soft) !important;
+  color: var(--color-text-muted) !important;
   height: 3rem !important;
   width: 3rem !important;
   padding: 0 !important;
@@ -2141,8 +2200,8 @@ button:disabled {
 }
 
 .date-input-field .p-button:hover {
-  background: #e2e8f0 !important;
-  color: #2d3748 !important;
+  background: var(--color-border) !important;
+  color: var(--color-text) !important;
 }
 
 .date-input-field .p-button .p-button-icon {
@@ -2151,11 +2210,11 @@ button:disabled {
 
 .date-input-field .p-button .pi-calendar {
   font-size: 1rem !important;
-  color: #4a5568 !important;
+  color: var(--color-text-muted) !important;
 }
 
 .date-input-field .p-button:hover .pi-calendar {
-  color: #2d3748 !important;
+  color: var(--color-text) !important;
 }
 
 /* Ensure consistent form field heights */
@@ -2170,45 +2229,45 @@ button:disabled {
 
 .date-input-field .p-inputtext:focus {
   outline: none !important;
-  border-color: #4299e1 !important;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgb(var(--rgb-primary) / 0.1) !important;
 }
 
 .date-input-field .p-calendar.p-invalid .p-inputtext {
-  border-color: #fed7d7 !important;
-  background-color: #fff5f5 !important;
+  border-color: var(--color-danger-border) !important;
+  background-color: var(--color-danger-soft) !important;
 }
 
 .p-datepicker {
-  border: 1px solid #cbd5e0 !important;
+  border: 1px solid var(--color-border-strong) !important;
   border-radius: 6px !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 4px 6px -1px rgb(var(--rgb-shadow) / 0.1) !important;
 }
 
 .p-datepicker .p-datepicker-header {
-  background: #4299e1 !important;
-  color: white !important;
-  border-bottom: 1px solid #cbd5e0 !important;
+  background: var(--color-primary) !important;
+  color: var(--color-on-primary) !important;
+  border-bottom: 1px solid var(--color-border-strong) !important;
   padding: 0.75rem !important;
 }
 
 .p-datepicker .p-datepicker-title {
-  color: white !important;
+  color: var(--color-on-primary) !important;
 }
 
 .p-datepicker .p-datepicker-prev,
 .p-datepicker .p-datepicker-next {
-  color: white !important;
+  color: var(--color-on-primary) !important;
 }
 
 .p-datepicker .p-datepicker-today > span {
-  background: #4299e1 !important;
-  color: white !important;
+  background: var(--color-primary) !important;
+  color: var(--color-on-primary) !important;
 }
 
 .p-yearpicker .p-yearpicker-year.p-highlight {
-  background: #4299e1 !important;
-  color: white !important;
+  background: var(--color-primary) !important;
+  color: var(--color-on-primary) !important;
 }
 
 /* Date Input Wrapper - New Approach */
@@ -2223,11 +2282,11 @@ button:disabled {
   flex: 1 !important;
   padding: 0.75rem !important;
   padding-right: 0.75rem !important;
-  border: 1px solid #cbd5e0 !important;
+  border: 1px solid var(--color-border-strong) !important;
   border-right: none !important;
   border-radius: 6px 0 0 6px !important;
   font-size: 1rem !important;
-  background-color: #ffffff !important;
+  background-color: var(--color-surface) !important;
   height: 3rem !important;
   box-sizing: border-box !important;
   margin: 0 !important;
@@ -2235,8 +2294,8 @@ button:disabled {
 
 .date-text-input:focus {
   outline: none !important;
-  border-color: #4299e1 !important;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1) !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgb(var(--rgb-primary) / 0.1) !important;
   z-index: 1;
   position: relative;
 }
@@ -2246,11 +2305,11 @@ button:disabled {
 }
 
 .date-calendar-picker .p-button {
-  border: 1px solid #cbd5e0 !important;
+  border: 1px solid var(--color-border-strong) !important;
   border-left: none !important;
   border-radius: 0 6px 6px 0 !important;
-  background: #f7fafc !important;
-  color: #4a5568 !important;
+  background: var(--color-surface-soft) !important;
+  color: var(--color-text-muted) !important;
   height: 3rem !important;
   width: 3rem !important;
   padding: 0 !important;
@@ -2262,17 +2321,17 @@ button:disabled {
 }
 
 .date-calendar-picker .p-button:hover {
-  background: #e2e8f0 !important;
-  color: #2d3748 !important;
+  background: var(--color-border) !important;
+  color: var(--color-text) !important;
 }
 
 .date-calendar-picker .p-button .pi {
   font-size: 1rem !important;
-  color: #4a5568 !important;
+  color: var(--color-text-muted) !important;
 }
 
 .date-calendar-picker .p-button:hover .pi {
-  color: #2d3748 !important;
+  color: var(--color-text) !important;
 }
 
 /* Force icon to show */
@@ -2280,20 +2339,137 @@ button:disabled {
   content: "\e92c" !important; /* Calendar icon unicode */
   font-family: "primeicons" !important;
   font-size: 1rem !important;
-  color: #4a5568 !important;
+  color: var(--color-text-muted) !important;
 }
 
 .date-calendar-picker .p-button:hover::before {
-  color: #2d3748 !important;
+  color: var(--color-text) !important;
 }
 
 /* Fallback if primeicons unicode doesn't work */
 .date-calendar-picker .p-button:empty::after {
   content: "📅" !important;
   font-size: 0.9rem !important;
-  color: #4a5568 !important;
+  color: var(--color-text-muted) !important;
 }
 
 .date-calendar-picker .p-button:hover:empty::after {
-  color: #2d3748 !important;
+  color: var(--color-text) !important;
+}
+/* ---------- PRIMEVUE THEME BRIDGE ----------
+   saga-blue hard-codes its blue; map the components this app uses onto the tokens. */
+.p-button:not(.p-button-link):not(.p-button-text):not(.p-button-outlined) {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+.p-button:not(.p-button-link):not(.p-button-text):not(.p-button-outlined):enabled:hover {
+  background: var(--color-primary-strong);
+  border-color: var(--color-primary-strong);
+}
+.p-button.p-button-link,
+.p-button.p-button-text,
+.p-button.p-button-link:enabled:hover .p-button-label {
+  color: var(--color-primary);
+}
+.p-button:disabled {
+  opacity: 0.55;
+}
+.p-inputtext,
+.p-dropdown,
+.p-multiselect,
+.p-checkbox .p-checkbox-box {
+  border-color: var(--color-border-strong);
+}
+.p-inputtext:enabled:hover,
+.p-inputtext:enabled:focus,
+.p-dropdown:not(.p-disabled):hover,
+.p-dropdown:not(.p-disabled).p-focus,
+.p-multiselect:not(.p-disabled):hover,
+.p-multiselect:not(.p-disabled).p-focus,
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box:hover {
+  border-color: var(--color-primary);
+}
+.p-inputtext:enabled:focus,
+.p-dropdown:not(.p-disabled).p-focus,
+.p-multiselect:not(.p-disabled).p-focus,
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-focus,
+.p-button:focus,
+.p-tabview .p-tabview-nav li .p-tabview-nav-link:not(.p-disabled):focus {
+  box-shadow: var(--focus-ring);
+}
+.p-checkbox .p-checkbox-box.p-highlight,
+.p-checkbox:not(.p-checkbox-disabled) .p-checkbox-box.p-highlight:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.p-tabview .p-tabview-nav {
+  border-color: var(--color-border);
+}
+.p-tabview .p-tabview-nav li .p-tabview-nav-link {
+  color: var(--color-text-muted);
+}
+.p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+  color: var(--color-primary-strong);
+  border-color: var(--color-primary);
+}
+.p-tabview .p-tabview-nav li:not(.p-highlight):not(.p-disabled):hover .p-tabview-nav-link {
+  color: var(--color-primary-strong);
+  border-color: var(--color-primary-border);
+}
+.p-multiselect-panel .p-multiselect-items .p-multiselect-item.p-highlight,
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight,
+.p-datepicker table td > span.p-highlight,
+.p-datepicker .p-yearpicker .p-yearpicker-year.p-highlight,
+.p-datepicker .p-monthpicker .p-monthpicker-month.p-highlight {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+}
+.p-datepicker table td.p-datepicker-today > span {
+  background: var(--color-surface-blush);
+  color: var(--color-text);
+}
+.p-datepicker .p-datepicker-header .p-datepicker-title button:enabled:hover {
+  color: var(--color-primary);
+}
+.p-multiselect.p-multiselect-chip .p-multiselect-token {
+  background: var(--color-surface-blush);
+  color: var(--color-primary-strong);
+}
+.p-toast .p-toast-message {
+  border-width: 0 0 0 5px;
+  color: var(--color-text);
+}
+.p-toast .p-toast-message.p-toast-message-success {
+  background: var(--color-success-soft);
+  border-color: var(--color-success);
+}
+.p-toast .p-toast-message.p-toast-message-error {
+  background: var(--color-danger-soft);
+  border-color: var(--color-danger);
+}
+.p-toast .p-toast-message.p-toast-message-warn {
+  background: var(--color-warning-soft);
+  border-color: var(--color-warning-solid);
+}
+.p-toast .p-toast-message.p-toast-message-info {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
+}
+.p-toast .p-toast-message.p-toast-message-success .p-toast-message-icon { color: var(--color-success); }
+.p-toast .p-toast-message.p-toast-message-error .p-toast-message-icon { color: var(--color-danger); }
+.p-toast .p-toast-message.p-toast-message-warn .p-toast-message-icon { color: var(--color-warning); }
+.p-toast .p-toast-message.p-toast-message-info .p-toast-message-icon { color: var(--color-primary); }
+.p-toast .p-toast-message .p-toast-icon-close { color: var(--color-text-muted); }
+
+/* ---------- FOCUS ----------
+   Earlier rules remove outlines in many places; keyboard focus must stay visible. */
+:is(a, button, input, select, textarea, [role="tab"], [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 2px solid var(--color-primary-strong) !important;
+  outline-offset: 2px !important;
+}
+
+::selection {
+  background: var(--color-surface-blush);
+  color: var(--color-text);
 }

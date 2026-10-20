@@ -11,9 +11,9 @@ smoking, vaping and alcohol use). Administrators can review submissions in an ad
 
 | Sign in | Questionnaire | Admin panel |
 |---|---|---|
-| ![Sign in](docs/screenshots/sign-in.png) | ![Questionnaire](docs/screenshots/questionnaire.png) | ![Admin panel](docs/screenshots/admin-panel.png) |
+| ![Sign in](docs/screenshots/after/auth-desktop.png) | ![Questionnaire](docs/screenshots/after/user-desktop.png) | ![Admin panel](docs/screenshots/after/admin-desktop.png) |
 
-<sub>Screenshots taken against the local Firebase Emulator with synthetic accounts only.</sub>
+<sub>Screenshots taken from the real app running against the local Firebase Emulator, with synthetic accounts only.</sub>
 
 ## ⚠️ Privacy & Intended Use
 
@@ -79,9 +79,49 @@ Security and testing work done after the internship, without redesigning the UI:
 - **Smaller fixes.** Settings writes no longer publish the admin's email address; the save-payload builder
   was moved to [`src/utils/profilePayload.js`](src/utils/profilePayload.js) so the tests exercise exactly
   what the app writes; README claims were corrected to match what is actually enforced.
-- **Light UI polish only.** Required fields no longer show as invalid before the user has touched them,
-  the page background now covers the full viewport, and the sign-in page states that the app gives no
-  medical advice. No redesign.
+- **Light UI fixes.** Required fields no longer show as invalid before the user has touched them,
+  the sign-in page states that the app gives no medical advice, and the duplicated ✓/✗ marks in the
+  password rules were removed.
+
+## 🎨 UI Evolution — Before & After
+
+After the security work the interface was moved from the default blue/green look to a soft pink / rose
+theme that fits a breast-cancer screening context, without changing layouts or features.
+
+| | Before | After |
+|---|---|---|
+| Sign in | ![Before: sign in](docs/screenshots/before/auth-desktop.png) | ![After: sign in](docs/screenshots/after/auth-desktop.png) |
+| Questionnaire | ![Before: questionnaire](docs/screenshots/before/user-desktop.png) | ![After: questionnaire](docs/screenshots/after/user-desktop.png) |
+| Admin panel | ![Before: admin panel](docs/screenshots/before/admin-desktop.png) | ![After: admin panel](docs/screenshots/after/admin-desktop.png) |
+
+<details>
+<summary>Mobile (390 px)</summary>
+
+| Before | After |
+|---|---|
+| ![Before: sign in, mobile](docs/screenshots/before/auth-mobile.png) | ![After: sign in, mobile](docs/screenshots/after/auth-mobile.png) |
+| ![Before: questionnaire, mobile](docs/screenshots/before/user-mobile.png) | ![After: questionnaire, mobile](docs/screenshots/after/user-mobile.png) |
+| ![Before: admin panel, mobile](docs/screenshots/before/admin-mobile.png) | ![After: admin panel, mobile](docs/screenshots/after/admin-mobile.png) |
+
+</details>
+
+Design decisions:
+
+- **One set of tokens.** All colors live as CSS custom properties at the top of
+  [`src/style/main.css`](src/style/main.css); component styles and the PrimeVue theme variables refer to
+  them, and a small "PrimeVue theme bridge" maps the components the app uses (buttons, inputs, tabs,
+  checkbox, dropdown, multiselect, date picker, toast) onto the same tokens.
+- **Palette.** Background `#FFF4F6`, blush surface `#F5DCE4`, text `#27232B`, deep rose `#923657`.
+  The primary rose was darkened from `#C34D75` to `#B03F67` so that it passes WCAG AA as text on the
+  light backgrounds (5.2:1) and with white text on buttons (5.6:1); `#C34D75` is kept for decoration only.
+- **States stay distinct.** Error = red `#B42318`, success = green `#1E7A4E`, warning = amber, each with
+  its own tinted background; the brand rose is never used for errors. A muted plum (`#6E4A7E`) is the
+  secondary accent for charts and badges.
+- **Accessibility.** Body, label and link text is ≥ 4.5:1 on the page and card backgrounds (the lighter
+  "subtle" tone is limited to placeholders, disabled states and icons), form-control borders are ≥ 3:1, and keyboard focus always shows a 2 px deep-rose outline (the old CSS removed outlines in
+  ~20 places).
+- **Mobile.** The admin header now wraps on small screens (the Sign Out button used to be cut off) and
+  the search icon no longer overlaps the placeholder.
 
 ## 🔒 Security Model
 

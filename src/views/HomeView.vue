@@ -1853,10 +1853,10 @@ export default {
   margin-bottom: 0;
   padding-left: 18px;
   font-size: 0.98em;
-  color: #444;
+  color: var(--color-text-muted);
 }
 .password-rules-list .invalid {
-  color: #c0392b;
+  color: var(--color-danger);
   font-weight: 500;
 }
 </style>
